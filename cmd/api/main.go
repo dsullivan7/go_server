@@ -4,12 +4,10 @@ import (
   "log"
   "net/http"
 
-  "github.com/go-chi/chi"
-  UserRoutes "go_server/internal/routes/users"
+  "go_server/internal/routes"
 )
 
 func main() {
-	router := chi.NewRouter()
-  router.Mount("/api/users", UserRoutes.Routes())
+	router := routes.Init()
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
