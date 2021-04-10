@@ -9,7 +9,15 @@ import (
 func Init() *chi.Mux{
 	router := chi.NewRouter()
 
-  router.Mount("/api/users", UserRoutes.Routes())
+  router.Mount("/api", initApi())
+
+	return router
+}
+
+func initApi() *chi.Mux{
+  router := chi.NewRouter()
+
+  router.Mount("/users", UserRoutes.Routes())
 
 	return router
 }
