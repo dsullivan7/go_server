@@ -5,9 +5,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
-
 	"github.com/google/uuid"
-
 	UsersService "go_server/internal/services/users"
 )
 

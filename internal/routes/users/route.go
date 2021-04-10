@@ -2,7 +2,6 @@ package users
 
 import (
 	"github.com/go-chi/chi"
-
 	UsersController "go_server/internal/controllers/users"
 )
 

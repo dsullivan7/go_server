@@ -1,9 +1,9 @@
 package users_test
 
 import (
-	"github.com/google/uuid"
 	"testing"
 
+	"github.com/google/uuid"
 	UsersService "go_server/internal/services/users"
 )
 
