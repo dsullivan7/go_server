@@ -3,18 +3,21 @@ package users_test
 import (
 	"testing"
 
+	"go_server/internal/db"
+	"go_server/internal/models"
 	UsersService "go_server/internal/services/users"
-
-	"github.com/google/uuid"
 )
 
 func TestGet(t *testing.T) {
 	t.Parallel()
 
-	userID := uuid.New()
-	user := UsersService.Get(userID)
+  userCreated := models.User{ FirstName: "FirstName" }
+  db.Connect()
+  db.DB.Create(&userCreated)
 
-	if user.UserID != userID {
-		t.Errorf("userID incorrect, got: %s, want: %s.", user.UserID, userID)
+	userFound := UsersService.Get(userCreated.UserID)
+
+	if userFound.UserID != userCreated.UserID {
+		t.Errorf("userID incorrect, got: %s, want: %s.", userFound.UserID, userCreated.UserID)
 	}
 }
