@@ -1,16 +1,16 @@
-package users
+package users_test
 
 import (
   "testing"
-  "github.com/satori/go.uuid"
+  "github.com/google/uuid"
 
   UsersService "go_server/internal/services/users"
 )
 
 func TestGet(t *testing.T) {
-    ID, err := uuid.NewV4()
-    user := UsersService.Get(ID)
-    if user.UserID != ID {
-       t.Errorf("userID incorrect, got: %s, want: %s.", user.UserID, ID)
+    userID := uuid.New()
+    user := UsersService.Get(userID)
+    if user.UserID != userID {
+       t.Errorf("userID incorrect, got: %s, want: %s.", user.UserID, userID)
     }
 }

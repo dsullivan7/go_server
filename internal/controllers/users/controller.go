@@ -1,24 +1,18 @@
 package users
 
 import (
-  "log"
   "net/http"
 
   "github.com/go-chi/chi"
   "github.com/go-chi/render"
 
-  "github.com/satori/go.uuid"
+  "github.com/google/uuid"
 
   UsersService "go_server/internal/services/users"
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {
-    userID, err := uuid.FromString(chi.URLParam(r, "userID"))
-
-    if err != nil {
-  		log.Printf("Something went wrong: %s", err)
-  		return
-  	}
+  userID := uuid.Must(uuid.Parse(chi.URLParam(r, "userID")))
 
     user := UsersService.Get(userID)
 

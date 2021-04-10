@@ -1,7 +1,7 @@
 package users
 
 import (
-  "github.com/satori/go.uuid"
+  "github.com/google/uuid"
 
   "go_server/internal/models"
 )
