@@ -10,9 +10,9 @@ import (
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {
-    userId := chi.URLParam(r, "userId")
+    userID := chi.URLParam(r, "userID")
 
-    user := UsersService.Get(userId)
+    user := UsersService.Get(userID)
 
     render.JSON(w, r, user)
 }

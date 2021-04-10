@@ -8,6 +8,6 @@ import (
 
 func Routes() *chi.Mux {
   router := chi.NewRouter()
-  router.Get("/{userId}", UsersController.Get)
+  router.Get("/{userID}", UsersController.Get)
   return router
 }

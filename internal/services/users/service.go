@@ -1,12 +1,14 @@
 package users
 
 import (
+  "github.com/google/uuid"
+
   "go_server/internal/models"
 )
 
-func Get(userId string) models.User{
+func Get(userID uuid.UUID) models.User{
   user := models.User {
-    UserId: userId,
+    UserID: userID,
   }
 
   return user
