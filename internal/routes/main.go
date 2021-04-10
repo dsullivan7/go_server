@@ -1,9 +1,10 @@
 package routes
 
 import (
+	UserRoutes "go_server/internal/routes/users"
+
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	UserRoutes "go_server/internal/routes/users"
 )
 
 func Init() *chi.Mux {
@@ -14,12 +15,12 @@ func Init() *chi.Mux {
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 
-	router.Mount("/api", initApi())
+	router.Mount("/api", initAPI())
 
 	return router
 }
 
-func initApi() *chi.Mux {
+func initAPI() *chi.Mux {
 	router := chi.NewRouter()
 
 	router.Mount("/users", UserRoutes.Routes())

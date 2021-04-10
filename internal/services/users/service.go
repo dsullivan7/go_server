@@ -1,8 +1,9 @@
 package users
 
 import (
-	"github.com/google/uuid"
 	"go_server/internal/models"
+
+	"github.com/google/uuid"
 )
 
 func Get(userID uuid.UUID) models.User {
