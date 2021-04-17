@@ -18,3 +18,11 @@ func Get(userID uuid.UUID) models.User {
 
 	return user
 }
+
+func Create() models.User {
+	user := models.User{ FirstName: "FirstName" }
+
+  db.DB.Create(&user)
+
+	return user
+}

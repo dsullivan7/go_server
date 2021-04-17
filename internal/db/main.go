@@ -32,7 +32,10 @@ func Connect() {
     panic("Failed to connect to database!")
   }
 
-  database.AutoMigrate(&models.User{})
-
   DB = database
+}
+
+func Migrate() {
+  DB.Exec("create extension if not exists \"uuid-ossp\"")
+  DB.AutoMigrate(&models.User{})
 }

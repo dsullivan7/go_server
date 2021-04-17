@@ -9,6 +9,7 @@ import (
 func Routes() *chi.Mux {
 	router := chi.NewRouter()
 	router.Get("/{userID}", UsersController.Get)
+	router.Post("/", UsersController.Create)
 
 	return router
 }

@@ -17,3 +17,9 @@ func Get(w http.ResponseWriter, r *http.Request) {
 
 	render.JSON(w, r, user)
 }
+
+func Create(w http.ResponseWriter, r *http.Request) {
+	user := UsersService.Create()
+
+	render.JSON(w, r, user)
+}
