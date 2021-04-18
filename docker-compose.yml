@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  db:
+    image: postgres
+    environment:
+      - PGDATABASE=${DB_NAME}
+      - PGHOST=${DB_HOST}
+      - PGUSER=${DB_USER}
+      - PGPORT=${DB_PORT}
+  db-migrate:
+    image: migrate/migrate
+    volumes:
+      - ./internal/db/migrations:/migrations
+    command: ["-path", "/migrations", "-database",  "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable", "up"]
