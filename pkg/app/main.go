@@ -9,7 +9,6 @@ import (
 
 func Init() {
   db.Connect()
-  db.Migrate()
 
   router := routes.Init()
 
