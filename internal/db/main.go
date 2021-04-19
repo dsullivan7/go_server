@@ -2,8 +2,10 @@ package db
 
 import (
   "go_server/internal/models"
+  "go_server/internal/config"
 
   "fmt"
+  "strings"
 
   "gorm.io/gorm"
   "gorm.io/driver/postgres"
@@ -12,17 +14,26 @@ import (
 var DB *gorm.DB
 
 func Connect() {
-  dbName := "go_server"
-  dbHost := "localhost"
+  var DSN strings.Builder
 
-  DSN := fmt.Sprintf("host=%s dbname=%s sslmode=disable", dbHost, dbName)
+  DSN.WriteString(fmt.Sprintf("host=%s dbname=%s", config.DBHost, config.DBName))
 
-  fmt.Println(DSN)
+  if config.DBUser != "" {
+    DSN.WriteString(fmt.Sprintf(" user=%s", config.DBUser))
+  }
+
+  if config.DBPassword != "" {
+    DSN.WriteString(fmt.Sprintf(" password=%s", config.DBPassword))
+  }
+
+  if config.DBSSL != true {
+    DSN.WriteString(" sslmode=disable")
+  }
 
   database, err := gorm.Open(
     postgres.New(
       postgres.Config{
-        DSN: DSN,
+        DSN: DSN.String(),
       },
     ),
     &gorm.Config{},
