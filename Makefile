@@ -13,3 +13,6 @@ ifeq ($(DB_DROP), yes)
 	$(MAKE) db-create
 endif
 	$(MAKE) db-migrate
+
+app:
+	docker-compose run --rm app
