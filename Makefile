@@ -24,8 +24,8 @@ app:
 
 .PHONY: build
 build:
-	docker run --rm -v ${PWD}:/data -w /data golang:1.16-alpine go build -o bin/app ./cmd/app.go
+	docker run --rm --env-file .env -v ${PWD}:/data -w /data golang:1.16-alpine go build -o bin/app ./cmd/app.go
 
 .PHONY: test
 test:
-	docker-compose run --rm go go test -v ./test/...
+	docker run --rm --env-file .env -v ${PWD}:/data -w /data golang:1.16-alpine go test -v ./test/...
