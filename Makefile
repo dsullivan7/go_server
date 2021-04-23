@@ -22,6 +22,10 @@ endif
 app:
 	docker-compose run --service-ports app go run ./cmd/app.go
 
+.PHONY: build
+build:
+	docker run --rm -v ${PWD}:/data -w /data golang:1.16-alpine go build -o bin/app ./cmd/app.go
+
 .PHONY: test
 test:
-	docker-compose run --rm app go test -v ./test/...
+	docker-compose run --rm go go test -v ./test/...
