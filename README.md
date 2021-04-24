@@ -1,20 +1,20 @@
-#Go Server
+# Go Server
 ---
 A web server built in golang
 
-##Get Started
+## Get Started
 ---
 
-###Docker
+### Docker
 ---
 Install Docker
 https://docs.docker.com/get-docker/
 
-###Environment
+### Environment
 ---
 Environment needs to be specified in an `.env` file
 
-###Initialize Database
+### Initialize Database
 ---
 ```
 make db-run
@@ -22,19 +22,19 @@ make db-create
 make db-migrate
 ```
 
-###Run the web server
+### Run the web server
 ---
 ```
 make run
 ```
 
-###Test
+### Test
 ---
 ```
 make test
 ```
 
-###Build and deploy
+### Build and deploy
 ---
 ```
 make build
