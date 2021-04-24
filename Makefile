@@ -16,15 +16,15 @@ db-start:
 
 .PHONY: db-create
 db-create:
-	docker-compose run --rm db createdb
+	docker run --rm --env-file .env --network="host" postgres:13.2-alpine sh -c "createdb -h \$${DB_HOST} -p \$${DB_PORT} -U \$${DB_USER} \$${DB_NAME}"
 
 .PHONY: db-drop
 db-drop:
-	docker-compose run --rm db dropdb go_server
+	docker run --rm --env-file .env --network="host" postgres:13.2-alpine sh -c "dropdb -h \$${DB_HOST} -p \$${DB_PORT} -U \$${DB_USER} \$${DB_NAME}"
 
 .PHONY: db-migrate
 db-migrate:
-	docker-compose run --rm db-migrate
+	docker run --rm --env-file .env -v ${PWD}/internal/db/migrations:/data -w /data --network="host" --entrypoint "" migrate/migrate sh -c "migrate -path /data -database postgres://\$${DB_USER}:\$${DB_PASSWORD}@\$${DB_HOST}:\$${DB_PORT}/\$${DB_NAME}?sslmode=disable up"
 
 .PHONY: db-init
 db-init:
