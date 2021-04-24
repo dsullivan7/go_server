@@ -1,9 +1,8 @@
 # Go Server
----
+
 A web server built in golang
 
 ## Get Started
----
 
 ### Docker
 ---
