@@ -15,7 +15,7 @@ import (
 
 func TestGet(t *testing.T) {
 	db.Connect()
-	db.DB.Raw("truncate table users")
+	db.DB.Exec("truncate table users")
 
 	testServer := httptest.NewServer(routes.Init())
 	defer testServer.Close()
@@ -54,7 +54,7 @@ func TestGet(t *testing.T) {
 
 func TestList(t *testing.T) {
 	db.Connect()
-	db.DB.Raw("truncate table users")
+	db.DB.Exec("truncate table users")
 
 	testServer := httptest.NewServer(routes.Init())
 	defer testServer.Close()
@@ -114,7 +114,7 @@ func TestList(t *testing.T) {
 
 func TestCreate(t *testing.T) {
 	db.Connect()
-	db.DB.Raw("truncate table users")
+	db.DB.Exec("truncate table users")
 
 	testServer := httptest.NewServer(routes.Init())
 	defer testServer.Close()

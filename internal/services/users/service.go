@@ -13,16 +13,32 @@ func Get(userID uuid.UUID) models.User {
   err := db.DB.Where("user_id = ?", userID).First(&user).Error
 
   if err != nil {
-    panic("User not found")
+    panic("Error finding user")
   }
 
 	return user
 }
 
-func Create() models.User {
-	user := models.User{ FirstName: "FirstName" }
+func List() []models.User {
+  var users []models.User
 
-  db.DB.Create(&user)
+  err := db.DB.Find(&users).Error
+
+  if err != nil {
+    panic("Error listing users")
+  }
+
+	return users
+}
+
+func Create(userPayload models.User) models.User {
+	user := userPayload
+
+  err := db.DB.Create(&user).Error
+
+  if err != nil {
+    panic("Error creating user")
+  }
 
 	return user
 }
