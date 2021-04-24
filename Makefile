@@ -1,3 +1,19 @@
+.PHONY: db-run
+db-run:
+	docker run --name go-server-postgres -p 5432:5432 -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_USER=$$(whoami) -d postgres:13.2-alpine
+
+.PHONY: db-remove
+db-remove:
+	docker rm go-server-postgres
+
+.PHONY: db-stop
+db-stop:
+	docker stop go-server-postgres
+
+.PHONY: db-start
+db-start:
+	docker start go-server-postgres
+
 .PHONY: db-create
 db-create:
 	docker-compose run --rm db createdb
