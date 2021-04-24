@@ -14,7 +14,7 @@ func Init() {
 
   router := routes.Init()
 
-  log.Println("Server started")
+  log.Println(fmt.Sprintf("Server started on port %s", config.Port))
 
   log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", config.Port), router))
 }
