@@ -11,6 +11,8 @@ func Routes() *chi.Mux {
 	router.Get("/{userID}", UsersController.Get)
 	router.Get("/", UsersController.List)
 	router.Post("/", UsersController.Create)
+	router.Delete("/{userID}", UsersController.Delete)
+	router.Put("/{userID}", UsersController.Modify)
 
 	return router
 }

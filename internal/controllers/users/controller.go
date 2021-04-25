@@ -33,5 +33,25 @@ func Create(w http.ResponseWriter, r *http.Request) {
 
 	user := UsersService.Create(userPayload)
 
+	w.WriteHeader(http.StatusCreated)
 	render.JSON(w, r, user)
+}
+
+func Modify(w http.ResponseWriter, r *http.Request) {
+	var userPayload models.User
+	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "userID")))
+
+	json.NewDecoder(r.Body).Decode(&userPayload)
+
+	user := UsersService.Modify(userID, userPayload)
+
+	render.JSON(w, r, user)
+}
+
+func Delete(w http.ResponseWriter, r *http.Request) {
+	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "userID")))
+
+	UsersService.Delete(userID)
+
+	w.WriteHeader(http.StatusNoContent)
 }

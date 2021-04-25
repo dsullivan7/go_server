@@ -42,3 +42,32 @@ func Create(userPayload models.User) models.User {
 
 	return user
 }
+
+func Modify(userID uuid.UUID, userPayload models.User) models.User {
+	var userFound models.User
+
+	errFind := db.DB.Where("user_id = ?", userID).First(&userFound).Error
+
+	if errFind != nil {
+		panic("Error finding user")
+	}
+
+	userFound.FirstName = userPayload.FirstName
+
+  errUpdate := db.DB.Save(&userFound).Error
+
+  if errUpdate != nil {
+    panic("Error updating user")
+  }
+
+	return userFound
+}
+
+func Delete(userID uuid.UUID) {
+
+  errUpdate := db.DB.Delete(&models.User{}, userID).Error
+
+  if errUpdate != nil {
+    panic("Error deleting user")
+  }
+}
