@@ -42,7 +42,7 @@ make deploy
 
 ## Operations
 
-###Create user
+### Create user
 
 ```
 POST
@@ -50,26 +50,30 @@ POST
 { "FirstName": "MyFirstName" }
 ```
 
-###Get user
+### Get user
+
 ```
 GET
 /api/users/:userId
 ```
 
-###List users
+### List users
+
 ```
 GET
 /api/users
 ```
 
-###Modify user
+### Modify user
+
 ```
 PUT
 /api/users/:userId
 { "FirstName": "DifferentFirstName" }
 ```
 
-###Delete user
+### Delete user
+
 ```
 DELETE
 /api/users/:userId
