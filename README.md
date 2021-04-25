@@ -2,7 +2,7 @@
 
 A web server built in golang
 
-## Get Started
+## Set Up
 
 ### Docker
 
@@ -38,4 +38,39 @@ make test
 ```
 make build
 make deploy
+```
+
+## Operations
+
+###Create user
+
+```
+POST
+/api/users/
+{ "FirstName": "MyFirstName" }
+```
+
+###Get user
+```
+GET
+/api/users/:userId
+```
+
+###List users
+```
+GET
+/api/users
+```
+
+###Modify user
+```
+PUT
+/api/users/:userId
+{ "FirstName": "DifferentFirstName" }
+```
+
+###Delete user
+```
+DELETE
+/api/users/:userId
 ```
