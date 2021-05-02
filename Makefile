@@ -60,4 +60,7 @@ build:
 
 .PHONY: test
 test:
-	docker run --rm --env-file $(ENVFILE) -v ${PWD}:/data -w /data $(DOCKER_GOLANG) go test -v $(TESTS)
+	$(MAKE) db-drop
+	$(MAKE) db-create
+	$(MAKE) db-migrate
+	docker run --rm --env-file $(ENVFILE) -v ${PWD}:/data -w /data $(DOCKER_GOLANG) go test $(TESTS)
