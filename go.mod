@@ -3,6 +3,8 @@ module go_server
 go 1.15
 
 require (
+	github.com/auth0/go-jwt-middleware v0.0.0-20190805220309-36081240882b
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/render v1.0.1
 	github.com/google/uuid v1.2.0
