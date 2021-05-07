@@ -14,7 +14,14 @@ import (
 	"go_server/internal/routes"
 	"go_server/internal/models"
 	"go_server/internal/db"
+	"go_server/internal/middlewares"
 )
+
+func init() {
+	middlewares.Auth = func(h http.Handler) http.Handler {
+		return h
+	}
+}
 
 func TestGet(t *testing.T) {
 	db.Connect()
