@@ -13,3 +13,6 @@ var DBHost = os.Getenv("DB_HOST")
 var DBUser = os.Getenv("DB_USER")
 var DBSSL, _ = strconv.ParseBool(os.Getenv("DB_SSL"))
 var DBPassword = os.Getenv("DB_PASSWORD")
+
+var Auth0Domain = os.Getenv("AUTH0_DOMAIN")
+var Auth0Audience = os.Getenv("AUTH0_AUDIENCE")

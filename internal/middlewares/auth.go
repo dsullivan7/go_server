@@ -1,12 +1,15 @@
 package middlewares
 
 import (
+	"fmt"
 	"encoding/json"
 	"net/http"
 	"errors"
 
 	"github.com/auth0/go-jwt-middleware"
 	"github.com/dgrijalva/jwt-go"
+
+	"go_server/internal/config"
 )
 
 type Response struct {
@@ -28,7 +31,7 @@ type JSONWebKeys struct {
 
 func getPemCert(token *jwt.Token) (string, error) {
 	cert := ""
-	resp, err := http.Get("https://go-server-dev.us.auth0.com/.well-known/jwks.json")
+	resp, err := http.Get(fmt.Sprintf("https://%s/.well-known/jwks.json", config.Auth0Domain))
 
 	if err != nil {
 		return cert, err
@@ -59,7 +62,7 @@ func getPemCert(token *jwt.Token) (string, error) {
 var Auth = jwtmiddleware.New(jwtmiddleware.Options {
   ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
     // Verify 'aud' claim
-    aud := "https://go-server.com"
+    aud := config.Auth0Audience
 
     checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(aud, false)
 
@@ -67,7 +70,7 @@ var Auth = jwtmiddleware.New(jwtmiddleware.Options {
       return token, errors.New("Invalid audience.")
     }
     // Verify 'iss' claim
-    iss := "https://go-server-dev.us.auth0.com/"
+    iss := fmt.Sprintf("https://%s/", config.Auth0Domain)
     checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, false)
     if !checkIss {
       return token, errors.New("Invalid issuer.")
