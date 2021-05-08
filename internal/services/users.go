@@ -10,7 +10,7 @@ import (
 func GetUser(userID uuid.UUID) models.User {
   var user models.User
 
-  err := db.DB.Where("user_id = ?", userID).First(&user).Error
+  err := db.DB.First(&user, userID).Error
 
   if err != nil {
     panic("Error finding user")
@@ -19,10 +19,10 @@ func GetUser(userID uuid.UUID) models.User {
 	return user
 }
 
-func ListUsers() []models.User {
+func ListUsers(query *models.User) []models.User {
   var users []models.User
 
-  err := db.DB.Find(&users).Error
+  err := db.DB.Where(query).Find(&users).Error
 
   if err != nil {
     panic("Error listing users")

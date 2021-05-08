@@ -23,7 +23,7 @@ func Init() *chi.Mux {
 func initAPI() *chi.Mux {
 	router := chi.NewRouter()
 
-	router.With(GoServerMiddlewares.Auth).Mount("/users", UserRoutes())
+	router.With(GoServerMiddlewares.Auth).With(GoServerMiddlewares.User).Mount("/users", UserRoutes())
 
 	return router
 }

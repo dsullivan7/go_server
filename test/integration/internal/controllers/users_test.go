@@ -2,12 +2,15 @@ package users_test
 
 import (
 	"fmt"
+	"context"
 	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"errors"
+
+	"github.com/dgrijalva/jwt-go"
 
 	"gorm.io/gorm"
 
@@ -19,7 +22,11 @@ import (
 
 func init() {
 	middlewares.Auth = func(h http.Handler) http.Handler {
-		return h
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			jwtToken := &jwt.Token{ Claims: jwt.MapClaims{ "sub": "auth0|loggedInUser" } }
+	    newContext := context.WithValue(r.Context(), "user", jwtToken)
+      h.ServeHTTP(w, r.WithContext(newContext))
+	  })
 	}
 }
 
@@ -69,8 +76,8 @@ func TestList(t *testing.T) {
 	testServer := httptest.NewServer(routes.Init())
 	defer testServer.Close()
 
-  user1 := models.User{ FirstName: "FirstName1" }
-  user2 := models.User{ FirstName: "FirstName2" }
+  user1 := models.User{ FirstName: "FirstName1", Auth0ID: "Auth0ID1" }
+  user2 := models.User{ FirstName: "FirstName2", Auth0ID: "Auth0ID2" }
   db.DB.Create(&user1)
 	db.DB.Create(&user2)
 
@@ -110,6 +117,10 @@ func TestList(t *testing.T) {
 		t.Fatalf("Expected: %s, Received: %s", user1.FirstName, userResponse.FirstName)
 	}
 
+	if user1.Auth0ID != userResponse.Auth0ID {
+		t.Fatalf("Expected: %s, Received: %s", user1.Auth0ID, userResponse.Auth0ID)
+	}
+
 	for _, value := range usersFound {
     if value.UserID == user2.UserID {
 			userResponse = value
@@ -119,6 +130,10 @@ func TestList(t *testing.T) {
 
 	if user2.FirstName != userResponse.FirstName {
 		t.Fatalf("Expected: %s, Received: %s", user2.FirstName, userResponse.FirstName)
+	}
+
+	if user2.Auth0ID != userResponse.Auth0ID {
+		t.Fatalf("Expected: %s, Received: %s", user2.Auth0ID, userResponse.Auth0ID)
 	}
 }
 
@@ -152,6 +167,10 @@ func TestCreate(t *testing.T) {
 
 	if userResponse.FirstName != "FirstName" {
 		t.Fatalf("Expected: %s, Received: %s", "FirstName", userResponse.FirstName)
+	}
+
+	if userResponse.Auth0ID != "auth0|loggedInUser" {
+		t.Fatalf("Expected: %s, Received: %s", "auth0|loggedInUser", userResponse.Auth0ID)
 	}
 
 	var userFound models.User
