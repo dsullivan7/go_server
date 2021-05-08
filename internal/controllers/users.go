@@ -1,10 +1,10 @@
-package users
+package controllers
 
 import (
 	"net/http"
 	"encoding/json"
 
-	UsersService "go_server/internal/services/users"
+	"go_server/internal/services"
 	"go_server/internal/models"
 
 	"github.com/go-chi/chi"
@@ -12,46 +12,46 @@ import (
 	"github.com/google/uuid"
 )
 
-func Get(w http.ResponseWriter, r *http.Request) {
+func GetUser(w http.ResponseWriter, r *http.Request) {
 	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "userID")))
 
-	user := UsersService.Get(userID)
+	user := services.GetUser(userID)
 
 	render.JSON(w, r, user)
 }
 
-func List(w http.ResponseWriter, r *http.Request) {
-	users := UsersService.List()
+func ListUsers(w http.ResponseWriter, r *http.Request) {
+	users := services.ListUsers()
 
 	render.JSON(w, r, users)
 }
 
-func Create(w http.ResponseWriter, r *http.Request) {
+func CreateUser(w http.ResponseWriter, r *http.Request) {
 	var userPayload models.User
 
 	json.NewDecoder(r.Body).Decode(&userPayload)
 
-	user := UsersService.Create(userPayload)
+	user := services.CreateUser(userPayload)
 
 	w.WriteHeader(http.StatusCreated)
 	render.JSON(w, r, user)
 }
 
-func Modify(w http.ResponseWriter, r *http.Request) {
+func ModifyUser(w http.ResponseWriter, r *http.Request) {
 	var userPayload models.User
 	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "userID")))
 
 	json.NewDecoder(r.Body).Decode(&userPayload)
 
-	user := UsersService.Modify(userID, userPayload)
+	user := services.ModifyUser(userID, userPayload)
 
 	render.JSON(w, r, user)
 }
 
-func Delete(w http.ResponseWriter, r *http.Request) {
+func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "userID")))
 
-	UsersService.Delete(userID)
+	services.DeleteUser(userID)
 
 	w.WriteHeader(http.StatusNoContent)
 }

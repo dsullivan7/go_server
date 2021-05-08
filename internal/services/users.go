@@ -1,4 +1,4 @@
-package users
+package services
 
 import (
 	"go_server/internal/db"
@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func Get(userID uuid.UUID) models.User {
+func GetUser(userID uuid.UUID) models.User {
   var user models.User
 
   err := db.DB.Where("user_id = ?", userID).First(&user).Error
@@ -19,7 +19,7 @@ func Get(userID uuid.UUID) models.User {
 	return user
 }
 
-func List() []models.User {
+func ListUsers() []models.User {
   var users []models.User
 
   err := db.DB.Find(&users).Error
@@ -31,7 +31,7 @@ func List() []models.User {
 	return users
 }
 
-func Create(userPayload models.User) models.User {
+func CreateUser(userPayload models.User) models.User {
 	user := userPayload
 
   err := db.DB.Create(&user).Error
@@ -43,7 +43,7 @@ func Create(userPayload models.User) models.User {
 	return user
 }
 
-func Modify(userID uuid.UUID, userPayload models.User) models.User {
+func ModifyUser(userID uuid.UUID, userPayload models.User) models.User {
 	var userFound models.User
 
 	errFind := db.DB.Where("user_id = ?", userID).First(&userFound).Error
@@ -63,7 +63,7 @@ func Modify(userID uuid.UUID, userPayload models.User) models.User {
 	return userFound
 }
 
-func Delete(userID uuid.UUID) {
+func DeleteUser(userID uuid.UUID) {
 
   errUpdate := db.DB.Delete(&models.User{}, userID).Error
 
