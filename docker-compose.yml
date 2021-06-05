@@ -8,7 +8,6 @@ x-app-environment: &app-environment
   DB_PASSWORD: $DB_PASSWORD
   PORT: $PORT
   AUTH0_DOMAIN: $AUTH0_DOMAIN
-  CGO_ENABLED: $CGO_ENABLED
 
 services:
   app:

@@ -51,4 +51,4 @@ test:
 	$(MAKE) db-drop
 	$(MAKE) db-create
 	$(MAKE) db-migrate
-	docker-compose run --rm app go test -v $(TESTS)
+	docker-compose run --rm -e CGO_ENABLED=0 app go test -v $(TESTS)
