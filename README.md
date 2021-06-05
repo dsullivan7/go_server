@@ -16,7 +16,7 @@ Environment needs to be specified in an `.env` file
 ### Initialize Database
 
 ```
-make db-run
+make db-start
 make db-create
 make db-migrate
 ```

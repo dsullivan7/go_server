@@ -1,0 +1,67 @@
+version: '3.8'
+
+x-app-environment: &app-environment
+  DB_HOST: $DB_HOST
+  DB_PORT: $DB_PORT
+  DB_USER: $DB_USER
+  DB_NAME: $DB_NAME
+  DB_PASSWORD: $DB_PASSWORD
+  PORT: $PORT
+  AUTH0_DOMAIN: $AUTH0_DOMAIN
+  CGO_ENABLED: $CGO_ENABLED
+
+services:
+  app:
+    image: golang:1.16-alpine
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - '${PORT:-7000}:${PORT:-7000}'
+    environment:
+      *app-environment
+
+  deploy:
+    image: alpine:3.13.5
+    working_dir: /app
+    volumes:
+      - ./bin:/app
+    ports:
+      - '${PORT:-7000}:${PORT:-7000}'
+    environment:
+      *app-environment
+
+  build:
+    image: golang:1.16-alpine
+    working_dir: /app
+    volumes:
+      - ./:/app
+
+  postgres:
+    image: postgres:13.2
+    environment:
+      POSTGRES_PASSWORD: $DB_PASSWORD
+    ports:
+      - '${DB_PORT:-5432}:${DB_PORT:-5432}'
+
+  postgres-util:
+    image: postgres:13.2
+    environment:
+      DB_HOST: $DB_HOST
+      DB_PORT: $DB_PORT
+      DB_USER: $DB_USER
+      DB_NAME: $DB_NAME
+      PGPASSWORD: $DB_PASSWORD
+
+  migrate:
+    image: migrate/migrate
+    volumes:
+      - ./internal/db/migrations:/app
+    environment:
+      DB_HOST: $DB_HOST
+      DB_PORT: $DB_PORT
+      DB_USER: $DB_USER
+      DB_NAME: $DB_NAME
+      DB_PASSWORD: $DB_PASSWORD
+    command:
+      [ '-path', '/app', '-database',  'postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable', 'up' ]
