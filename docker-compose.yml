@@ -9,6 +9,15 @@ x-app-environment: &app-environment
   PORT: $PORT
   AUTH0_DOMAIN: $AUTH0_DOMAIN
 
+x-db-environment: &db-environment
+  DB_SSL_MODE: $DB_SSL_MODE
+  DB_HOST: $DB_HOST
+  DB_PORT: $DB_PORT
+  DB_USER: $DB_USER
+  DB_NAME: $DB_NAME
+  DB_PASSWORD: $DB_PASSWORD
+  PGPASSWORD: $DB_PASSWORD
+
 services:
   app:
     image: golang:1.16-alpine
@@ -46,21 +55,13 @@ services:
   postgres-util:
     image: postgres:13.2
     environment:
-      DB_HOST: $DB_HOST
-      DB_PORT: $DB_PORT
-      DB_USER: $DB_USER
-      DB_NAME: $DB_NAME
-      PGPASSWORD: $DB_PASSWORD
+      *db-environment
 
   migrate:
     image: migrate/migrate
     volumes:
       - ./internal/db/migrations:/app
     environment:
-      DB_HOST: $DB_HOST
-      DB_PORT: $DB_PORT
-      DB_USER: $DB_USER
-      DB_NAME: $DB_NAME
-      DB_PASSWORD: $DB_PASSWORD
+      *db-environment
     command:
-      [ '-path', '/app', '-database',  'postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable', 'up' ]
+      [ '-path', '/app', '-database',  'postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL_MODE}', 'up' ]
