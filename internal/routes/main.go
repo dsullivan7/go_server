@@ -5,6 +5,8 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+
+	"go_server/internal/config"
 )
 
 func Init() *chi.Mux {
@@ -24,7 +26,7 @@ func initAPI() *chi.Mux {
 	router := chi.NewRouter()
 
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hello!"))
+		w.Write([]byte(config.DBUser))
 	})
 
 	return router
