@@ -1,14 +1,7 @@
 FROM postgres:13.2
-
-ENV AUTH0_DOMAIN=$AUTH0_DOMAIN
-ENV AUTH0_CUSTOM_DOMAIN=$AUTH0_CUSTOM_DOMAIN
-ENV AUTH0_PERX_API_AUDIENCE=$AUTH0_PERX_API_AUDIENCE
-ENV AUTH0_WEB_CLIENT_ID=$AUTH0_WEB_CLIENT_ID
-
-COPY ./dbinit.sh /
-RUN chmod +x /dbinit.sh
-CMD ["/dbinit.sh"]
+COPY ./dbinit.sh /app
+ENTRYPOINT ["sh", "-c", "/app/dbinit.sh"]
 
 FROM migrate/migrate
 COPY ./internal/db/migrations /app
-CMD ["-path", "/app", "-database", "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL_MODE}", "up"]
+CMD ["-path", "/app", "-database",  "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL_MODE}", "up"]
