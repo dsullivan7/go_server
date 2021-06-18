@@ -2,7 +2,7 @@ package app
 
 import (
 	"go_server/internal/routes"
-	"go_server/internal/db"
+	// "go_server/internal/db"
 	"go_server/internal/config"
 	"fmt"
 	"log"
@@ -10,7 +10,7 @@ import (
 )
 
 func Init() {
-  db.Connect()
+  // db.Connect()
 
   router := routes.Init()
 

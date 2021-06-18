@@ -1,10 +1,14 @@
 package routes
 
 import (
-	GoServerMiddlewares "go_server/internal/middlewares"
+	"net/http"
+
+	// GoServerMiddlewares "go_server/internal/middlewares"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+
+	"go_server/internal/config"
 )
 
 func Init() *chi.Mux {
@@ -23,10 +27,10 @@ func Init() *chi.Mux {
 func initAPI() *chi.Mux {
 	router := chi.NewRouter()
 
-	router.With(GoServerMiddlewares.Auth).With(GoServerMiddlewares.User).Mount("/users", UserRoutes())
-	// router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-	// 	w.Write([]byte(config.DBUser))
-	// })
+	// router.With(GoServerMiddlewares.Auth).With(GoServerMiddlewares.User).Mount("/users", UserRoutes())
+	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(config.DBUser))
+	})
 
 	return router
 }
