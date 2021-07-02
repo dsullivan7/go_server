@@ -18,6 +18,10 @@ func Connect() {
 
   DSN.WriteString(fmt.Sprintf("host=%s dbname=%s", config.DBHost, config.DBName))
 
+  if config.DBPort != "" {
+    DSN.WriteString(fmt.Sprintf(" port=%s", config.DBPort))
+  }
+
   if config.DBUser != "" {
     DSN.WriteString(fmt.Sprintf(" user=%s", config.DBUser))
   }

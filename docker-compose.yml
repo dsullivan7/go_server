@@ -16,6 +16,7 @@ x-db-environment: &db-environment
   DB_USER: $DB_USER
   DB_NAME: $DB_NAME
   DB_PASSWORD: $DB_PASSWORD
+  DB_DROP: $DB_DROP
   PGPASSWORD: $DB_PASSWORD
 
 services:
@@ -29,7 +30,17 @@ services:
     environment:
       *app-environment
 
-  deploy:
+  go-get:
+    image: golang:1.16-alpine
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - '${PORT:-7000}:${PORT:-7000}'
+    environment:
+      *app-environment
+
+  run:
     image: alpine:3.13.5
     working_dir: /app
     volumes:
@@ -52,16 +63,16 @@ services:
     ports:
       - '${DB_PORT:-5432}:5432'
 
-  postgres-util:
-    image: postgres:13.2
+  db-migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile.migrate
     environment:
       *db-environment
 
-  migrate:
-    image: migrate/migrate
-    volumes:
-      - ./internal/db/migrations:/app
+  db-init:
+    build:
+      context: .
+      dockerfile: Dockerfile.db-init
     environment:
       *db-environment
-    command:
-      [ '-path', '/app', '-database',  'postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL_MODE}', 'up' ]

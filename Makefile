@@ -24,23 +24,23 @@ db-drop:
 
 .PHONY: db-migrate
 db-migrate:
-	docker-compose run --rm migrate
+	docker-compose run --rm db-migrate
 
 .PHONY: db-init
 db-init:
-ifeq ($(DB_DROP), yes)
-	$(MAKE) db-drop
-	$(MAKE) db-create
-endif
-	$(MAKE) db-migrate
+	docker-compose run --rm db-init
+
+.PHONY: app
+app:
+	docker-compose run --service-ports app go run ./cmd/app.go
 
 .PHONY: run
 run:
-	docker-compose run --service-ports app go run ./cmd/app.go
+	docker-compose run --service-ports golang ./app
 
-.PHONY: deploy
-deploy:
-	docker-compose run --service-ports deploy ./app
+.PHONY: go-mod-tidy
+go-mod-tidy:
+	docker run --rm -v ${PWD}:/data -w /data ${DOCKER_GOLANG} go mod tidy
 
 .PHONY: build
 build:
