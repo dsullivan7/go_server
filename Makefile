@@ -24,11 +24,11 @@ db-drop:
 
 .PHONY: db-migrate
 db-migrate:
-	docker-compose run --rm db-migrate
+	docker-compose up --build db-migrate
 
 .PHONY: db-init
 db-init:
-	docker-compose run --rm db-init
+	docker-compose up --build db-init
 
 .PHONY: app
 app:

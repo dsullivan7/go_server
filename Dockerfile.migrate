@@ -1,4 +1,4 @@
 FROM migrate/migrate as migrate
 COPY ./internal/db/migrations /app
 ENTRYPOINT ["sh", "-c"]
-CMD ["migrate -path /app -database postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL_MODE} up"]
+CMD ["migrate -verbose -path /app -database postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL_MODE} up"]
