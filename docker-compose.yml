@@ -30,13 +30,23 @@ services:
     environment:
       *app-environment
 
-  go-get:
-    image: golang:1.16-alpine
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.app-dev
     working_dir: /app
     volumes:
       - ./:/app
     ports:
       - '${PORT:-7000}:${PORT:-7000}'
+    environment:
+      *app-environment
+
+  go-get:
+    image: golang:1.16-alpine
+    working_dir: /app
+    volumes:
+      - ./:/app
     environment:
       *app-environment
 

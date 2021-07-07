@@ -34,6 +34,10 @@ db-init:
 app:
 	docker-compose run --service-ports app go run ./cmd/app.go
 
+.PHONY: app-dev
+app-dev:
+	docker-compose up --build app-dev
+
 .PHONY: run
 run:
 	docker-compose run --service-ports golang ./app

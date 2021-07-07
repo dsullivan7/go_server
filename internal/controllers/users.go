@@ -11,7 +11,7 @@ import (
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
 
-  "github.com/dgrijalva/jwt-go"
+  // "github.com/dgrijalva/jwt-go"
 )
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
@@ -33,10 +33,10 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	json.NewDecoder(r.Body).Decode(&userPayload)
 
-	if (userPayload.Auth0ID == "") {
-		auth0Id := r.Context().Value("user").(*jwt.Token).Claims.(jwt.MapClaims)["sub"].(string)
-		userPayload.Auth0ID = auth0Id
-	}
+	// if (userPayload.Auth0ID == "") {
+	// 	auth0Id := r.Context().Value("user").(*jwt.Token).Claims.(jwt.MapClaims)["sub"].(string)
+	// 	userPayload.Auth0ID = auth0Id
+	// }
 
 	user := services.CreateUser(userPayload)
 
