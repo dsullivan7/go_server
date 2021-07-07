@@ -22,7 +22,7 @@ func GetUser(userID uuid.UUID) models.User {
 func ListUsers(query *models.User) []models.User {
   var users []models.User
 
-  err := db.DB.Where(query).Find(&users).Error
+  err := db.DB.Where(query).Order("created_at desc").Find(&users).Error
 
   if err != nil {
     panic("Error listing users")
