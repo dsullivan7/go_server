@@ -56,6 +56,10 @@
         {
           "name": "DB_NAME",
           "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/DB_NAME"
+        },
+        {
+          "name": "ALLOWED_ORIGINS",
+          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/ALLOWED_ORIGINS"
         }
       ]
     }
