@@ -1,7 +1,8 @@
 version: 2.1
 jobs:
   test:
-    machine: true
+    machine:
+      image: ubuntu-2004:202104-01
     working_directory: ~/data
     steps:
       - checkout
