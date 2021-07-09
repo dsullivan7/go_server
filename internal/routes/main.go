@@ -20,10 +20,6 @@ func Init() *chi.Mux {
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 
-	print("allowed origins")
-	print(config.AllowedOrigins)
-	print("\n")
-
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   strings.Split(config.AllowedOrigins, ","),
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
