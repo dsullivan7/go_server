@@ -1,7 +1,11 @@
 version: 2.1
-orbs:
-    hello: circleci/hello-build@0.0.5
-workflows:
-    "Hello Workflow":
-        jobs:
-          - hello/hello-build
+jobs:
+  test:
+    machine: true
+    working_directory: ~/data
+    steps:
+      - checkout
+      - run: make db-start
+      - run: make db-init
+      - run: make db-migrate
+      - run: make test
