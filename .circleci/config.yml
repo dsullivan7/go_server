@@ -9,3 +9,7 @@ jobs:
       - run: make db-init
       - run: make db-migrate
       - run: make test
+workflows:
+  test:
+    jobs:
+      - test
