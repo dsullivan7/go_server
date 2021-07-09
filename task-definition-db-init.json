@@ -17,7 +17,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "tchr-voice",
+          "awslogs-group": "/tchr-voice/db-init",
           "awslogs-region": "us-east-2",
           "awslogs-stream-prefix": "db-init"
         }

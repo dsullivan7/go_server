@@ -2,12 +2,14 @@ package routes
 
 import (
 	"net/http"
-
-	// GoServerMiddlewares "go_server/internal/middlewares"
+	"strings"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
+
+	// GoServerMiddlewares "go_server/internal/middlewares"
+	"go_server/internal/config"
 )
 
 func Init() *chi.Mux {
@@ -18,8 +20,12 @@ func Init() *chi.Mux {
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 
+	print("allowed origins")
+	print(config.AllowedOrigins)
+	print("\n")
+
 	router.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedOrigins:   strings.Split(config.AllowedOrigins, ","),
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},

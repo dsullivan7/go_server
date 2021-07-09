@@ -33,11 +33,16 @@ make run
 make test
 ```
 
-### Build and deploy
+### Build
 
 ```
 make build
-make deploy
+```
+
+### Build Docker Image
+
+```
+docker build -t tchr-voice-app -f Dockerfile.app .
 ```
 
 ## Operations

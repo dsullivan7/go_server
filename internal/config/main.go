@@ -7,6 +7,8 @@ import (
 
 var Port = os.Getenv("PORT")
 
+var AllowedOrigins = os.Getenv("ALLOWED_ORIGINS")
+
 var DBPort = os.Getenv("DB_PORT")
 var DBName = os.Getenv("DB_NAME")
 var DBHost = os.Getenv("DB_HOST")
