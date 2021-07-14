@@ -52,6 +52,4 @@ build:
 
 .PHONY: test
 test:
-	$(MAKE) db-init
-	$(MAKE) db-migrate
 	docker-compose run --rm -e CGO_ENABLED=0 app go test -v $(TESTS)

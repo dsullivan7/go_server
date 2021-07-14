@@ -71,9 +71,11 @@ services:
     image: postgres:12.7
     environment:
       POSTGRES_PASSWORD: $DB_PASSWORD
-      DB_USER: $DB_USER
+      POSTGRES_USER: $DB_USER
     ports:
       - '${DB_PORT:-5432}:5432'
+    volumes:
+      - dbdata_12.7:/var/lib/postgresql/data
 
   db-migrate:
     build:
@@ -88,3 +90,6 @@ services:
       dockerfile: Dockerfile.db-init
     environment:
       *db-environment
+
+volumes:
+  dbdata_12.7:
