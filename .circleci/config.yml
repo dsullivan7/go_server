@@ -4,7 +4,7 @@ jobs:
     machine:
       image: ubuntu-2004:202104-01
     docker:
-      - image: circleci/postgres:9.6-alpine
+      - image: circleci/postgres:12.7
     working_directory: ~/data
     steps:
       - checkout
