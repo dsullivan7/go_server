@@ -1,4 +1,4 @@
-DOCKER_POSTGRES = postgres:13.2
+DOCKER_POSTGRES = postgres:12.7
 DOCKER_ALPINE = alpine:3.13.5
 DOCKER_GOLANG = golang:1.16-alpine
 

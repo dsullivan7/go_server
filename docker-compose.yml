@@ -68,7 +68,7 @@ services:
       - ./:/app
 
   postgres:
-    image: postgres:13.2
+    image: postgres:12.7
     environment:
       POSTGRES_PASSWORD: $DB_PASSWORD
     ports:
