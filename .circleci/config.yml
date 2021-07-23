@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  assume-role: airswap/assume-role@0.2.0
+  aws-cli: circleci/aws-cli@2.0.3
 
 jobs:
   test:
@@ -15,13 +15,9 @@ jobs:
       - run: make db-migrate
       - run: make test
   assume-role:
-    docker:
-      - image: 'circleci/node:current'
+    executor: aws-cli/default
     steps:
-      - assume-role/assume-role:
-          aws-region: 'us-east-2'
-          account-id: '408204130528'
-          role-name: 'SunburstDevAdmin'
+      - aws-cli/setup
 
 workflows:
   test:
