@@ -1,4 +1,8 @@
 version: 2.1
+
+orbs:
+  assume-role: airswap/assume-role@0.2.0
+
 jobs:
   test:
     machine:
@@ -10,7 +14,17 @@ jobs:
       - run: make db-init
       - run: make db-migrate
       - run: make test
+  assume-role:
+    steps:
+      - assume-role/assume-role
+
 workflows:
   test:
     jobs:
       - test
+  deploy:
+    jobs:
+      - assume-role:
+        aws-region: us-east-2
+        account-id: 408204130528
+        role-name: SunburstDevAdmin
