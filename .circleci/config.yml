@@ -6,15 +6,19 @@ orbs:
   aws-ecs: circleci/aws-ecs@2.2.1
 
 commands:
+  aws-debug:
+    steps:
+      - run: |
+          echo "access key id: ${AWS_ACCESS_KEY_ID}"
   aws-assume-role:
-    description: Installs AWS CLI, setup the IAM user keys and assume specified role
+    description: Assumes the specified role
     parameters:
       role:
         description: Role name
         type: string
     steps:
       - run: |
-          temporary_credentials=$(aws sts assume-role --role-arn "arn:aws:iam::${AWS_ACCOUNT_ID}:role/<< parameters.role >>" --role-session-name "ci_session")
+          temporary_credentials=$(aws sts assume-role --role-arn "arn:aws:iam::${AWS_ACCOUNT_ID}:role/<< parameters.role >>" --role-session-name "ci-${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BUILD_NUM}-${CIRCLE_BRANCH}")
 
           echo "Successfully assumed role"
 
@@ -69,6 +73,7 @@ jobs:
           aws-region: AWS_REGION
       - aws-assume-role:
           role: 'SunburstDevAdmin'
+      - aws-debug
       - aws-ecr/build-and-push-image:
           checkout: false
           repo: tchr-voice-app
