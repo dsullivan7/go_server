@@ -41,6 +41,17 @@ jobs:
       - run: make db-init
       - run: make db-migrate
       - run: make test
+
+  build:
+    machine:
+      image: ubuntu-2004:202104-01
+    working_directory: ~/data
+    steps:
+      - checkout
+      - run: make build
+      - store_artifacts:
+          path: ~/data/go_server/bin
+
   assume-role:
     executor: aws-cli/default
     environment:
@@ -55,4 +66,5 @@ workflows:
   test:
     jobs:
       - test
+      - build
       - assume-role
