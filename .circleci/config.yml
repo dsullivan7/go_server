@@ -48,13 +48,14 @@ jobs:
     executor: aws-cli/default
     working_directory: ~/data
     environment:
-      AWS_DEFAULT_REGION: us-east-2
+      AWS_REGION: us-east-2
       AWS_ACCOUNT_ID: '408204130528'
       AWS_ECR_ACCOUNT_URL: '408204130528.dkr.ecr.us-east-2.amazonaws.com'
     steps:
       - attach_workspace:
           at: ~/data
       - aws-cli/setup
+          aws-region: AWS_REGION
       - aws-assume-role:
           role: 'SunburstDevAdmin'
       - aws-ecr/build-and-push-image:
