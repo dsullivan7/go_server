@@ -79,6 +79,5 @@ workflows:
       - test
       - build
       - deploy:
-          context: context-containing-roles
           requires:
             - build
