@@ -50,18 +50,18 @@ jobs:
     environment:
       AWS_REGION: us-east-2
       AWS_ACCOUNT_ID: '408204130528'
-      AWS_ECR_ACCOUNT_URL: '408204130528.dkr.ecr.us-east-2.amazonaws.com'
+      AWS_ECR_ACCOUNT_URL: 408204130528.dkr.ecr.us-east-2.amazonaws.com
     steps:
       - attach_workspace:
           at: ~/data
-      - aws-cli/setup
+      - aws-cli/setup:
           aws-region: AWS_REGION
       - aws-assume-role:
           role: 'SunburstDevAdmin'
       - aws-ecr/build-and-push-image:
           checkout: false
-          repo: 'tchr-voice-app'
-          tag: "${CIRCLE_SHA1}"
+          repo: tchr-voice-app
+          tag: ${CIRCLE_SHA1}
 
 workflows:
   test:
