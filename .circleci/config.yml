@@ -50,7 +50,7 @@ jobs:
       - checkout
       - run: make build
       - store_artifacts:
-          path: ~/data/go_server/bin
+          path: ~/data/bin
 
   assume-role:
     executor: aws-cli/default
