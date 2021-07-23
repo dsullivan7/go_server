@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   aws-cli: circleci/aws-cli@2.0.3
+  aws-ecr: circleci/aws-ecr@7.0.0
 
 commands:
   aws-assume-role:
@@ -15,22 +16,19 @@ commands:
         description: AWS Secret Access Key Variable Name
         type: env_var_name
         default: AWS_SECRET_ACCESS_KEY
-      profile_name:
-        description: AWS Profile Name
-        type: string
-        default: default
-      account:
-        description: AWS account in which the assumed role is
-        type: string
+      account_id:
+        description: AWS Account ID Variable Name
+        type: env_var_name
+        default: AWS_ACCOUNT_ID
       role:
         description: Role name
         type: string
     steps:
       - run: |
-          temp_role=$(aws sts assume-role --role-arn "arn:aws:iam::<< parameters.account >>:role/<< parameters.role >>" --role-session-name "ci_session" --profile << parameters.profile_name >>) && \
-          aws configure set aws_access_key_id $(echo $temp_role | jq .Credentials.AccessKeyId | xargs) --profile << parameters.profile_name >> && \
-          aws configure set aws_secret_access_key $(echo $temp_role | jq .Credentials.SecretAccessKey | xargs) --profile << parameters.profile_name >> && \
-          aws configure set aws_session_token $(echo $temp_role | jq .Credentials.SessionToken | xargs) --profile << parameters.profile_name >>
+          temp_role=$(aws sts assume-role --role-arn "arn:aws:iam::<< parameters.account_id >>:role/<< parameters.role >>" --role-session-name "ci_session" && \
+          aws configure set aws_access_key_id $(echo $temp_role | jq .Credentials.AccessKeyId | xargs) && \
+          aws configure set aws_secret_access_key $(echo $temp_role | jq .Credentials.SecretAccessKey | xargs) && \
+          aws configure set aws_session_token $(echo $temp_role | jq .Credentials.SessionToken | xargs)
 
 jobs:
   test:
@@ -47,10 +45,10 @@ jobs:
     executor: aws-cli/default
     environment:
       AWS_DEFAULT_REGION: us-east-2
+      AWS_ACCOUNT_ID: '408204130528'
     steps:
       - aws-cli/setup
       - aws-assume-role:
-          account: '408204130528'
           role: 'SunburstDevAdmin'
 
 workflows:
