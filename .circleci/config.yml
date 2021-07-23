@@ -15,8 +15,13 @@ jobs:
       - run: make db-migrate
       - run: make test
   assume-role:
+    docker:
+      - image: 'circleci/node:current'
     steps:
-      - assume-role/assume-role
+      - assume-role/assume-role:
+          aws-region: 'us-east-2'
+          account-id: '408204130528'
+          role-name: 'SunburstDevAdmin'
 
 workflows:
   test:
@@ -24,7 +29,4 @@ workflows:
       - test
   deploy:
     jobs:
-      - assume-role:
-        aws-region: us-east-2
-        account-id: 408204130528
-        role-name: SunburstDevAdmin
+      - assume-role
