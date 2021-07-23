@@ -23,7 +23,7 @@ jobs:
   test:
     machine:
       image: ubuntu-2004:202104-01
-    working_directory: /data
+    working_directory: ~/data
     steps:
       - checkout
       - run: make db-start
@@ -34,7 +34,7 @@ jobs:
   build:
     machine:
       image: ubuntu-2004:202104-01
-    working_directory: /data
+    working_directory: ~/data
     steps:
       - checkout
       - run: make build
@@ -46,14 +46,14 @@ jobs:
 
   deploy:
     executor: aws-cli/default
-    working_directory: /data
+    working_directory: ~/data
     environment:
       AWS_DEFAULT_REGION: us-east-2
       AWS_ACCOUNT_ID: '408204130528'
       AWS_ECR_ACCOUNT_URL: '408204130528.dkr.ecr.us-east-2.amazonaws.com'
     steps:
       - attach_workspace:
-          at: /data
+          at: ~/data
       - aws-cli/setup
       - aws-assume-role:
           role: 'SunburstDevAdmin'
