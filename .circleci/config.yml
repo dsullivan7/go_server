@@ -14,10 +14,21 @@ commands:
         type: string
     steps:
       - run: |
-          temp_role=$(aws sts assume-role --role-arn "arn:aws:iam::${AWS_ACCOUNT_ID}:role/<< parameters.role >>" --role-session-name "ci_session") && \
-          aws configure set aws_access_key_id $(echo $temp_role | jq .Credentials.AccessKeyId | xargs) && \
-          aws configure set aws_secret_access_key $(echo $temp_role | jq .Credentials.SecretAccessKey | xargs) && \
-          aws configure set aws_session_token $(echo $temp_role | jq .Credentials.SessionToken | xargs)
+          temporary_credentials=$(aws sts assume-role --role-arn "arn:aws:iam::${AWS_ACCOUNT_ID}:role/<< parameters.role >>" --role-session-name "ci_session")
+
+          echo "Successfully assumed role"
+
+          aws_access_key_id=$(echo $temp_role | jq .Credentials.AccessKeyId | xargs)
+          aws_secret_access_key=$(echo $temp_role | jq .Credentials.SecretAccessKey | xargs)
+          aws_session_token=$(echo $temp_role | jq .Credentials.SessionToken | xargs)
+
+          aws configure set aws_access_key_id $(aws_access_key_id)
+          aws configure set aws_secret_access_key $(aws_secret_access_key)
+          aws configure set aws_session_token $(aws_session_token)
+
+          export AWS_ACCESS_KEY_ID=${aws_access_key_id}
+          export AWS_SECRET_ACCESS_KEY=${aws_secret_access_key}
+          export AWS_SESSION_TOKEN=${aws_session_token}
 
 jobs:
   test:
@@ -62,6 +73,7 @@ jobs:
           checkout: false
           repo: tchr-voice-app
           tag: ${CIRCLE_SHA1}
+          dockerfile: Dockerfile.app
 
 workflows:
   test:
