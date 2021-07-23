@@ -69,7 +69,6 @@ jobs:
           aws-region: AWS_REGION
       - aws-assume-role:
           role: 'SunburstDevAdmin'
-      - aws-debug
       - aws-ecr/build-and-push-image:
           checkout: false
           repo: tchr-voice-app
