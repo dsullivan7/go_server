@@ -6,10 +6,6 @@ orbs:
   aws-ecs: circleci/aws-ecs@2.2.1
 
 commands:
-  aws-debug:
-    steps:
-      - run: |
-          echo "access key id: ${AWS_ACCESS_KEY_ID}"
   aws-assume-role:
     description: Assumes the specified role
     parameters:
@@ -86,5 +82,6 @@ workflows:
       - test
       - build
       - deploy:
+          context: context-containing-roles
           requires:
             - build
