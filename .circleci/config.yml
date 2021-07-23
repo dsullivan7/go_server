@@ -3,6 +3,7 @@ version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@2.0.3
   aws-ecr: circleci/aws-ecr@7.0.0
+  aws-ecs: circleci/aws-ecs@2.2.1
 
 commands:
   aws-assume-role:
@@ -20,15 +21,19 @@ commands:
         description: AWS Account ID Variable Name
         type: env_var_name
         default: AWS_ACCOUNT_ID
+      profile_name:
+        description: AWS Profile Name
+        type: string
+        default: default
       role:
         description: Role name
         type: string
     steps:
       - run: |
-          temp_role=$(aws sts assume-role --role-arn "arn:aws:iam::<< parameters.account_id >>:role/<< parameters.role >>" --role-session-name "ci_session") && \
-          aws configure set aws_access_key_id $(echo $temp_role | jq .Credentials.AccessKeyId | xargs) && \
-          aws configure set aws_secret_access_key $(echo $temp_role | jq .Credentials.SecretAccessKey | xargs) && \
-          aws configure set aws_session_token $(echo $temp_role | jq .Credentials.SessionToken | xargs)
+          temp_role=$(aws sts assume-role --role-arn "arn:aws:iam::<< parameters.account_id >>:role/<< parameters.role >>" --role-session-name "ci_session"  --profile << parameters.profile_name >>) && \
+          aws configure set aws_access_key_id $(echo $temp_role | jq .Credentials.AccessKeyId | xargs) --profile << parameters.profile_name >> && \
+          aws configure set aws_secret_access_key $(echo $temp_role | jq .Credentials.SecretAccessKey | xargs) --profile << parameters.profile_name >> && \
+          aws configure set aws_session_token $(echo $temp_role | jq .Credentials.SessionToken | xargs) --profile << parameters.profile_name >>
 
 jobs:
   test:
