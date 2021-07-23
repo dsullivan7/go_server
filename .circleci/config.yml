@@ -45,6 +45,8 @@ jobs:
       - run: make test
   assume-role:
     executor: aws-cli/default
+    environment:
+      AWS_DEFAULT_REGION: us-east-2
     steps:
       - aws-cli/setup
       - aws-assume-role:
