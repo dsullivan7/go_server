@@ -9,18 +9,6 @@ commands:
   aws-assume-role:
     description: Installs AWS CLI, setup the IAM user keys and assume specified role
     parameters:
-      access_key_id:
-        description: AWS Access Key ID Variable Name
-        type: env_var_name
-        default: AWS_ACCESS_KEY_ID
-      secret_access_key:
-        description: AWS Secret Access Key Variable Name
-        type: env_var_name
-        default: AWS_SECRET_ACCESS_KEY
-      account_id:
-        description: AWS Account ID Variable Name
-        type: env_var_name
-        default: AWS_ACCOUNT_ID
       profile_name:
         description: AWS Profile Name
         type: string
@@ -30,7 +18,7 @@ commands:
         type: string
     steps:
       - run: |
-          temp_role=$(aws sts assume-role --role-arn "arn:aws:iam::<< parameters.account_id >>:role/<< parameters.role >>" --role-session-name "ci_session"  --profile << parameters.profile_name >>) && \
+          temp_role=$(aws sts assume-role --role-arn "arn:aws:iam::${AWS_ACCOUNT_ID}:role/<< parameters.role >>" --role-session-name "ci_session" --profile << parameters.profile_name >>) && \
           aws configure set aws_access_key_id $(echo $temp_role | jq .Credentials.AccessKeyId | xargs) --profile << parameters.profile_name >> && \
           aws configure set aws_secret_access_key $(echo $temp_role | jq .Credentials.SecretAccessKey | xargs) --profile << parameters.profile_name >> && \
           aws configure set aws_session_token $(echo $temp_role | jq .Credentials.SessionToken | xargs) --profile << parameters.profile_name >>
