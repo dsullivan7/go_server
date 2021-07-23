@@ -22,7 +22,7 @@ commands:
           aws_secret_access_key=$(echo $temp_role | jq .Credentials.SecretAccessKey | xargs)
           aws_session_token=$(echo $temp_role | jq .Credentials.SessionToken | xargs)
 
-          echo ${aws_access_key_id}
+          echo "access key id: ${aws_access_key_id}"
 
           aws configure set aws_access_key_id ${aws_access_key_id}
           aws configure set aws_secret_access_key ${aws_secret_access_key}
