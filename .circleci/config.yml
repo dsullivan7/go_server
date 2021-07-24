@@ -80,12 +80,10 @@ jobs:
           repo: tchr-voice-app
           tag: ${CIRCLE_SHA1}
           dockerfile: Dockerfile.app
-      - aws-ecs/deploy-service-update:
+      - aws-ecs/update-service:
           cluster-name: 'tchr-voice-cluster'
           container-image-name-updates: 'container=tchr-voice-service-app,tag=${CIRCLE_SHA1}'
           family: 'tchr-voice-app'
-          requires:
-            - aws-ecr/build-and-push-image
 
 workflows:
   test:
