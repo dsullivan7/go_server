@@ -62,7 +62,7 @@ jobs:
             - Dockerfile.app
 
   deploy:
-    executor: aws-cli/default
+    executor: aws-ecr/default
     working_directory: ~/data
     environment:
       AWS_REGION: us-east-2
@@ -75,8 +75,6 @@ jobs:
           aws-region: AWS_REGION
       - aws-assume-role:
           role: 'SunburstDevAdmin'
-      - setup_remote_docker:
-          docker_layer_caching: true
       - aws-ecr/build-and-push-image:
           checkout: false
           repo: tchr-voice-app
