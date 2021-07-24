@@ -82,8 +82,9 @@ jobs:
           dockerfile: Dockerfile.app
       - aws-ecs/update-service:
           cluster-name: 'tchr-voice-cluster'
-          container-image-name-updates: 'container=tchr-voice-service-app,tag=${CIRCLE_SHA1}'
           family: 'tchr-voice-app'
+          service-name: 'tchr-voice-service-app'
+          container-image-name-updates: 'container=tchr-voice-app,tag=${CIRCLE_SHA1}'
 
 workflows:
   test:
