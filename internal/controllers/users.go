@@ -23,11 +23,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListUsers(w http.ResponseWriter, r *http.Request) {
-	// users := services.ListUsers(&models.User{})
-	firstName := "firstName"
-	lastName := "lastName"
-	user := models.User{ FirstName: &firstName, LastName: &lastName}
-	users := [1]models.User{user}
+	users := services.ListUsers(&models.User{})
 
 	render.JSON(w, r, users)
 }
