@@ -75,6 +75,8 @@ jobs:
           aws-region: AWS_REGION
       - aws-assume-role:
           role: 'SunburstDevAdmin'
+      - setup_remote_docker:
+          docker_layer_caching: true
       - aws-ecr/build-and-push-image:
           checkout: false
           repo: tchr-voice-app
