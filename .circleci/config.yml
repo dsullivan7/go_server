@@ -57,6 +57,8 @@ jobs:
       - run: make build
       - persist_to_workspace:
           root: .
+          paths:
+            - ./*
 
   deploy:
     executor: aws-ecr/default
