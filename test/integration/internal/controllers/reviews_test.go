@@ -1,4 +1,4 @@
-package reviews_test
+package controllers
 
 import (
 	"fmt"
@@ -8,11 +8,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"errors"
+	// "errors"
 
 	"github.com/dgrijalva/jwt-go"
 
-	"gorm.io/gorm"
+	// "gorm.io/gorm"
 
 	"go_server/internal/routes"
 	"go_server/internal/models"
@@ -30,10 +30,10 @@ func init() {
 	}
 }
 
-func TestGet(t *testing.T) {
+func TestGetReview(t *testing.T) {
 	db.Connect()
-	db.DB.Exec("truncate table users")
-	db.DB.Exec("truncate table reviews")
+	db.DB.Exec("truncate table reviews cascade")
+	db.DB.Exec("truncate table users cascade")
 
 	testServer := httptest.NewServer(routes.Init())
 	defer testServer.Close()
@@ -45,7 +45,7 @@ func TestGet(t *testing.T) {
 	db.DB.Create(&user2)
 
 	text := "Text"
-  review := models.Review{ FromUserId: user1.UserID, ToUserId: user2.UserID, Text: &text }
+  review := models.Review{ FromUserID: &user1.UserID, ToUserID: &user2.UserID, Text: &text }
 
   db.DB.Create(&review)
 
@@ -85,10 +85,10 @@ func TestGet(t *testing.T) {
 	}
 }
 
-func TestList(t *testing.T) {
+func TestListReviews(t *testing.T) {
 	db.Connect()
-	db.DB.Exec("truncate table users")
-	db.DB.Exec("truncate table reviews")
+	db.DB.Exec("truncate table reviews cascade")
+	db.DB.Exec("truncate table users cascade")
 
 	testServer := httptest.NewServer(routes.Init())
 	defer testServer.Close()
@@ -104,18 +104,14 @@ func TestList(t *testing.T) {
 	db.DB.Create(&user4)
 
 	text1 := "Text1"
-  review1 := models.Review{ FromUserId: user1.UserID, ToUserId: user2.UserID, Text: &text1 }
+  review1 := models.Review{ FromUserID: &user1.UserID, ToUserID: &user2.UserID, Text: &text1 }
 
 	text2 := "Text2"
-  review2 := models.Review{ FromUserId: user2.UserID, ToUserId: user3.UserID, Text: &text2 }
+  review2 := models.Review{ FromUserID: &user2.UserID, ToUserID: &user3.UserID, Text: &text2 }
 
 	res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/reviews"))
 
 	if errRequest != nil {
-		t.Fatalf("Get: %v", errRequest)
-	}
-
-	if errRequestQuery != nil {
 		t.Fatalf("Get: %v", errRequest)
 	}
 
@@ -146,15 +142,15 @@ func TestList(t *testing.T) {
 	}
 
 	if review1.ReviewID != reviewResponse.ReviewID {
-		t.Fatalf("Expected: %s, Received: %s", review1.ReviewID, *reviewResponse.ReviewID)
+		t.Fatalf("Expected: %s, Received: %s", review1.ReviewID, reviewResponse.ReviewID)
 	}
 
-	if *review1.FromUserId != *reviewResponse.FromUserId {
-		t.Fatalf("Expected: %s, Received: %s", *review1.FromUserId, *reviewResponse.FromUserId)
+	if *review1.FromUserID != *reviewResponse.FromUserID {
+		t.Fatalf("Expected: %s, Received: %s", *review1.FromUserID, *reviewResponse.FromUserID)
 	}
 
-	if *review1.ToUserId != *reviewResponse.ToUserId {
-		t.Fatalf("Expected: %s, Received: %s", *review1.ToUserId, *reviewResponse.ToUserId)
+	if *review1.ToUserID != *reviewResponse.ToUserID {
+		t.Fatalf("Expected: %s, Received: %s", *review1.ToUserID, *reviewResponse.ToUserID)
 	}
 
 	if *review1.Text != *reviewResponse.Text {
@@ -169,15 +165,15 @@ func TestList(t *testing.T) {
 	}
 
 	if review2.ReviewID != reviewResponse.ReviewID {
-		t.Fatalf("Expected: %s, Received: %s", review2.ReviewID, *reviewResponse.ReviewID)
+		t.Fatalf("Expected: %s, Received: %s", review2.ReviewID, reviewResponse.ReviewID)
 	}
 
-	if *review2.FromUserId != *reviewResponse.FromUserId {
-		t.Fatalf("Expected: %s, Received: %s", *review2.FromUserId, *reviewResponse.FromUserId)
+	if *review2.FromUserID != *reviewResponse.FromUserID {
+		t.Fatalf("Expected: %s, Received: %s", *review2.FromUserID, *reviewResponse.FromUserID)
 	}
 
-	if *review2.ToUserId != *reviewResponse.ToUserId {
-		t.Fatalf("Expected: %s, Received: %s", *review2.ToUserId, *reviewResponse.ToUserId)
+	if *review2.ToUserID != *reviewResponse.ToUserID {
+		t.Fatalf("Expected: %s, Received: %s", *review2.ToUserID, *reviewResponse.ToUserID)
 	}
 
 	if *review2.Text != *reviewResponse.Text {
@@ -186,16 +182,15 @@ func TestList(t *testing.T) {
 
 	// test request with query
 
-	res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/reviews?to_user_id=", user3.UserID))
+	res, errRequest = http.Get(fmt.Sprint(testServer.URL, "/api/reviews?to_user_id=", user3.UserID))
 
 	if res.StatusCode != http.StatusOK {
 		t.Fatalf("Expected %d, Received %d", http.StatusOK, res.StatusCode)
 	}
 
-	decoder := json.NewDecoder(res.Body)
+	decoder = json.NewDecoder(res.Body)
 
-	var reviewsFound []models.Review
-	errDecode := decoder.Decode(&reviewsFound)
+	errDecode = decoder.Decode(&reviewsFound)
 
 	if errDecode != nil {
 		t.Fatalf("Decoding error: %v", errDecode)
@@ -205,18 +200,18 @@ func TestList(t *testing.T) {
 		t.Fatalf("Expected: %d, Received: %d", 1, len(reviewsFound))
 	}
 
-	reivewResponse = reviewsFound[0]
+	reviewResponse = reviewsFound[0]
 
 	if review2.ReviewID != reviewResponse.ReviewID {
-		t.Fatalf("Expected: %s, Received: %s", review2.ReviewID, *reviewResponse.ReviewID)
+		t.Fatalf("Expected: %s, Received: %s", review2.ReviewID, reviewResponse.ReviewID)
 	}
 
-	if *review2.FromUserId != *reviewResponse.FromUserId {
-		t.Fatalf("Expected: %s, Received: %s", *review2.FromUserId, *reviewResponse.FromUserId)
+	if *review2.FromUserID != *reviewResponse.FromUserID {
+		t.Fatalf("Expected: %s, Received: %s", *review2.FromUserID, *reviewResponse.FromUserID)
 	}
 
-	if *review2.ToUserId != *reviewResponse.ToUserId {
-		t.Fatalf("Expected: %s, Received: %s", *review2.ToUserId, *reviewResponse.ToUserId)
+	if *review2.ToUserID != *reviewResponse.ToUserID {
+		t.Fatalf("Expected: %s, Received: %s", *review2.ToUserID, *reviewResponse.ToUserID)
 	}
 
 	if *review2.Text != *reviewResponse.Text {
@@ -224,10 +219,10 @@ func TestList(t *testing.T) {
 	}
 }
 
-func TestCreate(t *testing.T) {
+func TestCreateReivew(t *testing.T) {
 	db.Connect()
-	db.DB.Exec("truncate table users")
-	db.DB.Exec("truncate table reviews")
+	db.DB.Exec("truncate table reviews cascade")
+	db.DB.Exec("truncate table users cascade")
 
 	testServer := httptest.NewServer(routes.Init())
 	defer testServer.Close()
@@ -238,7 +233,7 @@ func TestCreate(t *testing.T) {
 	db.DB.Create(&user1)
 	db.DB.Create(&user2)
 
-	var jsonStr = []byte(fmt.Sprint(`{"text":"Text", "from_user_id": "%s", "to_user_id": "%s"}`, &user1.UserID, &user2.UserID))
+	var jsonStr = []byte(fmt.Sprintf(`{"text":"Text", "from_user_id": "%s", "to_user_id": "%s"}`, &user1.UserID, &user2.UserID))
 
 	res, errRequest := http.Post(fmt.Sprint(testServer.URL, "/api/reviews"), "application/json", bytes.NewBuffer(jsonStr))
 
@@ -263,12 +258,12 @@ func TestCreate(t *testing.T) {
 		t.Fatalf("Expected: %s, Received: %s", "Text", *reviewResponse.Text)
 	}
 
-	if *reviewResponse.FromUserID != user1.UserId {
-		t.Fatalf("Expected: %s, Received: %s", user1.UserId, *reviewResponse.FromUserID)
+	if *reviewResponse.FromUserID != user1.UserID {
+		t.Fatalf("Expected: %s, Received: %s", user1.UserID, *reviewResponse.FromUserID)
 	}
 
-	if *reviewResponse.ToUserID != user2.UserId {
-		t.Fatalf("Expected: %s, Received: %s", user2.UserId, *reviewResponse.ToUserID)
+	if *reviewResponse.ToUserID != user2.UserID {
+		t.Fatalf("Expected: %s, Received: %s", user2.UserID, *reviewResponse.ToUserID)
 	}
 
 	var reviewFound models.Review
@@ -282,19 +277,19 @@ func TestCreate(t *testing.T) {
 		t.Fatalf("Expected: %s, Received: %s", "Text", *reviewFound.Text)
 	}
 
-	if *reviewFound.FromUserId != user1.UserID {
-		t.Fatalf("Expected: %s, Received: %s", user1.UserID, *reviewFound.FromUserId)
+	if *reviewFound.FromUserID != user1.UserID {
+		t.Fatalf("Expected: %s, Received: %s", user1.UserID, *reviewFound.FromUserID)
 	}
 
-	if *reviewFound.ToUserId != user2.UserID {
-		t.Fatalf("Expected: %s, Received: %s", user2.UserID, *reviewFound.ToUserId)
+	if *reviewFound.ToUserID != user2.UserID {
+		t.Fatalf("Expected: %s, Received: %s", user2.UserID, *reviewFound.ToUserID)
 	}
 }
 
 // func TestModify(t *testing.T) {
 // 	db.Connect()
-// 	db.DB.Exec("truncate table reviews")
-// 
+// 	db.DB.Exec("truncate table reviews cascade")
+//
 // 	testServer := httptest.NewServer(routes.Init())
 // 	defer testServer.Close()
 //
@@ -359,7 +354,7 @@ func TestCreate(t *testing.T) {
 //
 // func TestDelete(t *testing.T) {
 // 	db.Connect()
-// 	db.DB.Exec("truncate table reviews")
+// 	db.DB.Exec("truncate table reviews cascade")
 //
 // 	testServer := httptest.NewServer(routes.Init())
 // 	defer testServer.Close()

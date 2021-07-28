@@ -1,4 +1,4 @@
-package users_test
+package controllers
 
 import (
 	"fmt"
@@ -30,9 +30,9 @@ func init() {
 	}
 }
 
-func TestGet(t *testing.T) {
+func TestGetUser(t *testing.T) {
 	db.Connect()
-	db.DB.Exec("truncate table users")
+	db.DB.Exec("truncate table users cascade")
 
 	testServer := httptest.NewServer(routes.Init())
 	defer testServer.Close()
@@ -70,9 +70,9 @@ func TestGet(t *testing.T) {
 	}
 }
 
-func TestList(t *testing.T) {
+func TestListUsers(t *testing.T) {
 	db.Connect()
-	db.DB.Exec("truncate table users")
+	db.DB.Exec("truncate table users cascade")
 
 	testServer := httptest.NewServer(routes.Init())
 	defer testServer.Close()
@@ -144,9 +144,9 @@ func TestList(t *testing.T) {
 	}
 }
 
-func TestCreate(t *testing.T) {
+func TestCreateUser(t *testing.T) {
 	db.Connect()
-	db.DB.Exec("truncate table users")
+	db.DB.Exec("truncate table users cascade")
 
 	testServer := httptest.NewServer(routes.Init())
 	defer testServer.Close()
@@ -192,9 +192,9 @@ func TestCreate(t *testing.T) {
 	}
 }
 
-func TestModify(t *testing.T) {
+func TestModifyUser(t *testing.T) {
 	db.Connect()
-	db.DB.Exec("truncate table users")
+	db.DB.Exec("truncate table users cascade")
 
 	testServer := httptest.NewServer(routes.Init())
 	defer testServer.Close()
@@ -258,9 +258,9 @@ func TestModify(t *testing.T) {
 	}
 }
 
-func TestDelete(t *testing.T) {
+func TestDeleteUser(t *testing.T) {
 	db.Connect()
-	db.DB.Exec("truncate table users")
+	db.DB.Exec("truncate table users cascade")
 
 	testServer := httptest.NewServer(routes.Init())
 	defer testServer.Close()

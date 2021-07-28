@@ -1,5 +1,5 @@
 create table reviews (
-  reivew_id uuid primary key unique not null default (uuid_generate_v4()),
+  review_id uuid primary key unique not null default (uuid_generate_v4()),
   from_user_id uuid references users on delete set null on update cascade,
   to_user_id uuid references users on delete set null on update cascade,
   text text,

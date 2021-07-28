@@ -42,6 +42,7 @@ func initAPI() *chi.Mux {
 
 	// router.With(GoServerMiddlewares.Auth).With(GoServerMiddlewares.User).Mount("/users", UserRoutes())
 	router.Mount("/users", UserRoutes())
+	router.Mount("/reviews", ReviewRoutes())
 
 	return router
 }
