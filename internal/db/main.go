@@ -1,7 +1,6 @@
 package db
 
 import (
-  "go_server/internal/models"
   "go_server/internal/config"
 
   "fmt"
@@ -48,9 +47,4 @@ func Connect() {
   }
 
   DB = database
-}
-
-func Migrate() {
-  DB.Exec("create extension if not exists \"uuid-ossp\"")
-  DB.AutoMigrate(&models.User{})
 }

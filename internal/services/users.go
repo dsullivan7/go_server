@@ -52,7 +52,17 @@ func ModifyUser(userID uuid.UUID, userPayload models.User) models.User {
 		panic("Error finding user")
 	}
 
-	userFound.FirstName = userPayload.FirstName
+	if (userPayload.FirstName != nil) {
+		userFound.FirstName = userPayload.FirstName
+	}
+
+	if (userPayload.LastName != nil) {
+		userFound.LastName = userPayload.LastName
+	}
+
+	if (userPayload.Auth0ID != nil) {
+		userFound.Auth0ID = userPayload.Auth0ID
+	}
 
   errUpdate := db.DB.Save(&userFound).Error
 
