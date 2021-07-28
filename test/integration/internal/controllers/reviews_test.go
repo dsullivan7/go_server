@@ -8,11 +8,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	// "errors"
+	"errors"
 
 	"github.com/dgrijalva/jwt-go"
 
-	// "gorm.io/gorm"
+	"gorm.io/gorm"
 
 	"go_server/internal/routes"
 	"go_server/internal/models"
@@ -108,6 +108,9 @@ func TestListReviews(t *testing.T) {
 
 	text2 := "Text2"
   review2 := models.Review{ FromUserID: &user2.UserID, ToUserID: &user3.UserID, Text: &text2 }
+
+	db.DB.Create(&review1)
+	db.DB.Create(&review2)
 
 	res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/reviews"))
 
@@ -286,100 +289,107 @@ func TestCreateReivew(t *testing.T) {
 	}
 }
 
-// func TestModify(t *testing.T) {
-// 	db.Connect()
-// 	db.DB.Exec("truncate table reviews cascade")
-//
-// 	testServer := httptest.NewServer(routes.Init())
-// 	defer testServer.Close()
-//
-// 	firstName:= "firstName"
-//   review := models.Review{ FirstName: &firstName }
-//
-//   db.DB.Create(&review)
-//
-//
-// 	firstNameDifferent := "firstNameDifferent"
-// 	reviewDifferent := models.Review{ FirstName: &firstNameDifferent }
-// 	jsonReq, errJSON := json.Marshal(reviewDifferent)
-//
-// 	if errJSON != nil {
-// 		t.Fatalf("JSON: %v", errJSON)
-// 	}
-//
-// 	req, errRequest := http.NewRequest(http.MethodPut, fmt.Sprint(testServer.URL, "/api/reviews/", review.ReviewID), bytes.NewBuffer(jsonReq))
-// 	client := &http.Client{}
-// 	res, errRequest := client.Do(req)
-//
-// 	if errRequest != nil {
-// 		t.Fatalf("Delete: %v", errRequest)
-// 	}
-//
-// 	if res.StatusCode != http.StatusOK {
-//     t.Fatalf("Expected %d, Received %d", http.StatusOK, res.StatusCode)
-//   }
-//
-// 	decoder := json.NewDecoder(res.Body)
-//
-// 	var reviewResponse models.Review
-// 	errDecode := decoder.Decode(&reviewResponse)
-//
-// 	if errDecode != nil {
-// 		t.Fatalf("Decoding error: %v", errDecode)
-// 	}
-//
-// 	if review.ReviewID != reviewResponse.ReviewID {
-// 		t.Fatalf("Expected: %s, Received: %s", review.ReviewID, reviewResponse.ReviewID)
-// 	}
-//
-// 	if *reviewDifferent.FirstName != *reviewResponse.FirstName {
-// 		t.Fatalf("Expected: %s, Received: %s", *review.FirstName, *reviewResponse.FirstName)
-// 	}
-//
-// 	var reviewFound models.Review
-//   errFound := db.DB.Where("review_id = ?", review.ReviewID).First(&reviewFound).Error
-//
-// 	if errFound != nil {
-// 		t.Fatalf("Error: %v", errFound)
-// 	}
-//
-// 	if review.ReviewID != reviewFound.ReviewID {
-// 		t.Fatalf("Expected: %s, Received: %s", review.ReviewID, reviewFound.ReviewID)
-// 	}
-//
-// 	if *reviewDifferent.FirstName != *reviewFound.FirstName {
-// 		t.Fatalf("Expected: %s, Received: %s", *review.FirstName, *reviewFound.FirstName)
-// 	}
-// }
-//
-// func TestDelete(t *testing.T) {
-// 	db.Connect()
-// 	db.DB.Exec("truncate table reviews cascade")
-//
-// 	testServer := httptest.NewServer(routes.Init())
-// 	defer testServer.Close()
-//
-// 	firstName := "firstName"
-//   review := models.Review{ FirstName: &firstName }
-//
-//   db.DB.Create(&review)
-//
-// 	req, errRequest := http.NewRequest(http.MethodDelete, fmt.Sprint(testServer.URL, "/api/reviews/", review.ReviewID), nil)
-// 	client := &http.Client{}
-// 	res, errRequest := client.Do(req)
-//
-// 	if errRequest != nil {
-// 		t.Fatalf("Delete: %v", errRequest)
-// 	}
-//
-// 	if res.StatusCode != http.StatusNoContent {
-//     t.Fatalf("Expected %d, Received %d", http.StatusNoContent, res.StatusCode)
-//   }
-//
-// 	var reviewFound models.Review
-//   errFound := db.DB.Where("review_id = ?", review.ReviewID).First(&reviewFound).Error
-//
-// 	if !errors.Is(errFound, gorm.ErrRecordNotFound) {
-// 		t.Fatalf("Expected review not to be found")
-// 	}
-// }
+func TestModifyReview(t *testing.T) {
+	db.Connect()
+	db.DB.Exec("truncate table reviews cascade")
+	db.DB.Exec("truncate table users cascade")
+
+	testServer := httptest.NewServer(routes.Init())
+	defer testServer.Close()
+
+	user1 := models.User{}
+	user2 := models.User{}
+
+	db.DB.Create(&user1)
+	db.DB.Create(&user2)
+
+	text := "Text"
+  review := models.Review{ FromUserID: &user1.UserID, ToUserID: &user2.UserID, Text: &text }
+
+	db.DB.Create(&review)
+
+	var jsonStr = []byte(`{"text":"TextDifferent"}`)
+
+	req, errRequest := http.NewRequest(http.MethodPut, fmt.Sprint(testServer.URL, "/api/reviews/", review.ReviewID), bytes.NewBuffer(jsonStr))
+	client := &http.Client{}
+	res, errRequest := client.Do(req)
+
+	if errRequest != nil {
+		t.Fatalf("Delete: %v", errRequest)
+	}
+
+	if res.StatusCode != http.StatusOK {
+    t.Fatalf("Expected %d, Received %d", http.StatusOK, res.StatusCode)
+  }
+
+	decoder := json.NewDecoder(res.Body)
+
+	var reviewResponse models.Review
+	errDecode := decoder.Decode(&reviewResponse)
+
+	if errDecode != nil {
+		t.Fatalf("Decoding error: %v", errDecode)
+	}
+
+	if review.ReviewID != reviewResponse.ReviewID {
+		t.Fatalf("Expected: %s, Received: %s", review.ReviewID, reviewResponse.ReviewID)
+	}
+
+	if *reviewResponse.Text != "TextDifferent" {
+		t.Fatalf("Expected: %s, Received: %s", "TextDifferent", *reviewResponse.Text)
+	}
+
+	var reviewFound models.Review
+  errFound := db.DB.Where("review_id = ?", review.ReviewID).First(&reviewFound).Error
+
+	if errFound != nil {
+		t.Fatalf("Error: %v", errFound)
+	}
+
+	if review.ReviewID != reviewFound.ReviewID {
+		t.Fatalf("Expected: %s, Received: %s", review.ReviewID, reviewFound.ReviewID)
+	}
+
+	if *reviewFound.Text != "TextDifferent" {
+		t.Fatalf("Expected: %s, Received: %s", "TextDifferent", *reviewFound.Text)
+	}
+}
+
+func TestDeleteReview(t *testing.T) {
+	db.Connect()
+	db.DB.Exec("truncate table reviews cascade")
+	db.DB.Exec("truncate table users cascade")
+
+	testServer := httptest.NewServer(routes.Init())
+	defer testServer.Close()
+
+	user1 := models.User{}
+	user2 := models.User{}
+
+	db.DB.Create(&user1)
+	db.DB.Create(&user2)
+
+	text := "Text"
+  review := models.Review{ FromUserID: &user1.UserID, ToUserID: &user2.UserID, Text: &text }
+
+	db.DB.Create(&review)
+
+	req, errRequest := http.NewRequest(http.MethodDelete, fmt.Sprint(testServer.URL, "/api/reviews/", review.ReviewID), nil)
+	client := &http.Client{}
+	res, errRequest := client.Do(req)
+
+	if errRequest != nil {
+		t.Fatalf("Delete: %v", errRequest)
+	}
+
+	if res.StatusCode != http.StatusNoContent {
+    t.Fatalf("Expected %d, Received %d", http.StatusNoContent, res.StatusCode)
+  }
+
+	var reviewFound models.Review
+  errFound := db.DB.Where("review_id = ?", review.ReviewID).First(&reviewFound).Error
+
+	if !errors.Is(errFound, gorm.ErrRecordNotFound) {
+		t.Fatalf("Expected review not to be found")
+	}
+}

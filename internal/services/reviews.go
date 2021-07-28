@@ -19,7 +19,7 @@ func GetReview(reviewID uuid.UUID) models.Review {
 	return review
 }
 
-func ListReviews(query *models.Review) []models.Review {
+func ListReviews(query map[string]interface{}) []models.Review {
   var reviews []models.Review
 
   err := db.DB.Where(query).Order("created_at desc").Find(&reviews).Error

@@ -21,7 +21,19 @@ func GetReview(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListReviews(w http.ResponseWriter, r *http.Request) {
-	reviews := services.ListReviews(&models.Review{})
+	query := map[string]interface{}{}
+	fromUserID := r.URL.Query().Get("from_user_id")
+	toUserID := r.URL.Query().Get("to_user_id")
+
+	if (fromUserID != "") {
+		query["from_user_id"] = fromUserID
+	}
+
+	if (toUserID != "") {
+		query["to_user_id"] = toUserID
+	}
+
+	reviews := services.ListReviews(query)
 
 	render.JSON(w, r, reviews)
 }
