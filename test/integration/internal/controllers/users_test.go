@@ -199,21 +199,20 @@ func TestModifyUser(t *testing.T) {
 	testServer := httptest.NewServer(routes.Init())
 	defer testServer.Close()
 
-	firstName:= "firstName"
-  user := models.User{ FirstName: &firstName }
+	firstName:= "FirstName"
+	lastName:= "LastName"
+	auth0ID:= "Auth0ID"
+  user := models.User{
+		FirstName: &firstName,
+		LastName: &lastName,
+		Auth0ID: &auth0ID,
+	}
 
   db.DB.Create(&user)
 
+	var jsonStr = []byte(`{"first_name":"FirstNameDifferent", "last_name": "LastNameDifferent", "auth0_id": "Auth0IDDifferent"}`)
 
-	firstNameDifferent := "firstNameDifferent"
-	userDifferent := models.User{ FirstName: &firstNameDifferent }
-	jsonReq, errJSON := json.Marshal(userDifferent)
-
-	if errJSON != nil {
-		t.Fatalf("JSON: %v", errJSON)
-	}
-
-	req, errRequest := http.NewRequest(http.MethodPut, fmt.Sprint(testServer.URL, "/api/users/", user.UserID), bytes.NewBuffer(jsonReq))
+	req, errRequest := http.NewRequest(http.MethodPut, fmt.Sprint(testServer.URL, "/api/users/", user.UserID), bytes.NewBuffer(jsonStr))
 	client := &http.Client{}
 	res, errRequest := client.Do(req)
 
@@ -238,8 +237,16 @@ func TestModifyUser(t *testing.T) {
 		t.Fatalf("Expected: %s, Received: %s", user.UserID, userResponse.UserID)
 	}
 
-	if *userDifferent.FirstName != *userResponse.FirstName {
-		t.Fatalf("Expected: %s, Received: %s", *user.FirstName, *userResponse.FirstName)
+	if *userResponse.FirstName != "FirstNameDifferent" {
+		t.Fatalf("Expected: %s, Received: %s", "FirstNameDifferent", *userResponse.FirstName)
+	}
+
+	if *userResponse.LastName != "LastNameDifferent" {
+		t.Fatalf("Expected: %s, Received: %s", "LastNameDifferent", *userResponse.LastName)
+	}
+
+	if *userResponse.Auth0ID != "Auth0IDDifferent" {
+		t.Fatalf("Expected: %s, Received: %s", "Auth0IDDifferent", *userResponse.Auth0ID)
 	}
 
 	var userFound models.User
@@ -253,8 +260,16 @@ func TestModifyUser(t *testing.T) {
 		t.Fatalf("Expected: %s, Received: %s", user.UserID, userFound.UserID)
 	}
 
-	if *userDifferent.FirstName != *userFound.FirstName {
-		t.Fatalf("Expected: %s, Received: %s", *user.FirstName, *userFound.FirstName)
+	if *userFound.FirstName != "FirstNameDifferent" {
+		t.Fatalf("Expected: %s, Received: %s", "FirstNameDifferent", *userFound.FirstName)
+	}
+
+	if *userFound.LastName != "LastNameDifferent" {
+		t.Fatalf("Expected: %s, Received: %s", "LastNameDifferent", *userFound.LastName)
+	}
+
+	if *userFound.Auth0ID != "Auth0IDDifferent" {
+		t.Fatalf("Expected: %s, Received: %s", "Auth0IDDifferent", *userFound.Auth0ID)
 	}
 }
 
