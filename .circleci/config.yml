@@ -77,6 +77,16 @@ jobs:
           role: 'SunburstDevAdmin'
       - aws-ecr/build-and-push-image:
           checkout: false
+          repo: tchr-voice-db-init
+          tag: ${CIRCLE_SHA1}
+          dockerfile: Dockerfile.db-init
+      - aws-ecs/run-task:
+          cluster-name: 'tchr-voice-cluster'
+          task-definition: 'tchr-voice-db-init'
+          subnet-ids: 'subnet-07c96383382d15162,subnet-0eea121729d78f36d'
+          security-group-ids: 'sg-0e5b2cdefdfe35af9'
+      - aws-ecr/build-and-push-image:
+          checkout: false
           repo: tchr-voice-app
           tag: ${CIRCLE_SHA1}
           dockerfile: Dockerfile.app
