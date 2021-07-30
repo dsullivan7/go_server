@@ -35,6 +35,18 @@ commands:
             echo "export AWS_SECRET_ACCESS_KEY=${aws_secret_access_key}";
             echo "export AWS_SESSION_TOKEN=${aws_session_token}";
           } >> "$BASH_ENV"
+  envsubst:
+    description: Assumes the specified role
+    parameters:
+      input-file:
+        description: Input file
+        type: string
+      output-file:
+        description: Output file
+        type: string
+    steps:
+      - run: |
+          envsubst < parameters.input-file > parameters.output-file
 
 jobs:
   test:
@@ -79,6 +91,11 @@ jobs:
           repo: tchr-voice-db-init
           tag: ${CIRCLE_SHA1}
           dockerfile: Dockerfile.db-init
+      - envsubst:
+          input: task-definition-db-init.template.json
+          output: task-definition.json
+      - aws-ecs/update-task-definition-from-json:
+          task-definition-json: task-definition.json
       - aws-ecs/run-task:
           cluster: 'tchr-voice-cluster'
           task-definition: 'tchr-voice-db-init'
@@ -89,6 +106,11 @@ jobs:
           repo: tchr-voice-migrate
           tag: ${CIRCLE_SHA1}
           dockerfile: Dockerfile.migrate
+      - envsubst:
+          input: task-definition-migrate.template.json
+          output: task-definition.json
+      - aws-ecs/update-task-definition-from-json:
+          task-definition-json: task-definition.json
       - aws-ecs/run-task:
           cluster: 'tchr-voice-cluster'
           task-definition: 'tchr-voice-migrate'
