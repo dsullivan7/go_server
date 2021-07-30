@@ -38,15 +38,15 @@ commands:
   envsubst:
     description: Assumes the specified role
     parameters:
-      input-file:
+      input:
         description: Input file
         type: string
-      output-file:
+      output:
         description: Output file
         type: string
     steps:
       - run: |
-          envsubst < parameters.input-file > parameters.output-file
+          envsubst < parameters.input > parameters.output
 
 jobs:
   test:
