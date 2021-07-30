@@ -46,7 +46,7 @@ commands:
         type: string
     steps:
       - run: |
-          envsubst < parameters.input > parameters.output
+          envsubst < << parameters.input >> > << parameters.output >>
 
 jobs:
   test:
