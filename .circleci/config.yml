@@ -121,6 +121,9 @@ jobs:
           repo: tchr-voice-app
           tag: ${CIRCLE_SHA1}
           dockerfile: Dockerfile.app
+      - envsubst:
+          input: task-definition-app.template.json
+          output: task-definition.json
       - aws-ecs/update-service:
           cluster-name: 'tchr-voice-cluster'
           family: 'tchr-voice-app'
@@ -128,7 +131,7 @@ jobs:
           container-image-name-updates: 'container=tchr-voice-app,tag=${CIRCLE_SHA1}'
 
 workflows:
-  test:
+  pipeline:
     jobs:
       - test
       - build
