@@ -1,0 +1,67 @@
+{
+  "family": "tchr-voice-app",
+  "executionRoleArn": "arn:aws:iam::408204130528:role/tchr_voice_ecs_execution_role",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "256",
+  "memory": "1024",
+  "containerDefinitions": [
+    {
+      "name": "tchr-voice-app",
+      "image": "408204130528.dkr.ecr.us-east-2.amazonaws.com/tchr-voice-app:latest",
+      "essential": true,
+      "cpu": 10,
+      "memory": 512,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/tchr-voice/app",
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "app"
+        }
+      },
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "hostPort": 80
+        }
+      ],
+      "secrets": [
+        {
+          "name": "PORT",
+          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/PORT"
+        },
+        {
+          "name": "DB_USER",
+          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/DB_USER"
+        },
+        {
+          "name": "DB_PASSWORD",
+          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/DB_PASSWORD"
+        },
+        {
+          "name": "DB_HOST",
+          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/DB_HOST"
+        },
+        {
+          "name": "DB_PORT",
+          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/DB_PORT"
+        },
+        {
+          "name": "DB_SSL",
+          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/DB_SSL"
+        },
+        {
+          "name": "DB_NAME",
+          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/DB_NAME"
+        },
+        {
+          "name": "ALLOWED_ORIGINS",
+          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/ALLOWED_ORIGINS"
+        }
+      ]
+    }
+  ]
+}
