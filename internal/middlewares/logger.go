@@ -15,10 +15,12 @@ func Logger(l *zap.Logger) func(next http.Handler) http.Handler {
 			ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
 
 			t1 := time.Now()
+
 			defer func() {
 				l.Info("Response",
 					zap.String("proto", r.Proto),
 					zap.String("path", r.URL.Path),
+					zap.Any("query", r.URL.Query()),
 					zap.Duration("lat", time.Since(t1)),
 					zap.Int("status", ww.Status()),
 					zap.Int("size", ww.BytesWritten()),
