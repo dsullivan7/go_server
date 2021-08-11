@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"errors"
 
 	"github.com/dgrijalva/jwt-go"
 
@@ -18,6 +17,8 @@ import (
 	"go_server/internal/models"
 	"go_server/internal/db"
 	"go_server/internal/middlewares"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {
@@ -37,37 +38,33 @@ func TestGetUser(t *testing.T) {
 	testServer := httptest.NewServer(routes.Init())
 	defer testServer.Close()
 
-	firstName := "FirstName"
-  user := models.User{ FirstName: &firstName }
+	firstName := "firstName"
+	lastName := "lastName"
+	auth0ID := "auth0ID"
+
+  user := models.User{
+		FirstName: &firstName,
+		LastName: &lastName,
+		Auth0ID: &auth0ID,
+	 }
 
   db.DB.Create(&user)
 
 	res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/users/", user.UserID))
 
-	if errRequest != nil {
-		t.Fatalf("Get: %v", errRequest)
-	}
+	assert.Nil(t, errRequest)
 
-	if res.StatusCode != http.StatusOK {
-		t.Fatalf("Expected %d, Received %d", http.StatusOK, res.StatusCode)
-	}
+	assert.Equal(t, res.StatusCode, http.StatusOK)
 
 	decoder := json.NewDecoder(res.Body)
 
 	var userResponse models.User
-	errDecode := decoder.Decode(&userResponse)
+	decoder.Decode(&userResponse)
 
-	if errDecode != nil {
-		t.Fatalf("Decoding error: %v", errDecode)
-	}
-
-	if user.UserID != userResponse.UserID {
-		t.Fatalf("Expected: %s, Received: %s", user.UserID, userResponse.UserID)
-	}
-
-	if *user.FirstName != *userResponse.FirstName {
-		t.Fatalf("Expected: %s, Received: %s", *user.FirstName, *userResponse.FirstName)
-	}
+	assert.Equal(t, user.UserID, userResponse.UserID)
+	assert.Equal(t, *user.FirstName, *userResponse.FirstName)
+	assert.Equal(t, *user.LastName, *userResponse.LastName)
+	assert.Equal(t, *user.Auth0ID, *userResponse.Auth0ID)
 }
 
 func TestListUsers(t *testing.T) {
@@ -78,38 +75,40 @@ func TestListUsers(t *testing.T) {
 	defer testServer.Close()
 
 	firstName1 := "firstName1"
+	lastName1 := "lastName1"
 	auth0Id1 := "auth0Id1"
 
 	firstName2 := "firstName2"
+	lastName2 := "lastName2"
 	auth0Id2 := "auth0Id2"
 
-  user1 := models.User{ FirstName: &firstName1, Auth0ID: &auth0Id1 }
-  user2 := models.User{ FirstName: &firstName2, Auth0ID: &auth0Id2 }
+  user1 := models.User{
+		FirstName: &firstName1,
+		LastName: &lastName1,
+		Auth0ID: &auth0Id1,
+	}
+
+  user2 := models.User{
+		FirstName: &firstName2,
+		LastName: &lastName2,
+		Auth0ID: &auth0Id2,
+	}
+
   db.DB.Create(&user1)
 	db.DB.Create(&user2)
 
 	res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/users"))
 
-	if errRequest != nil {
-		t.Fatalf("Get: %v", errRequest)
-	}
+	assert.Nil(t, errRequest)
 
-	if res.StatusCode != http.StatusOK {
-		t.Fatalf("Expected %d, Received %d", http.StatusOK, res.StatusCode)
-	}
+	assert.Equal(t, res.StatusCode, http.StatusOK)
 
 	decoder := json.NewDecoder(res.Body)
 
 	var usersFound []models.User
-	errDecode := decoder.Decode(&usersFound)
+	decoder.Decode(&usersFound)
 
-	if errDecode != nil {
-		t.Fatalf("Decoding error: %v", errDecode)
-	}
-
-	if len(usersFound) != 2 {
-		t.Fatalf("Expected: %d, Received: %d", 2, len(usersFound))
-	}
+	assert.Equal(t, len(usersFound), 2)
 
 	var userResponse models.User
 
@@ -120,13 +119,10 @@ func TestListUsers(t *testing.T) {
     }
 	}
 
-	if *user1.FirstName != *userResponse.FirstName {
-		t.Fatalf("Expected: %s, Received: %s", *user1.FirstName, *userResponse.FirstName)
-	}
-
-	if *user1.Auth0ID != *userResponse.Auth0ID {
-		t.Fatalf("Expected: %s, Received: %s", *user1.Auth0ID, *userResponse.Auth0ID)
-	}
+	assert.Equal(t, user1.UserID, userResponse.UserID)
+	assert.Equal(t, *user1.FirstName, *userResponse.FirstName)
+	assert.Equal(t, *user1.LastName, *userResponse.LastName)
+	assert.Equal(t, *user1.Auth0ID, *userResponse.Auth0ID)
 
 	for _, value := range usersFound {
     if value.UserID == user2.UserID {
@@ -135,13 +131,10 @@ func TestListUsers(t *testing.T) {
     }
 	}
 
-	if *user2.FirstName != *userResponse.FirstName {
-		t.Fatalf("Expected: %s, Received: %s", *user2.FirstName, *userResponse.FirstName)
-	}
-
-	if *user2.Auth0ID != *userResponse.Auth0ID {
-		t.Fatalf("Expected: %s, Received: %s", *user2.Auth0ID, *userResponse.Auth0ID)
-	}
+	assert.Equal(t, user2.UserID, userResponse.UserID)
+	assert.Equal(t, *user2.FirstName, *userResponse.FirstName)
+	assert.Equal(t, *user2.LastName, *userResponse.LastName)
+	assert.Equal(t, *user2.Auth0ID, *userResponse.Auth0ID)
 }
 
 func TestCreateUser(t *testing.T) {
@@ -151,45 +144,35 @@ func TestCreateUser(t *testing.T) {
 	testServer := httptest.NewServer(routes.Init())
 	defer testServer.Close()
 
-	var jsonStr = []byte(`{"first_name":"FirstName"}`)
+	var jsonStr = []byte(`{
+		"first_name":"FirstName",
+		"last_name":"LastName"
+	}`)
 
 	res, errRequest := http.Post(fmt.Sprint(testServer.URL, "/api/users"), "application/json", bytes.NewBuffer(jsonStr))
 
-	if errRequest != nil {
-		t.Fatalf("Get: %v", errRequest)
-	}
+	assert.Nil(t, errRequest)
 
-	if res.StatusCode != http.StatusCreated {
-		t.Fatalf("Expected %d, Received %d", http.StatusCreated, res.StatusCode)
-	}
+	assert.Equal(t, res.StatusCode, http.StatusCreated)
 
 	decoder := json.NewDecoder(res.Body)
 
 	var userResponse models.User
-	errDecode := decoder.Decode(&userResponse)
+	decoder.Decode(&userResponse)
 
-	if errDecode != nil {
-		t.Fatalf("Decoding error: %v", errDecode)
-	}
-
-	if *userResponse.FirstName != "FirstName" {
-		t.Fatalf("Expected: %s, Received: %s", "FirstName", *userResponse.FirstName)
-	}
-
-	// if *userResponse.Auth0ID != "auth0|loggedInUser" {
-	// 	t.Fatalf("Expected: %s, Received: %s", "auth0|loggedInUser", *userResponse.Auth0ID)
-	// }
+	assert.NotNil(t, userResponse.UserID)
+	assert.Equal(t, *userResponse.FirstName, "FirstName")
+	assert.Equal(t, *userResponse.LastName, "LastName")
+	// assert.Equal(t, *userResponse.Auth0ID, "auth0|loggedInUser")
 
 	var userFound models.User
 	errFound := db.DB.Where("user_id = ?", userResponse.UserID).First(&userFound).Error
 
-	if errFound != nil {
-		t.Fatalf("Error: %v", errFound)
-	}
+	assert.Nil(t, errFound)
 
-	if "FirstName" != *userFound.FirstName {
-		t.Fatalf("Expected: %s, Received: %s", "FirstName", *userFound.FirstName)
-	}
+	assert.Equal(t, *userFound.FirstName, "FirstName")
+	assert.Equal(t, *userFound.LastName, "LastName")
+	// assert.Equal(t, *userFound.Auth0ID, "auth0|loggedInUser")
 }
 
 func TestModifyUser(t *testing.T) {
@@ -210,67 +193,37 @@ func TestModifyUser(t *testing.T) {
 
   db.DB.Create(&user)
 
-	var jsonStr = []byte(`{"first_name":"FirstNameDifferent", "last_name": "LastNameDifferent", "auth0_id": "Auth0IDDifferent"}`)
+	var jsonStr = []byte(`{
+		"first_name":"FirstNameDifferent",
+		"last_name": "LastNameDifferent",
+		"auth0_id": "Auth0IDDifferent"
+	}`)
 
 	req, errRequest := http.NewRequest(http.MethodPut, fmt.Sprint(testServer.URL, "/api/users/", user.UserID), bytes.NewBuffer(jsonStr))
 	client := &http.Client{}
 	res, errRequest := client.Do(req)
 
-	if errRequest != nil {
-		t.Fatalf("Delete: %v", errRequest)
-	}
+	assert.Nil(t, errRequest)
 
-	if res.StatusCode != http.StatusOK {
-    t.Fatalf("Expected %d, Received %d", http.StatusOK, res.StatusCode)
-  }
+	assert.Equal(t, res.StatusCode, http.StatusOK)
 
 	decoder := json.NewDecoder(res.Body)
 
 	var userResponse models.User
-	errDecode := decoder.Decode(&userResponse)
+	decoder.Decode(&userResponse)
 
-	if errDecode != nil {
-		t.Fatalf("Decoding error: %v", errDecode)
-	}
-
-	if user.UserID != userResponse.UserID {
-		t.Fatalf("Expected: %s, Received: %s", user.UserID, userResponse.UserID)
-	}
-
-	if *userResponse.FirstName != "FirstNameDifferent" {
-		t.Fatalf("Expected: %s, Received: %s", "FirstNameDifferent", *userResponse.FirstName)
-	}
-
-	if *userResponse.LastName != "LastNameDifferent" {
-		t.Fatalf("Expected: %s, Received: %s", "LastNameDifferent", *userResponse.LastName)
-	}
-
-	if *userResponse.Auth0ID != "Auth0IDDifferent" {
-		t.Fatalf("Expected: %s, Received: %s", "Auth0IDDifferent", *userResponse.Auth0ID)
-	}
+	assert.Equal(t, *userResponse.FirstName, "FirstNameDifferent")
+	assert.Equal(t, *userResponse.LastName, "LastNameDifferent")
+	assert.Equal(t, *userResponse.Auth0ID, "Auth0IDDifferent")
 
 	var userFound models.User
   errFound := db.DB.Where("user_id = ?", user.UserID).First(&userFound).Error
 
-	if errFound != nil {
-		t.Fatalf("Error: %v", errFound)
-	}
+	assert.Nil(t, errFound)
 
-	if user.UserID != userFound.UserID {
-		t.Fatalf("Expected: %s, Received: %s", user.UserID, userFound.UserID)
-	}
-
-	if *userFound.FirstName != "FirstNameDifferent" {
-		t.Fatalf("Expected: %s, Received: %s", "FirstNameDifferent", *userFound.FirstName)
-	}
-
-	if *userFound.LastName != "LastNameDifferent" {
-		t.Fatalf("Expected: %s, Received: %s", "LastNameDifferent", *userFound.LastName)
-	}
-
-	if *userFound.Auth0ID != "Auth0IDDifferent" {
-		t.Fatalf("Expected: %s, Received: %s", "Auth0IDDifferent", *userFound.Auth0ID)
-	}
+	assert.Equal(t, *userFound.FirstName, "FirstNameDifferent")
+	assert.Equal(t, *userFound.LastName, "LastNameDifferent")
+	assert.Equal(t, *userFound.Auth0ID, "Auth0IDDifferent")
 }
 
 func TestDeleteUser(t *testing.T) {
@@ -289,18 +242,12 @@ func TestDeleteUser(t *testing.T) {
 	client := &http.Client{}
 	res, errRequest := client.Do(req)
 
-	if errRequest != nil {
-		t.Fatalf("Delete: %v", errRequest)
-	}
+	assert.Nil(t, errRequest)
 
-	if res.StatusCode != http.StatusNoContent {
-    t.Fatalf("Expected %d, Received %d", http.StatusNoContent, res.StatusCode)
-  }
+	assert.Equal(t, res.StatusCode, http.StatusNoContent)
 
 	var userFound models.User
   errFound := db.DB.Where("user_id = ?", user.UserID).First(&userFound).Error
 
-	if !errors.Is(errFound, gorm.ErrRecordNotFound) {
-		t.Fatalf("Expected user not to be found")
-	}
+	assert.Equal(t, errFound, gorm.ErrRecordNotFound)
 }
