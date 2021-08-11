@@ -22,7 +22,7 @@ x-db-environment: &db-environment
 
 services:
   app:
-    image: golang:1.16-alpine
+    image: golang:1.16.7-alpine
     working_dir: /app
     volumes:
       - ./:/app
@@ -44,7 +44,7 @@ services:
       *app-environment
 
   go-get:
-    image: golang:1.16-alpine
+    image: golang:1.16.7-alpine
     working_dir: /app
     volumes:
       - ./:/app
@@ -62,7 +62,7 @@ services:
       *app-environment
 
   build:
-    image: golang:1.16-alpine
+    image: golang:1.16.7-alpine
     working_dir: /app
     volumes:
       - ./:/app

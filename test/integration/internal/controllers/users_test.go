@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/dgrijalva/jwt-go"
+	jwt "github.com/dgrijalva/jwt-go"
 
 	"gorm.io/gorm"
 
@@ -21,11 +21,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type userString string
+const userKey = userString("user")
+
 func init() {
 	middlewares.Auth = func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			jwtToken := &jwt.Token{ Claims: jwt.MapClaims{ "sub": "auth0|loggedInUser" } }
-	    newContext := context.WithValue(r.Context(), "user", jwtToken)
+	    newContext := context.WithValue(r.Context(), userKey, jwtToken)
       h.ServeHTTP(w, r.WithContext(newContext))
 	  })
 	}
@@ -59,7 +62,8 @@ func TestGetUser(t *testing.T) {
 	decoder := json.NewDecoder(res.Body)
 
 	var userResponse models.User
-	decoder.Decode(&userResponse)
+	errDecoder := decoder.Decode(&userResponse)
+	assert.Nil(t, errDecoder)
 
 	assert.Equal(t, user.UserID, userResponse.UserID)
 	assert.Equal(t, *user.FirstName, *userResponse.FirstName)
@@ -106,7 +110,8 @@ func TestListUsers(t *testing.T) {
 	decoder := json.NewDecoder(res.Body)
 
 	var usersFound []models.User
-	decoder.Decode(&usersFound)
+	errDecoder := decoder.Decode(&usersFound)
+	assert.Nil(t, errDecoder)
 
 	assert.Equal(t, len(usersFound), 2)
 
@@ -158,7 +163,8 @@ func TestCreateUser(t *testing.T) {
 	decoder := json.NewDecoder(res.Body)
 
 	var userResponse models.User
-	decoder.Decode(&userResponse)
+	errDecoder := decoder.Decode(&userResponse)
+	assert.Nil(t, errDecoder)
 
 	assert.NotNil(t, userResponse.UserID)
 	assert.Equal(t, *userResponse.FirstName, "FirstName")
@@ -199,7 +205,9 @@ func TestModifyUser(t *testing.T) {
 		"auth0_id": "Auth0IDDifferent"
 	}`)
 
-	req, errRequest := http.NewRequest(http.MethodPut, fmt.Sprint(testServer.URL, "/api/users/", user.UserID), bytes.NewBuffer(jsonStr))
+	req, errCreated := http.NewRequest(http.MethodPut, fmt.Sprint(testServer.URL, "/api/users/", user.UserID), bytes.NewBuffer(jsonStr))
+	assert.Nil(t, errCreated)
+
 	client := &http.Client{}
 	res, errRequest := client.Do(req)
 
@@ -210,7 +218,8 @@ func TestModifyUser(t *testing.T) {
 	decoder := json.NewDecoder(res.Body)
 
 	var userResponse models.User
-	decoder.Decode(&userResponse)
+	errDecoder := decoder.Decode(&userResponse)
+	assert.Nil(t, errDecoder)
 
 	assert.Equal(t, *userResponse.FirstName, "FirstNameDifferent")
 	assert.Equal(t, *userResponse.LastName, "LastNameDifferent")
@@ -238,7 +247,9 @@ func TestDeleteUser(t *testing.T) {
 
   db.DB.Create(&user)
 
-	req, errRequest := http.NewRequest(http.MethodDelete, fmt.Sprint(testServer.URL, "/api/users/", user.UserID), nil)
+	req, errCreated := http.NewRequest(http.MethodDelete, fmt.Sprint(testServer.URL, "/api/users/", user.UserID), nil)
+	assert.Nil(t, errCreated)
+
 	client := &http.Client{}
 	res, errRequest := client.Do(req)
 

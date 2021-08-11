@@ -41,7 +41,12 @@ func ListReviews(w http.ResponseWriter, r *http.Request) {
 func CreateReview(w http.ResponseWriter, r *http.Request) {
 	var reviewPayload models.Review
 
-	json.NewDecoder(r.Body).Decode(&reviewPayload)
+	err := json.NewDecoder(r.Body).Decode(&reviewPayload)
+
+	if (err != nil) {
+		w.WriteHeader(400)
+		return
+	}
 
 	review := services.CreateReview(reviewPayload)
 
@@ -53,7 +58,12 @@ func ModifyReview(w http.ResponseWriter, r *http.Request) {
 	var reviewPayload models.Review
 	reviewID := uuid.Must(uuid.Parse(chi.URLParam(r, "reviewID")))
 
-	json.NewDecoder(r.Body).Decode(&reviewPayload)
+	err := json.NewDecoder(r.Body).Decode(&reviewPayload)
+
+	if (err != nil) {
+		w.WriteHeader(400)
+		return
+	}
 
 	review := services.ModifyReview(reviewID, reviewPayload)
 

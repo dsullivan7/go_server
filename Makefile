@@ -1,6 +1,7 @@
 DOCKER_POSTGRES = postgres:12.7
 DOCKER_ALPINE = alpine:3.13.5
-DOCKER_GOLANG = golang:1.16-alpine
+DOCKER_GOLANG = golang:1.16.7-alpine
+DOCKER_GOLANG_LINT = golangci/golangci-lint:v1.41.1
 
 ENVFILE ?= .env
 
@@ -53,3 +54,7 @@ build:
 .PHONY: test
 test:
 	docker-compose run --rm -e CGO_ENABLED=0 app go test -v $(TESTS)
+
+.PHONY: lint
+lint:
+	docker run --rm -v ${PWD}:/data -w /data ${DOCKER_GOLANG_LINT} golangci-lint run

@@ -9,27 +9,14 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/dgrijalva/jwt-go"
-
 	"gorm.io/gorm"
 
 	"go_server/internal/routes"
 	"go_server/internal/models"
 	"go_server/internal/db"
-	"go_server/internal/middlewares"
 
 	"github.com/stretchr/testify/assert"
 )
-
-func init() {
-	middlewares.Auth = func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			jwtToken := &jwt.Token{ Claims: jwt.MapClaims{ "sub": "auth0|loggedInReview" } }
-	    newContext := context.WithValue(r.Context(), "review", jwtToken)
-      h.ServeHTTP(w, r.WithContext(newContext))
-	  })
-	}
-}
 
 func TestGetReview(t *testing.T) {
 	db.Connect()
@@ -59,7 +46,9 @@ func TestGetReview(t *testing.T) {
 	decoder := json.NewDecoder(res.Body)
 
 	var reviewResponse models.Review
-	decoder.Decode(&reviewResponse)
+
+	errDecode := decoder.Decode(&reviewResponse)
+	assert.Nil(t, errDecode)
 
 	assert.Equal(t, review.ReviewID, reviewResponse.ReviewID)
 	assert.Equal(t, *review.Text, *reviewResponse.Text)
@@ -103,7 +92,8 @@ func TestListReviews(t *testing.T) {
 	decoder := json.NewDecoder(res.Body)
 
 	var reviewsFound []models.Review
-	decoder.Decode(&reviewsFound)
+	errDecode1 := decoder.Decode(&reviewsFound)
+	assert.Nil(t, errDecode1)
 
 	assert.Equal(t, len(reviewsFound), 2)
 
@@ -136,11 +126,14 @@ func TestListReviews(t *testing.T) {
 	// test request with query
 	res, errRequest = http.Get(fmt.Sprint(testServer.URL, "/api/reviews?to_user_id=", user3.UserID))
 
+	assert.Nil(t, errRequest)
+
 	assert.Equal(t, res.StatusCode, http.StatusOK)
 
 	decoder = json.NewDecoder(res.Body)
 
-	decoder.Decode(&reviewsFound)
+	errDecode2 := decoder.Decode(&reviewsFound)
+	assert.Nil(t, errDecode2)
 
 	assert.Equal(t, len(reviewsFound), 1)
 
@@ -177,7 +170,8 @@ func TestCreateReivew(t *testing.T) {
 	decoder := json.NewDecoder(res.Body)
 
 	var reviewResponse models.Review
-	decoder.Decode(&reviewResponse)
+	errDecode := decoder.Decode(&reviewResponse)
+	assert.Nil(t, errDecode)
 
 	assert.NotNil(t, reviewResponse.ReviewID)
 	assert.Equal(t, *reviewResponse.FromUserID, user1.UserID)
@@ -215,7 +209,9 @@ func TestModifyReview(t *testing.T) {
 
 	var jsonStr = []byte(`{"text":"TextDifferent"}`)
 
-	req, errRequest := http.NewRequest(http.MethodPut, fmt.Sprint(testServer.URL, "/api/reviews/", review.ReviewID), bytes.NewBuffer(jsonStr))
+	req, errCreate := http.NewRequest(http.MethodPut, fmt.Sprint(testServer.URL, "/api/reviews/", review.ReviewID), bytes.NewBuffer(jsonStr))
+	assert.Nil(t, errCreate)
+
 	client := &http.Client{}
 	res, errRequest := client.Do(req)
 
@@ -226,7 +222,8 @@ func TestModifyReview(t *testing.T) {
 	decoder := json.NewDecoder(res.Body)
 
 	var reviewResponse models.Review
-	decoder.Decode(&reviewResponse)
+	errDecode := decoder.Decode(&reviewResponse)
+	assert.Nil(t, errDecode)
 
 	assert.Equal(t, review.ReviewID, reviewResponse.ReviewID)
 	assert.Equal(t, *reviewResponse.Text, "TextDifferent")
@@ -259,7 +256,9 @@ func TestDeleteReview(t *testing.T) {
 
 	db.DB.Create(&review)
 
-	req, errRequest := http.NewRequest(http.MethodDelete, fmt.Sprint(testServer.URL, "/api/reviews/", review.ReviewID), nil)
+	req, errCreate := http.NewRequest(http.MethodDelete, fmt.Sprint(testServer.URL, "/api/reviews/", review.ReviewID), nil)
+	assert.Nil(t, errCreate)
+
 	client := &http.Client{}
 	res, errRequest := client.Do(req)
 

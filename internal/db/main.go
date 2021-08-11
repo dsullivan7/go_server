@@ -29,7 +29,7 @@ func Connect() {
     DSN.WriteString(fmt.Sprintf(" password=%s", config.DBPassword))
   }
 
-  if config.DBSSL != true {
+  if !config.DBSSL {
     DSN.WriteString(" sslmode=disable")
   }
 

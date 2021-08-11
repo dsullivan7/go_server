@@ -31,7 +31,12 @@ func ListUsers(w http.ResponseWriter, r *http.Request) {
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	var userPayload models.User
 
-	json.NewDecoder(r.Body).Decode(&userPayload)
+	err := json.NewDecoder(r.Body).Decode(&userPayload)
+
+	if (err != nil) {
+		w.WriteHeader(400)
+		return
+	}
 
 	// if (userPayload.Auth0ID == "") {
 	// 	auth0Id := r.Context().Value("user").(*jwt.Token).Claims.(jwt.MapClaims)["sub"].(string)
@@ -48,7 +53,12 @@ func ModifyUser(w http.ResponseWriter, r *http.Request) {
 	var userPayload models.User
 	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "userID")))
 
-	json.NewDecoder(r.Body).Decode(&userPayload)
+	err := json.NewDecoder(r.Body).Decode(&userPayload)
+
+	if (err != nil) {
+		w.WriteHeader(400)
+		return
+	}
 
 	user := services.ModifyUser(userID, userPayload)
 

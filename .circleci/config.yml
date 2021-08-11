@@ -49,6 +49,14 @@ commands:
           envsubst < << parameters.input >> > << parameters.output >>
 
 jobs:
+  lint:
+    machine:
+      image: ubuntu-2004:202104-01
+    working_directory: ~/data
+    steps:
+      - checkout
+      - run: make lint
+
   test:
     machine:
       image: ubuntu-2004:202104-01
@@ -133,8 +141,13 @@ jobs:
 workflows:
   pipeline:
     jobs:
+      - lint
       - test
+          requires:
+            - lint
       - build
+          requires:
+            - test
       - deploy:
           requires:
             - build

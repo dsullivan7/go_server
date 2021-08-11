@@ -32,7 +32,7 @@ func Init() *chi.Mux {
 
 	router.Mount("/api", initAPI())
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Healthy!"))
+		w.WriteHeader(200)
 	})
 
 	return router
