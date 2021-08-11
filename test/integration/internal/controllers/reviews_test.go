@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"context"
 	"bytes"
 	"encoding/json"
 	"net/http"
