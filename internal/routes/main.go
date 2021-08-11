@@ -8,7 +8,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
 
-	// GoServerMiddlewares "go_server/internal/middlewares"
+	goServerMiddlewares "go_server/internal/middlewares"
 	"go_server/internal/config"
 )
 
@@ -17,7 +17,7 @@ func Init() *chi.Mux {
 
 	router.Use(middleware.RequestID)
 	router.Use(middleware.RealIP)
-	router.Use(middleware.Logger)
+	router.Use(goServerMiddlewares.Logger)
 	router.Use(middleware.Recoverer)
 
 	router.Use(cors.Handler(cors.Options{
