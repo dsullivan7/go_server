@@ -21,7 +21,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetReview(t *testing.T) {
+func TestReviews(t *testing.T) {
 	config := config.NewConfig()
 	logger := logger.NewZapLogger()
 
@@ -39,325 +39,243 @@ func TestGetReview(t *testing.T) {
 	controllers := controllers.NewControllers(store, config, logger)
 	router := chi.NewRouter()
 	server := server.NewServer(router, controllers, config, logger)
-
-	db.Exec("truncate table reviews cascade")
-	db.Exec("truncate table users cascade")
-
 	testServer := httptest.NewServer(server.Routes())
+
 	defer testServer.Close()
 
-	user1 := models.User{}
-	user2 := models.User{}
+	t.Run("Test Get", func(t *testing.T) {
+		db.Exec("truncate table reviews cascade")
+		db.Exec("truncate table users cascade")
 
-	db.Create(&user1)
-	db.Create(&user2)
+		user1 := models.User{}
+		user2 := models.User{}
 
-	text := "Text"
-  review := models.Review{ FromUserID: &user1.UserID, ToUserID: &user2.UserID, Text: &text }
+		db.Create(&user1)
+		db.Create(&user2)
 
-  db.Create(&review)
+		text := "Text"
+	  review := models.Review{ FromUserID: &user1.UserID, ToUserID: &user2.UserID, Text: &text }
 
-	res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/reviews/", review.ReviewID))
+	  db.Create(&review)
 
-	assert.Nil(t, errRequest)
+		res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/reviews/", review.ReviewID))
 
-	assert.Equal(t, res.StatusCode, http.StatusOK)
+		assert.Nil(t, errRequest)
 
-	decoder := json.NewDecoder(res.Body)
+		assert.Equal(t, res.StatusCode, http.StatusOK)
 
-	var reviewResponse models.Review
+		decoder := json.NewDecoder(res.Body)
 
-	errDecode := decoder.Decode(&reviewResponse)
-	assert.Nil(t, errDecode)
+		var reviewResponse models.Review
 
-	assert.Equal(t, review.ReviewID, reviewResponse.ReviewID)
-	assert.Equal(t, *review.Text, *reviewResponse.Text)
-	assert.Equal(t, *review.FromUserID, *reviewResponse.FromUserID)
-	assert.Equal(t, *review.ToUserID, *reviewResponse.ToUserID)
-}
+		errDecode := decoder.Decode(&reviewResponse)
+		assert.Nil(t, errDecode)
 
-func TestListReviews(t *testing.T) {
-	config := config.NewConfig()
-	logger := logger.NewZapLogger()
+		assert.Equal(t, review.ReviewID, reviewResponse.ReviewID)
+		assert.Equal(t, *review.Text, *reviewResponse.Text)
+		assert.Equal(t, *review.FromUserID, *reviewResponse.FromUserID)
+		assert.Equal(t, *review.ToUserID, *reviewResponse.ToUserID)
+	})
 
-	db, _ := db.NewDatabase(
-		config.DBHost,
-		config.DBName,
-		config.DBPort,
-		config.DBUser,
-		config.DBPassword,
-		config.DBSSL,
-	)
+	t.Run("Test List", func(t *testing.T) {
+		db.Exec("truncate table reviews cascade")
+		db.Exec("truncate table users cascade")
 
-	store := store.NewGormStore(db)
+		user1 := models.User{}
+		user2 := models.User{}
+		user3 := models.User{}
+		user4 := models.User{}
 
-	controllers := controllers.NewControllers(store, config, logger)
-	router := chi.NewRouter()
-	server := server.NewServer(router, controllers, config, logger)
+		db.Create(&user1)
+		db.Create(&user2)
+		db.Create(&user3)
+		db.Create(&user4)
 
-	db.Exec("truncate table reviews cascade")
-	db.Exec("truncate table users cascade")
+		text1 := "Text1"
+	  review1 := models.Review{ FromUserID: &user1.UserID, ToUserID: &user2.UserID, Text: &text1 }
 
-	testServer := httptest.NewServer(server.Routes())
-	defer testServer.Close()
+		text2 := "Text2"
+	  review2 := models.Review{ FromUserID: &user2.UserID, ToUserID: &user3.UserID, Text: &text2 }
 
-	user1 := models.User{}
-	user2 := models.User{}
-	user3 := models.User{}
-	user4 := models.User{}
+		db.Create(&review1)
+		db.Create(&review2)
 
-	db.Create(&user1)
-	db.Create(&user2)
-	db.Create(&user3)
-	db.Create(&user4)
+		res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/reviews"))
 
-	text1 := "Text1"
-  review1 := models.Review{ FromUserID: &user1.UserID, ToUserID: &user2.UserID, Text: &text1 }
+		assert.Nil(t, errRequest)
 
-	text2 := "Text2"
-  review2 := models.Review{ FromUserID: &user2.UserID, ToUserID: &user3.UserID, Text: &text2 }
+		assert.Equal(t, res.StatusCode, http.StatusOK)
 
-	db.Create(&review1)
-	db.Create(&review2)
+		decoder := json.NewDecoder(res.Body)
 
-	res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/reviews"))
+		var reviewsFound []models.Review
+		errDecode1 := decoder.Decode(&reviewsFound)
+		assert.Nil(t, errDecode1)
 
-	assert.Nil(t, errRequest)
+		assert.Equal(t, len(reviewsFound), 2)
 
-	assert.Equal(t, res.StatusCode, http.StatusOK)
+		var reviewResponse models.Review
 
-	decoder := json.NewDecoder(res.Body)
+		for _, value := range reviewsFound {
+	    if value.ReviewID == review1.ReviewID {
+				reviewResponse = value
 
-	var reviewsFound []models.Review
-	errDecode1 := decoder.Decode(&reviewsFound)
-	assert.Nil(t, errDecode1)
+				break
+	    }
+		}
 
-	assert.Equal(t, len(reviewsFound), 2)
+		assert.Equal(t, review1.ReviewID, reviewResponse.ReviewID)
+		assert.Equal(t, *review1.FromUserID, *reviewResponse.FromUserID)
+		assert.Equal(t, *review1.ToUserID, *reviewResponse.ToUserID)
+		assert.Equal(t, *review1.Text, *reviewResponse.Text)
 
-	var reviewResponse models.Review
+		for _, value := range reviewsFound {
+	    if value.ReviewID == review2.ReviewID {
+				reviewResponse = value
 
-	for _, value := range reviewsFound {
-    if value.ReviewID == review1.ReviewID {
-			reviewResponse = value
+				break
+	    }
+		}
 
-			break
-    }
-	}
+		assert.Equal(t, review2.ReviewID, reviewResponse.ReviewID)
+		assert.Equal(t, *review2.FromUserID, *reviewResponse.FromUserID)
+		assert.Equal(t, *review2.ToUserID, *reviewResponse.ToUserID)
+		assert.Equal(t, *review2.Text, *reviewResponse.Text)
 
-	assert.Equal(t, review1.ReviewID, reviewResponse.ReviewID)
-	assert.Equal(t, *review1.FromUserID, *reviewResponse.FromUserID)
-	assert.Equal(t, *review1.ToUserID, *reviewResponse.ToUserID)
-	assert.Equal(t, *review1.Text, *reviewResponse.Text)
+		// test request with query
+		res, errRequest = http.Get(fmt.Sprint(testServer.URL, "/api/reviews?to_user_id=", user3.UserID))
 
-	for _, value := range reviewsFound {
-    if value.ReviewID == review2.ReviewID {
-			reviewResponse = value
+		assert.Nil(t, errRequest)
 
-			break
-    }
-	}
+		assert.Equal(t, res.StatusCode, http.StatusOK)
 
-	assert.Equal(t, review2.ReviewID, reviewResponse.ReviewID)
-	assert.Equal(t, *review2.FromUserID, *reviewResponse.FromUserID)
-	assert.Equal(t, *review2.ToUserID, *reviewResponse.ToUserID)
-	assert.Equal(t, *review2.Text, *reviewResponse.Text)
+		decoder = json.NewDecoder(res.Body)
 
-	// test request with query
-	res, errRequest = http.Get(fmt.Sprint(testServer.URL, "/api/reviews?to_user_id=", user3.UserID))
+		errDecode2 := decoder.Decode(&reviewsFound)
+		assert.Nil(t, errDecode2)
 
-	assert.Nil(t, errRequest)
+		assert.Equal(t, len(reviewsFound), 1)
 
-	assert.Equal(t, res.StatusCode, http.StatusOK)
+		reviewResponse = reviewsFound[0]
 
-	decoder = json.NewDecoder(res.Body)
+		assert.Equal(t, review2.ReviewID, reviewResponse.ReviewID)
+		assert.Equal(t, *review2.FromUserID, *reviewResponse.FromUserID)
+		assert.Equal(t, *review2.ToUserID, *reviewResponse.ToUserID)
+		assert.Equal(t, *review2.Text, *reviewResponse.Text)
+	})
 
-	errDecode2 := decoder.Decode(&reviewsFound)
-	assert.Nil(t, errDecode2)
+	t.Run("Test Create", func(t *testing.T) {
+		db.Exec("truncate table reviews cascade")
+		db.Exec("truncate table users cascade")
 
-	assert.Equal(t, len(reviewsFound), 1)
+		user1 := models.User{}
+		user2 := models.User{}
 
-	reviewResponse = reviewsFound[0]
+		db.Create(&user1)
+		db.Create(&user2)
 
-	assert.Equal(t, review2.ReviewID, reviewResponse.ReviewID)
-	assert.Equal(t, *review2.FromUserID, *reviewResponse.FromUserID)
-	assert.Equal(t, *review2.ToUserID, *reviewResponse.ToUserID)
-	assert.Equal(t, *review2.Text, *reviewResponse.Text)
-}
+		var jsonStr = []byte(fmt.Sprintf(`{"text":"Text", "from_user_id": "%s", "to_user_id": "%s"}`, &user1.UserID, &user2.UserID))
 
-func TestCreateReivew(t *testing.T) {
-	config := config.NewConfig()
-	logger := logger.NewZapLogger()
+		res, errRequest := http.Post(fmt.Sprint(testServer.URL, "/api/reviews"), "application/json", bytes.NewBuffer(jsonStr))
 
-	db, _ := db.NewDatabase(
-		config.DBHost,
-		config.DBName,
-		config.DBPort,
-		config.DBUser,
-		config.DBPassword,
-		config.DBSSL,
-	)
+		assert.Nil(t, errRequest)
 
-	store := store.NewGormStore(db)
+		assert.Equal(t, res.StatusCode, http.StatusCreated)
 
-	controllers := controllers.NewControllers(store, config, logger)
-	router := chi.NewRouter()
-	server := server.NewServer(router, controllers, config, logger)
+		decoder := json.NewDecoder(res.Body)
 
-	db.Exec("truncate table reviews cascade")
-	db.Exec("truncate table users cascade")
+		var reviewResponse models.Review
+		errDecode := decoder.Decode(&reviewResponse)
+		assert.Nil(t, errDecode)
 
-	testServer := httptest.NewServer(server.Routes())
-	defer testServer.Close()
+		assert.NotNil(t, reviewResponse.ReviewID)
+		assert.Equal(t, *reviewResponse.FromUserID, user1.UserID)
+		assert.Equal(t, *reviewResponse.ToUserID, user2.UserID)
+		assert.Equal(t, *reviewResponse.Text, "Text")
 
-	user1 := models.User{}
-	user2 := models.User{}
+		var reviewFound models.Review
+		errFound := db.Where("review_id = ?", reviewResponse.ReviewID).First(&reviewFound).Error
 
-	db.Create(&user1)
-	db.Create(&user2)
+		assert.Nil(t, errFound)
 
-	var jsonStr = []byte(fmt.Sprintf(`{"text":"Text", "from_user_id": "%s", "to_user_id": "%s"}`, &user1.UserID, &user2.UserID))
+		assert.Equal(t, *reviewFound.FromUserID, user1.UserID)
+		assert.Equal(t, *reviewFound.ToUserID, user2.UserID)
+		assert.Equal(t, *reviewFound.Text, "Text")
+	})
 
-	res, errRequest := http.Post(fmt.Sprint(testServer.URL, "/api/reviews"), "application/json", bytes.NewBuffer(jsonStr))
+	t.Run("Test Modify", func(t *testing.T) {
+		db.Exec("truncate table reviews cascade")
+		db.Exec("truncate table users cascade")
 
-	assert.Nil(t, errRequest)
+		user1 := models.User{}
+		user2 := models.User{}
 
-	assert.Equal(t, res.StatusCode, http.StatusCreated)
+		db.Create(&user1)
+		db.Create(&user2)
 
-	decoder := json.NewDecoder(res.Body)
+		text := "Text"
+	  review := models.Review{ FromUserID: &user1.UserID, ToUserID: &user2.UserID, Text: &text }
 
-	var reviewResponse models.Review
-	errDecode := decoder.Decode(&reviewResponse)
-	assert.Nil(t, errDecode)
+		db.Create(&review)
 
-	assert.NotNil(t, reviewResponse.ReviewID)
-	assert.Equal(t, *reviewResponse.FromUserID, user1.UserID)
-	assert.Equal(t, *reviewResponse.ToUserID, user2.UserID)
-	assert.Equal(t, *reviewResponse.Text, "Text")
+		var jsonStr = []byte(`{"text":"TextDifferent"}`)
 
-	var reviewFound models.Review
-	errFound := db.Where("review_id = ?", reviewResponse.ReviewID).First(&reviewFound).Error
+		req, errCreate := http.NewRequest(http.MethodPut, fmt.Sprint(testServer.URL, "/api/reviews/", review.ReviewID), bytes.NewBuffer(jsonStr))
+		assert.Nil(t, errCreate)
 
-	assert.Nil(t, errFound)
+		client := &http.Client{}
+		res, errRequest := client.Do(req)
 
-	assert.Equal(t, *reviewFound.FromUserID, user1.UserID)
-	assert.Equal(t, *reviewFound.ToUserID, user2.UserID)
-	assert.Equal(t, *reviewFound.Text, "Text")
-}
+		assert.Nil(t, errRequest)
 
-func TestModifyReview(t *testing.T) {
-	config := config.NewConfig()
-	logger := logger.NewZapLogger()
+		assert.Equal(t, res.StatusCode, http.StatusOK)
 
-	db, _ := db.NewDatabase(
-		config.DBHost,
-		config.DBName,
-		config.DBPort,
-		config.DBUser,
-		config.DBPassword,
-		config.DBSSL,
-	)
+		decoder := json.NewDecoder(res.Body)
 
-	store := store.NewGormStore(db)
+		var reviewResponse models.Review
+		errDecode := decoder.Decode(&reviewResponse)
+		assert.Nil(t, errDecode)
 
-	controllers := controllers.NewControllers(store, config, logger)
-	router := chi.NewRouter()
-	server := server.NewServer(router, controllers, config, logger)
+		assert.Equal(t, review.ReviewID, reviewResponse.ReviewID)
+		assert.Equal(t, *reviewResponse.Text, "TextDifferent")
 
-	db.Exec("truncate table reviews cascade")
-	db.Exec("truncate table users cascade")
+		var reviewFound models.Review
+	  errFound := db.Where("review_id = ?", review.ReviewID).First(&reviewFound).Error
 
-	testServer := httptest.NewServer(server.Routes())
-	defer testServer.Close()
+		assert.Nil(t, errFound)
 
-	user1 := models.User{}
-	user2 := models.User{}
+		assert.Equal(t, review.ReviewID, reviewFound.ReviewID)
+		assert.Equal(t, *reviewFound.Text, "TextDifferent")
+	})
 
-	db.Create(&user1)
-	db.Create(&user2)
+	t.Run("Test Delete", func(t *testing.T) {
+		db.Exec("truncate table reviews cascade")
+		db.Exec("truncate table users cascade")
 
-	text := "Text"
-  review := models.Review{ FromUserID: &user1.UserID, ToUserID: &user2.UserID, Text: &text }
+		user1 := models.User{}
+		user2 := models.User{}
 
-	db.Create(&review)
+		db.Create(&user1)
+		db.Create(&user2)
 
-	var jsonStr = []byte(`{"text":"TextDifferent"}`)
+		text := "Text"
+	  review := models.Review{ FromUserID: &user1.UserID, ToUserID: &user2.UserID, Text: &text }
 
-	req, errCreate := http.NewRequest(http.MethodPut, fmt.Sprint(testServer.URL, "/api/reviews/", review.ReviewID), bytes.NewBuffer(jsonStr))
-	assert.Nil(t, errCreate)
+		db.Create(&review)
 
-	client := &http.Client{}
-	res, errRequest := client.Do(req)
+		req, errCreate := http.NewRequest(http.MethodDelete, fmt.Sprint(testServer.URL, "/api/reviews/", review.ReviewID), nil)
+		assert.Nil(t, errCreate)
 
-	assert.Nil(t, errRequest)
+		client := &http.Client{}
+		res, errRequest := client.Do(req)
 
-	assert.Equal(t, res.StatusCode, http.StatusOK)
+		assert.Nil(t, errRequest)
 
-	decoder := json.NewDecoder(res.Body)
+		assert.Equal(t, res.StatusCode, http.StatusNoContent)
 
-	var reviewResponse models.Review
-	errDecode := decoder.Decode(&reviewResponse)
-	assert.Nil(t, errDecode)
+		var reviewFound models.Review
+	  errFound := db.Where("review_id = ?", review.ReviewID).First(&reviewFound).Error
 
-	assert.Equal(t, review.ReviewID, reviewResponse.ReviewID)
-	assert.Equal(t, *reviewResponse.Text, "TextDifferent")
-
-	var reviewFound models.Review
-  errFound := db.Where("review_id = ?", review.ReviewID).First(&reviewFound).Error
-
-	assert.Nil(t, errFound)
-
-	assert.Equal(t, review.ReviewID, reviewFound.ReviewID)
-	assert.Equal(t, *reviewFound.Text, "TextDifferent")
-}
-
-func TestDeleteReview(t *testing.T) {
-	config := config.NewConfig()
-	logger := logger.NewZapLogger()
-
-	db, _ := db.NewDatabase(
-		config.DBHost,
-		config.DBName,
-		config.DBPort,
-		config.DBUser,
-		config.DBPassword,
-		config.DBSSL,
-	)
-
-	store := store.NewGormStore(db)
-
-	controllers := controllers.NewControllers(store, config, logger)
-	router := chi.NewRouter()
-	server := server.NewServer(router, controllers, config, logger)
-
-	db.Exec("truncate table reviews cascade")
-	db.Exec("truncate table users cascade")
-
-	testServer := httptest.NewServer(server.Routes())
-	defer testServer.Close()
-
-	user1 := models.User{}
-	user2 := models.User{}
-
-	db.Create(&user1)
-	db.Create(&user2)
-
-	text := "Text"
-  review := models.Review{ FromUserID: &user1.UserID, ToUserID: &user2.UserID, Text: &text }
-
-	db.Create(&review)
-
-	req, errCreate := http.NewRequest(http.MethodDelete, fmt.Sprint(testServer.URL, "/api/reviews/", review.ReviewID), nil)
-	assert.Nil(t, errCreate)
-
-	client := &http.Client{}
-	res, errRequest := client.Do(req)
-
-	assert.Nil(t, errRequest)
-
-	assert.Equal(t, res.StatusCode, http.StatusNoContent)
-
-	var reviewFound models.Review
-  errFound := db.Where("review_id = ?", review.ReviewID).First(&reviewFound).Error
-
-	assert.Equal(t, errFound, gorm.ErrRecordNotFound)
+		assert.Equal(t, errFound, gorm.ErrRecordNotFound)
+	})
 }

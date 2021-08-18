@@ -31,5 +31,5 @@ func Run() {
 
 	server := server.NewServer(router, controllers, config, logger)
 
-	server.RunServer()
+	server.Run()
 }

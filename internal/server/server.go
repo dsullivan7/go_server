@@ -35,5 +35,5 @@ func (server *Server) Run() {
 
   server.logger.Info(fmt.Sprintf("Server started on port %s", server.config.Port))
 
-  server.logger.Info(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), server.router))
+  http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), server.router)
 }

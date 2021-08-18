@@ -22,10 +22,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type userString string
-const userKey = userString("user")
+// type userString string
+// const userKey = userString("user")
 
-func init() {
+// func init() {
 	// middlewares.Auth = func(h http.Handler) http.Handler {
 	// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	// 		jwtToken := &jwt.Token{ Claims: jwt.MapClaims{ "sub": "auth0|loggedInUser" } }
@@ -33,9 +33,8 @@ func init() {
   //     h.ServeHTTP(w, r.WithContext(newContext))
 	//   })
 	// }
-}
-
-func TestGetUser(t *testing.T) {
+// }
+func TestUsers(t *testing.T) {
 	config := config.NewConfig()
 	logger := logger.NewZapLogger()
 
@@ -54,302 +53,220 @@ func TestGetUser(t *testing.T) {
 	router := chi.NewRouter()
 	server := server.NewServer(router, controllers, config, logger)
 
-	db.Exec("truncate table reviews cascade")
-	db.Exec("truncate table users cascade")
-
 	testServer := httptest.NewServer(server.Routes())
 	defer testServer.Close()
 
-	firstName := "firstName"
-	lastName := "lastName"
-	auth0ID := "auth0ID"
+	t.Run("Test Get", func(t *testing.T) {
+		db.Exec("truncate table reviews cascade")
+		db.Exec("truncate table users cascade")
 
-  user := models.User{
-		FirstName: &firstName,
-		LastName: &lastName,
-		Auth0ID: &auth0ID,
-	 }
+		firstName := "firstName"
+		lastName := "lastName"
+		auth0ID := "auth0ID"
 
-  db.Create(&user)
+	  user := models.User{
+			FirstName: &firstName,
+			LastName: &lastName,
+			Auth0ID: &auth0ID,
+		 }
 
-	res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/users/", user.UserID))
+	  db.Create(&user)
 
-	assert.Nil(t, errRequest)
+		res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/users/", user.UserID))
 
-	assert.Equal(t, res.StatusCode, http.StatusOK)
+		assert.Nil(t, errRequest)
 
-	decoder := json.NewDecoder(res.Body)
+		assert.Equal(t, res.StatusCode, http.StatusOK)
 
-	var userResponse models.User
-	errDecoder := decoder.Decode(&userResponse)
-	assert.Nil(t, errDecoder)
+		decoder := json.NewDecoder(res.Body)
 
-	assert.Equal(t, user.UserID, userResponse.UserID)
-	assert.Equal(t, *user.FirstName, *userResponse.FirstName)
-	assert.Equal(t, *user.LastName, *userResponse.LastName)
-	assert.Equal(t, *user.Auth0ID, *userResponse.Auth0ID)
-}
-
-func TestListUsers(t *testing.T) {
-	config := config.NewConfig()
-	logger := logger.NewZapLogger()
-
-	db, _ := db.NewDatabase(
-		config.DBHost,
-		config.DBName,
-		config.DBPort,
-		config.DBUser,
-		config.DBPassword,
-		config.DBSSL,
-	)
+		var userResponse models.User
+		errDecoder := decoder.Decode(&userResponse)
+		assert.Nil(t, errDecoder)
 
-	store := store.NewGormStore(db)
+		assert.Equal(t, user.UserID, userResponse.UserID)
+		assert.Equal(t, *user.FirstName, *userResponse.FirstName)
+		assert.Equal(t, *user.LastName, *userResponse.LastName)
+		assert.Equal(t, *user.Auth0ID, *userResponse.Auth0ID)
+	})
 
-	controllers := controllers.NewControllers(store, config, logger)
-	router := chi.NewRouter()
-	server := server.NewServer(router, controllers, config, logger)
+	t.Run("Test List", func(t *testing.T) {
+		db.Exec("truncate table reviews cascade")
+		db.Exec("truncate table users cascade")
 
-	db.Exec("truncate table reviews cascade")
-	db.Exec("truncate table users cascade")
+		firstName1 := "firstName1"
+		lastName1 := "lastName1"
+		auth0Id1 := "auth0Id1"
 
-	testServer := httptest.NewServer(server.Routes())
-	defer testServer.Close()
+		firstName2 := "firstName2"
+		lastName2 := "lastName2"
+		auth0Id2 := "auth0Id2"
 
-	firstName1 := "firstName1"
-	lastName1 := "lastName1"
-	auth0Id1 := "auth0Id1"
+	  user1 := models.User{
+			FirstName: &firstName1,
+			LastName: &lastName1,
+			Auth0ID: &auth0Id1,
+		}
 
-	firstName2 := "firstName2"
-	lastName2 := "lastName2"
-	auth0Id2 := "auth0Id2"
+	  user2 := models.User{
+			FirstName: &firstName2,
+			LastName: &lastName2,
+			Auth0ID: &auth0Id2,
+		}
 
-  user1 := models.User{
-		FirstName: &firstName1,
-		LastName: &lastName1,
-		Auth0ID: &auth0Id1,
-	}
+	  db.Create(&user1)
+		db.Create(&user2)
 
-  user2 := models.User{
-		FirstName: &firstName2,
-		LastName: &lastName2,
-		Auth0ID: &auth0Id2,
-	}
+		res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/users"))
 
-  db.Create(&user1)
-	db.Create(&user2)
+		assert.Nil(t, errRequest)
 
-	res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/users"))
+		assert.Equal(t, res.StatusCode, http.StatusOK)
 
-	assert.Nil(t, errRequest)
+		decoder := json.NewDecoder(res.Body)
 
-	assert.Equal(t, res.StatusCode, http.StatusOK)
+		var usersFound []models.User
+		errDecoder := decoder.Decode(&usersFound)
+		assert.Nil(t, errDecoder)
 
-	decoder := json.NewDecoder(res.Body)
+		assert.Equal(t, len(usersFound), 2)
 
-	var usersFound []models.User
-	errDecoder := decoder.Decode(&usersFound)
-	assert.Nil(t, errDecoder)
+		var userResponse models.User
 
-	assert.Equal(t, len(usersFound), 2)
+		for _, value := range usersFound {
+	    if value.UserID == user1.UserID {
+				userResponse = value
+				break
+	    }
+		}
 
-	var userResponse models.User
+		assert.Equal(t, user1.UserID, userResponse.UserID)
+		assert.Equal(t, *user1.FirstName, *userResponse.FirstName)
+		assert.Equal(t, *user1.LastName, *userResponse.LastName)
+		assert.Equal(t, *user1.Auth0ID, *userResponse.Auth0ID)
 
-	for _, value := range usersFound {
-    if value.UserID == user1.UserID {
-			userResponse = value
-			break
-    }
-	}
+		for _, value := range usersFound {
+	    if value.UserID == user2.UserID {
+				userResponse = value
+				break
+	    }
+		}
 
-	assert.Equal(t, user1.UserID, userResponse.UserID)
-	assert.Equal(t, *user1.FirstName, *userResponse.FirstName)
-	assert.Equal(t, *user1.LastName, *userResponse.LastName)
-	assert.Equal(t, *user1.Auth0ID, *userResponse.Auth0ID)
-
-	for _, value := range usersFound {
-    if value.UserID == user2.UserID {
-			userResponse = value
-			break
-    }
-	}
+		assert.Equal(t, user2.UserID, userResponse.UserID)
+		assert.Equal(t, *user2.FirstName, *userResponse.FirstName)
+		assert.Equal(t, *user2.LastName, *userResponse.LastName)
+		assert.Equal(t, *user2.Auth0ID, *userResponse.Auth0ID)
+	})
 
-	assert.Equal(t, user2.UserID, userResponse.UserID)
-	assert.Equal(t, *user2.FirstName, *userResponse.FirstName)
-	assert.Equal(t, *user2.LastName, *userResponse.LastName)
-	assert.Equal(t, *user2.Auth0ID, *userResponse.Auth0ID)
-}
-
-func TestCreateUser(t *testing.T) {
-	config := config.NewConfig()
-	logger := logger.NewZapLogger()
-
-	db, _ := db.NewDatabase(
-		config.DBHost,
-		config.DBName,
-		config.DBPort,
-		config.DBUser,
-		config.DBPassword,
-		config.DBSSL,
-	)
+	t.Run("Test Create", func(t *testing.T) {
+		db.Exec("truncate table reviews cascade")
+		db.Exec("truncate table users cascade")
 
-	store := store.NewGormStore(db)
+		var jsonStr = []byte(`{
+			"first_name":"FirstName",
+			"last_name":"LastName"
+		}`)
 
-	controllers := controllers.NewControllers(store, config, logger)
-	router := chi.NewRouter()
-	server := server.NewServer(router, controllers, config, logger)
+		res, errRequest := http.Post(fmt.Sprint(testServer.URL, "/api/users"), "application/json", bytes.NewBuffer(jsonStr))
 
-	db.Exec("truncate table reviews cascade")
-	db.Exec("truncate table users cascade")
+		assert.Nil(t, errRequest)
 
-	testServer := httptest.NewServer(server.Routes())
-	defer testServer.Close()
+		assert.Equal(t, res.StatusCode, http.StatusCreated)
 
-	var jsonStr = []byte(`{
-		"first_name":"FirstName",
-		"last_name":"LastName"
-	}`)
+		decoder := json.NewDecoder(res.Body)
 
-	res, errRequest := http.Post(fmt.Sprint(testServer.URL, "/api/users"), "application/json", bytes.NewBuffer(jsonStr))
+		var userResponse models.User
+		errDecoder := decoder.Decode(&userResponse)
+		assert.Nil(t, errDecoder)
 
-	assert.Nil(t, errRequest)
+		assert.NotNil(t, userResponse.UserID)
+		assert.Equal(t, *userResponse.FirstName, "FirstName")
+		assert.Equal(t, *userResponse.LastName, "LastName")
+		// assert.Equal(t, *userResponse.Auth0ID, "auth0|loggedInUser")
 
-	assert.Equal(t, res.StatusCode, http.StatusCreated)
+		var userFound models.User
+		errFound := db.Where("user_id = ?", userResponse.UserID).First(&userFound).Error
 
-	decoder := json.NewDecoder(res.Body)
+		assert.Nil(t, errFound)
 
-	var userResponse models.User
-	errDecoder := decoder.Decode(&userResponse)
-	assert.Nil(t, errDecoder)
+		assert.Equal(t, *userFound.FirstName, "FirstName")
+		assert.Equal(t, *userFound.LastName, "LastName")
+		// assert.Equal(t, *userFound.Auth0ID, "auth0|loggedInUser")
+	})
 
-	assert.NotNil(t, userResponse.UserID)
-	assert.Equal(t, *userResponse.FirstName, "FirstName")
-	assert.Equal(t, *userResponse.LastName, "LastName")
-	// assert.Equal(t, *userResponse.Auth0ID, "auth0|loggedInUser")
+	t.Run("Test Modify", func(t *testing.T) {
+		db.Exec("truncate table reviews cascade")
+		db.Exec("truncate table users cascade")
 
-	var userFound models.User
-	errFound := db.Where("user_id = ?", userResponse.UserID).First(&userFound).Error
+		firstName:= "FirstName"
+		lastName:= "LastName"
+		auth0ID:= "Auth0ID"
+	  user := models.User{
+			FirstName: &firstName,
+			LastName: &lastName,
+			Auth0ID: &auth0ID,
+		}
 
-	assert.Nil(t, errFound)
+	  db.Create(&user)
 
-	assert.Equal(t, *userFound.FirstName, "FirstName")
-	assert.Equal(t, *userFound.LastName, "LastName")
-	// assert.Equal(t, *userFound.Auth0ID, "auth0|loggedInUser")
-}
+		var jsonStr = []byte(`{
+			"first_name":"FirstNameDifferent",
+			"last_name": "LastNameDifferent",
+			"auth0_id": "Auth0IDDifferent"
+		}`)
 
-func TestModifyUser(t *testing.T) {
-	config := config.NewConfig()
-	logger := logger.NewZapLogger()
+		req, errCreated := http.NewRequest(http.MethodPut, fmt.Sprint(testServer.URL, "/api/users/", user.UserID), bytes.NewBuffer(jsonStr))
+		assert.Nil(t, errCreated)
 
-	db, _ := db.NewDatabase(
-		config.DBHost,
-		config.DBName,
-		config.DBPort,
-		config.DBUser,
-		config.DBPassword,
-		config.DBSSL,
-	)
+		client := &http.Client{}
+		res, errRequest := client.Do(req)
 
-	store := store.NewGormStore(db)
+		assert.Nil(t, errRequest)
 
-	controllers := controllers.NewControllers(store, config, logger)
-	router := chi.NewRouter()
-	server := server.NewServer(router, controllers, config, logger)
+		assert.Equal(t, res.StatusCode, http.StatusOK)
 
-	db.Exec("truncate table reviews cascade")
-	db.Exec("truncate table users cascade")
+		decoder := json.NewDecoder(res.Body)
 
-	testServer := httptest.NewServer(server.Routes())
-	defer testServer.Close()
+		var userResponse models.User
+		errDecoder := decoder.Decode(&userResponse)
+		assert.Nil(t, errDecoder)
 
-	firstName:= "FirstName"
-	lastName:= "LastName"
-	auth0ID:= "Auth0ID"
-  user := models.User{
-		FirstName: &firstName,
-		LastName: &lastName,
-		Auth0ID: &auth0ID,
-	}
+		assert.Equal(t, *userResponse.FirstName, "FirstNameDifferent")
+		assert.Equal(t, *userResponse.LastName, "LastNameDifferent")
+		assert.Equal(t, *userResponse.Auth0ID, "Auth0IDDifferent")
 
-  db.Create(&user)
+		var userFound models.User
+	  errFound := db.Where("user_id = ?", user.UserID).First(&userFound).Error
 
-	var jsonStr = []byte(`{
-		"first_name":"FirstNameDifferent",
-		"last_name": "LastNameDifferent",
-		"auth0_id": "Auth0IDDifferent"
-	}`)
+		assert.Nil(t, errFound)
 
-	req, errCreated := http.NewRequest(http.MethodPut, fmt.Sprint(testServer.URL, "/api/users/", user.UserID), bytes.NewBuffer(jsonStr))
-	assert.Nil(t, errCreated)
+		assert.Equal(t, *userFound.FirstName, "FirstNameDifferent")
+		assert.Equal(t, *userFound.LastName, "LastNameDifferent")
+		assert.Equal(t, *userFound.Auth0ID, "Auth0IDDifferent")
+	})
 
-	client := &http.Client{}
-	res, errRequest := client.Do(req)
+	t.Run("Test Delete", func(t *testing.T) {
+		db.Exec("truncate table reviews cascade")
+		db.Exec("truncate table users cascade")
 
-	assert.Nil(t, errRequest)
+		firstName := "firstName"
+	  user := models.User{ FirstName: &firstName }
 
-	assert.Equal(t, res.StatusCode, http.StatusOK)
+	  db.Create(&user)
 
-	decoder := json.NewDecoder(res.Body)
+		req, errCreated := http.NewRequest(http.MethodDelete, fmt.Sprint(testServer.URL, "/api/users/", user.UserID), nil)
+		assert.Nil(t, errCreated)
 
-	var userResponse models.User
-	errDecoder := decoder.Decode(&userResponse)
-	assert.Nil(t, errDecoder)
+		client := &http.Client{}
+		res, errRequest := client.Do(req)
 
-	assert.Equal(t, *userResponse.FirstName, "FirstNameDifferent")
-	assert.Equal(t, *userResponse.LastName, "LastNameDifferent")
-	assert.Equal(t, *userResponse.Auth0ID, "Auth0IDDifferent")
+		assert.Nil(t, errRequest)
 
-	var userFound models.User
-  errFound := db.Where("user_id = ?", user.UserID).First(&userFound).Error
+		assert.Equal(t, res.StatusCode, http.StatusNoContent)
 
-	assert.Nil(t, errFound)
+		var userFound models.User
+	  errFound := db.Where("user_id = ?", user.UserID).First(&userFound).Error
 
-	assert.Equal(t, *userFound.FirstName, "FirstNameDifferent")
-	assert.Equal(t, *userFound.LastName, "LastNameDifferent")
-	assert.Equal(t, *userFound.Auth0ID, "Auth0IDDifferent")
-}
-
-func TestDeleteUser(t *testing.T) {
-	config := config.NewConfig()
-	logger := logger.NewZapLogger()
-
-	db, _ := db.NewDatabase(
-		config.DBHost,
-		config.DBName,
-		config.DBPort,
-		config.DBUser,
-		config.DBPassword,
-		config.DBSSL,
-	)
-
-	store := store.NewGormStore(db)
-
-	controllers := controllers.NewControllers(store, config, logger)
-	router := chi.NewRouter()
-	server := server.NewServer(router, controllers, config, logger)
-
-	db.Exec("truncate table reviews cascade")
-	db.Exec("truncate table users cascade")
-
-	testServer := httptest.NewServer(server.Routes())
-	defer testServer.Close()
-
-	firstName := "firstName"
-  user := models.User{ FirstName: &firstName }
-
-  db.Create(&user)
-
-	req, errCreated := http.NewRequest(http.MethodDelete, fmt.Sprint(testServer.URL, "/api/users/", user.UserID), nil)
-	assert.Nil(t, errCreated)
-
-	client := &http.Client{}
-	res, errRequest := client.Do(req)
-
-	assert.Nil(t, errRequest)
-
-	assert.Equal(t, res.StatusCode, http.StatusNoContent)
-
-	var userFound models.User
-  errFound := db.Where("user_id = ?", user.UserID).First(&userFound).Error
-
-	assert.Equal(t, errFound, gorm.ErrRecordNotFound)
+		assert.Equal(t, errFound, gorm.ErrRecordNotFound)
+	})
 }
