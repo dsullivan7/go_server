@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"encoding/json"
 
-	"go_server/internal/services"
 	"go_server/internal/models"
 
 	"github.com/go-chi/chi"
@@ -14,21 +13,23 @@ import (
   // "github.com/dgrijalva/jwt-go"
 )
 
-func GetUser(w http.ResponseWriter, r *http.Request) {
+func (c *Controllers) GetUser(w http.ResponseWriter, r *http.Request) {
 	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "userID")))
 
-	user := services.GetUser(userID)
+	user := c.store.GetUser(userID)
 
 	render.JSON(w, r, user)
 }
 
-func ListUsers(w http.ResponseWriter, r *http.Request) {
-	users := services.ListUsers(&models.User{})
+func (c *Controllers) ListUsers(w http.ResponseWriter, r *http.Request) {
+	query := map[string]interface{}{}
+
+	users := c.store.ListUsers(query)
 
 	render.JSON(w, r, users)
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func (c *Controllers) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var userPayload models.User
 
 	err := json.NewDecoder(r.Body).Decode(&userPayload)
@@ -43,13 +44,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	// 	userPayload.Auth0ID = auth0Id
 	// }
 
-	user := services.CreateUser(userPayload)
+	user := c.store.CreateUser(userPayload)
 
 	w.WriteHeader(http.StatusCreated)
 	render.JSON(w, r, user)
 }
 
-func ModifyUser(w http.ResponseWriter, r *http.Request) {
+func (c *Controllers) ModifyUser(w http.ResponseWriter, r *http.Request) {
 	var userPayload models.User
 	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "userID")))
 
@@ -60,15 +61,15 @@ func ModifyUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := services.ModifyUser(userID, userPayload)
+	user := c.store.ModifyUser(userID, userPayload)
 
 	render.JSON(w, r, user)
 }
 
-func DeleteUser(w http.ResponseWriter, r *http.Request) {
+func (c *Controllers) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "userID")))
 
-	services.DeleteUser(userID)
+	c.store.DeleteUser(userID)
 
 	w.WriteHeader(http.StatusNoContent)
 }

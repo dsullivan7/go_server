@@ -1,4 +1,4 @@
-package controllers
+package integration
 
 import (
 	"fmt"
@@ -7,34 +7,55 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
 	"gorm.io/gorm"
-
-	"go_server/internal/routes"
+	"go_server/internal/config"
 	"go_server/internal/models"
+	"go_server/internal/store"
+	"go_server/internal/controllers"
+	"go_server/internal/server"
+	"go_server/internal/logger"
 	"go_server/internal/db"
+	"github.com/go-chi/chi"
+
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetReview(t *testing.T) {
-	db.Connect()
-	db.DB.Exec("truncate table reviews cascade")
-	db.DB.Exec("truncate table users cascade")
+	config := config.NewConfig()
+	logger := logger.NewZapLogger()
 
-	testServer := httptest.NewServer(routes.Init())
+	db, _ := db.NewDatabase(
+		config.DBHost,
+		config.DBName,
+		config.DBPort,
+		config.DBUser,
+		config.DBPassword,
+		config.DBSSL,
+	)
+
+	store := store.NewGormStore(db)
+
+	controllers := controllers.NewControllers(store, config, logger)
+	router := chi.NewRouter()
+	server := server.NewServer(router, controllers, config, logger)
+
+	db.Exec("truncate table reviews cascade")
+	db.Exec("truncate table users cascade")
+
+	testServer := httptest.NewServer(server.Routes())
 	defer testServer.Close()
 
 	user1 := models.User{}
 	user2 := models.User{}
 
-	db.DB.Create(&user1)
-	db.DB.Create(&user2)
+	db.Create(&user1)
+	db.Create(&user2)
 
 	text := "Text"
   review := models.Review{ FromUserID: &user1.UserID, ToUserID: &user2.UserID, Text: &text }
 
-  db.DB.Create(&review)
+  db.Create(&review)
 
 	res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/reviews/", review.ReviewID))
 
@@ -56,11 +77,28 @@ func TestGetReview(t *testing.T) {
 }
 
 func TestListReviews(t *testing.T) {
-	db.Connect()
-	db.DB.Exec("truncate table reviews cascade")
-	db.DB.Exec("truncate table users cascade")
+	config := config.NewConfig()
+	logger := logger.NewZapLogger()
 
-	testServer := httptest.NewServer(routes.Init())
+	db, _ := db.NewDatabase(
+		config.DBHost,
+		config.DBName,
+		config.DBPort,
+		config.DBUser,
+		config.DBPassword,
+		config.DBSSL,
+	)
+
+	store := store.NewGormStore(db)
+
+	controllers := controllers.NewControllers(store, config, logger)
+	router := chi.NewRouter()
+	server := server.NewServer(router, controllers, config, logger)
+
+	db.Exec("truncate table reviews cascade")
+	db.Exec("truncate table users cascade")
+
+	testServer := httptest.NewServer(server.Routes())
 	defer testServer.Close()
 
 	user1 := models.User{}
@@ -68,10 +106,10 @@ func TestListReviews(t *testing.T) {
 	user3 := models.User{}
 	user4 := models.User{}
 
-	db.DB.Create(&user1)
-	db.DB.Create(&user2)
-	db.DB.Create(&user3)
-	db.DB.Create(&user4)
+	db.Create(&user1)
+	db.Create(&user2)
+	db.Create(&user3)
+	db.Create(&user4)
 
 	text1 := "Text1"
   review1 := models.Review{ FromUserID: &user1.UserID, ToUserID: &user2.UserID, Text: &text1 }
@@ -79,8 +117,8 @@ func TestListReviews(t *testing.T) {
 	text2 := "Text2"
   review2 := models.Review{ FromUserID: &user2.UserID, ToUserID: &user3.UserID, Text: &text2 }
 
-	db.DB.Create(&review1)
-	db.DB.Create(&review2)
+	db.Create(&review1)
+	db.Create(&review2)
 
 	res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/reviews"))
 
@@ -101,6 +139,7 @@ func TestListReviews(t *testing.T) {
 	for _, value := range reviewsFound {
     if value.ReviewID == review1.ReviewID {
 			reviewResponse = value
+
 			break
     }
 	}
@@ -113,6 +152,7 @@ func TestListReviews(t *testing.T) {
 	for _, value := range reviewsFound {
     if value.ReviewID == review2.ReviewID {
 			reviewResponse = value
+
 			break
     }
 	}
@@ -145,18 +185,35 @@ func TestListReviews(t *testing.T) {
 }
 
 func TestCreateReivew(t *testing.T) {
-	db.Connect()
-	db.DB.Exec("truncate table reviews cascade")
-	db.DB.Exec("truncate table users cascade")
+	config := config.NewConfig()
+	logger := logger.NewZapLogger()
 
-	testServer := httptest.NewServer(routes.Init())
+	db, _ := db.NewDatabase(
+		config.DBHost,
+		config.DBName,
+		config.DBPort,
+		config.DBUser,
+		config.DBPassword,
+		config.DBSSL,
+	)
+
+	store := store.NewGormStore(db)
+
+	controllers := controllers.NewControllers(store, config, logger)
+	router := chi.NewRouter()
+	server := server.NewServer(router, controllers, config, logger)
+
+	db.Exec("truncate table reviews cascade")
+	db.Exec("truncate table users cascade")
+
+	testServer := httptest.NewServer(server.Routes())
 	defer testServer.Close()
 
 	user1 := models.User{}
 	user2 := models.User{}
 
-	db.DB.Create(&user1)
-	db.DB.Create(&user2)
+	db.Create(&user1)
+	db.Create(&user2)
 
 	var jsonStr = []byte(fmt.Sprintf(`{"text":"Text", "from_user_id": "%s", "to_user_id": "%s"}`, &user1.UserID, &user2.UserID))
 
@@ -178,7 +235,7 @@ func TestCreateReivew(t *testing.T) {
 	assert.Equal(t, *reviewResponse.Text, "Text")
 
 	var reviewFound models.Review
-	errFound := db.DB.Where("review_id = ?", reviewResponse.ReviewID).First(&reviewFound).Error
+	errFound := db.Where("review_id = ?", reviewResponse.ReviewID).First(&reviewFound).Error
 
 	assert.Nil(t, errFound)
 
@@ -188,23 +245,40 @@ func TestCreateReivew(t *testing.T) {
 }
 
 func TestModifyReview(t *testing.T) {
-	db.Connect()
-	db.DB.Exec("truncate table reviews cascade")
-	db.DB.Exec("truncate table users cascade")
+	config := config.NewConfig()
+	logger := logger.NewZapLogger()
 
-	testServer := httptest.NewServer(routes.Init())
+	db, _ := db.NewDatabase(
+		config.DBHost,
+		config.DBName,
+		config.DBPort,
+		config.DBUser,
+		config.DBPassword,
+		config.DBSSL,
+	)
+
+	store := store.NewGormStore(db)
+
+	controllers := controllers.NewControllers(store, config, logger)
+	router := chi.NewRouter()
+	server := server.NewServer(router, controllers, config, logger)
+
+	db.Exec("truncate table reviews cascade")
+	db.Exec("truncate table users cascade")
+
+	testServer := httptest.NewServer(server.Routes())
 	defer testServer.Close()
 
 	user1 := models.User{}
 	user2 := models.User{}
 
-	db.DB.Create(&user1)
-	db.DB.Create(&user2)
+	db.Create(&user1)
+	db.Create(&user2)
 
 	text := "Text"
   review := models.Review{ FromUserID: &user1.UserID, ToUserID: &user2.UserID, Text: &text }
 
-	db.DB.Create(&review)
+	db.Create(&review)
 
 	var jsonStr = []byte(`{"text":"TextDifferent"}`)
 
@@ -228,7 +302,7 @@ func TestModifyReview(t *testing.T) {
 	assert.Equal(t, *reviewResponse.Text, "TextDifferent")
 
 	var reviewFound models.Review
-  errFound := db.DB.Where("review_id = ?", review.ReviewID).First(&reviewFound).Error
+  errFound := db.Where("review_id = ?", review.ReviewID).First(&reviewFound).Error
 
 	assert.Nil(t, errFound)
 
@@ -237,23 +311,40 @@ func TestModifyReview(t *testing.T) {
 }
 
 func TestDeleteReview(t *testing.T) {
-	db.Connect()
-	db.DB.Exec("truncate table reviews cascade")
-	db.DB.Exec("truncate table users cascade")
+	config := config.NewConfig()
+	logger := logger.NewZapLogger()
 
-	testServer := httptest.NewServer(routes.Init())
+	db, _ := db.NewDatabase(
+		config.DBHost,
+		config.DBName,
+		config.DBPort,
+		config.DBUser,
+		config.DBPassword,
+		config.DBSSL,
+	)
+
+	store := store.NewGormStore(db)
+
+	controllers := controllers.NewControllers(store, config, logger)
+	router := chi.NewRouter()
+	server := server.NewServer(router, controllers, config, logger)
+
+	db.Exec("truncate table reviews cascade")
+	db.Exec("truncate table users cascade")
+
+	testServer := httptest.NewServer(server.Routes())
 	defer testServer.Close()
 
 	user1 := models.User{}
 	user2 := models.User{}
 
-	db.DB.Create(&user1)
-	db.DB.Create(&user2)
+	db.Create(&user1)
+	db.Create(&user2)
 
 	text := "Text"
   review := models.Review{ FromUserID: &user1.UserID, ToUserID: &user2.UserID, Text: &text }
 
-	db.DB.Create(&review)
+	db.Create(&review)
 
 	req, errCreate := http.NewRequest(http.MethodDelete, fmt.Sprint(testServer.URL, "/api/reviews/", review.ReviewID), nil)
 	assert.Nil(t, errCreate)
@@ -266,7 +357,7 @@ func TestDeleteReview(t *testing.T) {
 	assert.Equal(t, res.StatusCode, http.StatusNoContent)
 
 	var reviewFound models.Review
-  errFound := db.DB.Where("review_id = ?", review.ReviewID).First(&reviewFound).Error
+  errFound := db.Where("review_id = ?", review.ReviewID).First(&reviewFound).Error
 
 	assert.Equal(t, errFound, gorm.ErrRecordNotFound)
 }

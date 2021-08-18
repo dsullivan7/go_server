@@ -1,16 +1,15 @@
-package services
+package store
 
 import (
-	"go_server/internal/db"
 	"go_server/internal/models"
 
 	"github.com/google/uuid"
 )
 
-func GetUser(userID uuid.UUID) models.User {
+func (gormStore *GormStore) GetUser(userID uuid.UUID) models.User {
   var user models.User
 
-  err := db.DB.First(&user, userID).Error
+  err := gormStore.database.First(&user, userID).Error
 
   if err != nil {
     panic("Error finding user")
@@ -19,10 +18,10 @@ func GetUser(userID uuid.UUID) models.User {
 	return user
 }
 
-func ListUsers(query *models.User) []models.User {
+func (gormStore *GormStore) ListUsers(query map[string]interface{}) []models.User {
   var users []models.User
 
-  err := db.DB.Where(query).Order("created_at desc").Find(&users).Error
+  err := gormStore.database.Where(query).Order("created_at desc").Find(&users).Error
 
   if err != nil {
     panic("Error listing users")
@@ -31,10 +30,10 @@ func ListUsers(query *models.User) []models.User {
 	return users
 }
 
-func CreateUser(userPayload models.User) models.User {
+func (gormStore *GormStore) CreateUser(userPayload models.User) models.User {
 	user := userPayload
 
-  err := db.DB.Create(&user).Error
+  err := gormStore.database.Create(&user).Error
 
   if err != nil {
     panic("Error creating user")
@@ -43,10 +42,10 @@ func CreateUser(userPayload models.User) models.User {
 	return user
 }
 
-func ModifyUser(userID uuid.UUID, userPayload models.User) models.User {
+func (gormStore *GormStore) ModifyUser(userID uuid.UUID, userPayload models.User) models.User {
 	var userFound models.User
 
-	errFind := db.DB.Where("user_id = ?", userID).First(&userFound).Error
+	errFind := gormStore.database.Where("user_id = ?", userID).First(&userFound).Error
 
 	if errFind != nil {
 		panic("Error finding user")
@@ -64,7 +63,7 @@ func ModifyUser(userID uuid.UUID, userPayload models.User) models.User {
 		userFound.Auth0ID = userPayload.Auth0ID
 	}
 
-  errUpdate := db.DB.Save(&userFound).Error
+  errUpdate := gormStore.database.Save(&userFound).Error
 
   if errUpdate != nil {
     panic("Error updating user")
@@ -73,9 +72,9 @@ func ModifyUser(userID uuid.UUID, userPayload models.User) models.User {
 	return userFound
 }
 
-func DeleteUser(userID uuid.UUID) {
+func (gormStore *GormStore) DeleteUser(userID uuid.UUID) {
 
-  errUpdate := db.DB.Delete(&models.User{}, userID).Error
+  errUpdate := gormStore.database.Delete(&models.User{}, userID).Error
 
   if errUpdate != nil {
     panic("Error deleting user")

@@ -1,16 +1,15 @@
-package services
+package store
 
 import (
-	"go_server/internal/db"
 	"go_server/internal/models"
 
 	"github.com/google/uuid"
 )
 
-func GetReview(reviewID uuid.UUID) models.Review {
+func (gormStore *GormStore) GetReview(reviewID uuid.UUID) models.Review {
   var review models.Review
 
-  err := db.DB.First(&review, reviewID).Error
+  err := gormStore.database.First(&review, reviewID).Error
 
   if err != nil {
     panic("Error finding review")
@@ -19,10 +18,10 @@ func GetReview(reviewID uuid.UUID) models.Review {
 	return review
 }
 
-func ListReviews(query map[string]interface{}) []models.Review {
+func (gormStore *GormStore) ListReviews(query map[string]interface{}) []models.Review {
   var reviews []models.Review
 
-  err := db.DB.Where(query).Order("created_at desc").Find(&reviews).Error
+  err := gormStore.database.Where(query).Order("created_at desc").Find(&reviews).Error
 
   if err != nil {
     panic("Error listing reviews")
@@ -31,10 +30,10 @@ func ListReviews(query map[string]interface{}) []models.Review {
 	return reviews
 }
 
-func CreateReview(reviewPayload models.Review) models.Review {
+func (gormStore *GormStore) CreateReview(reviewPayload models.Review) models.Review {
 	review := reviewPayload
 
-  err := db.DB.Create(&review).Error
+  err := gormStore.database.Create(&review).Error
 
   if err != nil {
     panic("Error creating review")
@@ -43,10 +42,10 @@ func CreateReview(reviewPayload models.Review) models.Review {
 	return review
 }
 
-func ModifyReview(reviewID uuid.UUID, reviewPayload models.Review) models.Review {
+func (gormStore *GormStore) ModifyReview(reviewID uuid.UUID, reviewPayload models.Review) models.Review {
 	var reviewFound models.Review
 
-	errFind := db.DB.Where("review_id = ?", reviewID).First(&reviewFound).Error
+	errFind := gormStore.database.Where("review_id = ?", reviewID).First(&reviewFound).Error
 
 	if errFind != nil {
 		panic("Error finding review")
@@ -64,7 +63,7 @@ func ModifyReview(reviewID uuid.UUID, reviewPayload models.Review) models.Review
 		reviewFound.Text = reviewPayload.Text
 	}
 
-  errUpdate := db.DB.Save(&reviewFound).Error
+  errUpdate := gormStore.database.Save(&reviewFound).Error
 
   if errUpdate != nil {
     panic("Error updating review")
@@ -73,9 +72,9 @@ func ModifyReview(reviewID uuid.UUID, reviewPayload models.Review) models.Review
 	return reviewFound
 }
 
-func DeleteReview(reviewID uuid.UUID) {
+func (gormStore *GormStore) DeleteReview(reviewID uuid.UUID) {
 
-  errUpdate := db.DB.Delete(&models.Review{}, reviewID).Error
+  errUpdate := gormStore.database.Delete(&models.Review{}, reviewID).Error
 
   if errUpdate != nil {
     panic("Error deleting review")

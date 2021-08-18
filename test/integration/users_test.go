@@ -1,22 +1,23 @@
-package controllers
+package integration
 
 import (
+	// jwt "github.com/dgrijalva/jwt-go"
 	"fmt"
-	"context"
 	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	jwt "github.com/dgrijalva/jwt-go"
-
 	"gorm.io/gorm"
-
-	"go_server/internal/routes"
+	"go_server/internal/config"
 	"go_server/internal/models"
+	"go_server/internal/store"
+	"go_server/internal/controllers"
+	"go_server/internal/server"
+	"go_server/internal/logger"
 	"go_server/internal/db"
-	"go_server/internal/middlewares"
+	"github.com/go-chi/chi"
+
 
 	"github.com/stretchr/testify/assert"
 )
@@ -25,20 +26,38 @@ type userString string
 const userKey = userString("user")
 
 func init() {
-	middlewares.Auth = func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			jwtToken := &jwt.Token{ Claims: jwt.MapClaims{ "sub": "auth0|loggedInUser" } }
-	    newContext := context.WithValue(r.Context(), userKey, jwtToken)
-      h.ServeHTTP(w, r.WithContext(newContext))
-	  })
-	}
+	// middlewares.Auth = func(h http.Handler) http.Handler {
+	// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// 		jwtToken := &jwt.Token{ Claims: jwt.MapClaims{ "sub": "auth0|loggedInUser" } }
+	//     newContext := context.WithValue(r.Context(), userKey, jwtToken)
+  //     h.ServeHTTP(w, r.WithContext(newContext))
+	//   })
+	// }
 }
 
 func TestGetUser(t *testing.T) {
-	db.Connect()
-	db.DB.Exec("truncate table users cascade")
+	config := config.NewConfig()
+	logger := logger.NewZapLogger()
 
-	testServer := httptest.NewServer(routes.Init())
+	db, _ := db.NewDatabase(
+		config.DBHost,
+		config.DBName,
+		config.DBPort,
+		config.DBUser,
+		config.DBPassword,
+		config.DBSSL,
+	)
+
+	store := store.NewGormStore(db)
+
+	controllers := controllers.NewControllers(store, config, logger)
+	router := chi.NewRouter()
+	server := server.NewServer(router, controllers, config, logger)
+
+	db.Exec("truncate table reviews cascade")
+	db.Exec("truncate table users cascade")
+
+	testServer := httptest.NewServer(server.Routes())
 	defer testServer.Close()
 
 	firstName := "firstName"
@@ -51,7 +70,7 @@ func TestGetUser(t *testing.T) {
 		Auth0ID: &auth0ID,
 	 }
 
-  db.DB.Create(&user)
+  db.Create(&user)
 
 	res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/users/", user.UserID))
 
@@ -72,10 +91,28 @@ func TestGetUser(t *testing.T) {
 }
 
 func TestListUsers(t *testing.T) {
-	db.Connect()
-	db.DB.Exec("truncate table users cascade")
+	config := config.NewConfig()
+	logger := logger.NewZapLogger()
 
-	testServer := httptest.NewServer(routes.Init())
+	db, _ := db.NewDatabase(
+		config.DBHost,
+		config.DBName,
+		config.DBPort,
+		config.DBUser,
+		config.DBPassword,
+		config.DBSSL,
+	)
+
+	store := store.NewGormStore(db)
+
+	controllers := controllers.NewControllers(store, config, logger)
+	router := chi.NewRouter()
+	server := server.NewServer(router, controllers, config, logger)
+
+	db.Exec("truncate table reviews cascade")
+	db.Exec("truncate table users cascade")
+
+	testServer := httptest.NewServer(server.Routes())
 	defer testServer.Close()
 
 	firstName1 := "firstName1"
@@ -98,8 +135,8 @@ func TestListUsers(t *testing.T) {
 		Auth0ID: &auth0Id2,
 	}
 
-  db.DB.Create(&user1)
-	db.DB.Create(&user2)
+  db.Create(&user1)
+	db.Create(&user2)
 
 	res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/users"))
 
@@ -143,10 +180,28 @@ func TestListUsers(t *testing.T) {
 }
 
 func TestCreateUser(t *testing.T) {
-	db.Connect()
-	db.DB.Exec("truncate table users cascade")
+	config := config.NewConfig()
+	logger := logger.NewZapLogger()
 
-	testServer := httptest.NewServer(routes.Init())
+	db, _ := db.NewDatabase(
+		config.DBHost,
+		config.DBName,
+		config.DBPort,
+		config.DBUser,
+		config.DBPassword,
+		config.DBSSL,
+	)
+
+	store := store.NewGormStore(db)
+
+	controllers := controllers.NewControllers(store, config, logger)
+	router := chi.NewRouter()
+	server := server.NewServer(router, controllers, config, logger)
+
+	db.Exec("truncate table reviews cascade")
+	db.Exec("truncate table users cascade")
+
+	testServer := httptest.NewServer(server.Routes())
 	defer testServer.Close()
 
 	var jsonStr = []byte(`{
@@ -172,7 +227,7 @@ func TestCreateUser(t *testing.T) {
 	// assert.Equal(t, *userResponse.Auth0ID, "auth0|loggedInUser")
 
 	var userFound models.User
-	errFound := db.DB.Where("user_id = ?", userResponse.UserID).First(&userFound).Error
+	errFound := db.Where("user_id = ?", userResponse.UserID).First(&userFound).Error
 
 	assert.Nil(t, errFound)
 
@@ -182,10 +237,28 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestModifyUser(t *testing.T) {
-	db.Connect()
-	db.DB.Exec("truncate table users cascade")
+	config := config.NewConfig()
+	logger := logger.NewZapLogger()
 
-	testServer := httptest.NewServer(routes.Init())
+	db, _ := db.NewDatabase(
+		config.DBHost,
+		config.DBName,
+		config.DBPort,
+		config.DBUser,
+		config.DBPassword,
+		config.DBSSL,
+	)
+
+	store := store.NewGormStore(db)
+
+	controllers := controllers.NewControllers(store, config, logger)
+	router := chi.NewRouter()
+	server := server.NewServer(router, controllers, config, logger)
+
+	db.Exec("truncate table reviews cascade")
+	db.Exec("truncate table users cascade")
+
+	testServer := httptest.NewServer(server.Routes())
 	defer testServer.Close()
 
 	firstName:= "FirstName"
@@ -197,7 +270,7 @@ func TestModifyUser(t *testing.T) {
 		Auth0ID: &auth0ID,
 	}
 
-  db.DB.Create(&user)
+  db.Create(&user)
 
 	var jsonStr = []byte(`{
 		"first_name":"FirstNameDifferent",
@@ -226,7 +299,7 @@ func TestModifyUser(t *testing.T) {
 	assert.Equal(t, *userResponse.Auth0ID, "Auth0IDDifferent")
 
 	var userFound models.User
-  errFound := db.DB.Where("user_id = ?", user.UserID).First(&userFound).Error
+  errFound := db.Where("user_id = ?", user.UserID).First(&userFound).Error
 
 	assert.Nil(t, errFound)
 
@@ -236,16 +309,34 @@ func TestModifyUser(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
-	db.Connect()
-	db.DB.Exec("truncate table users cascade")
+	config := config.NewConfig()
+	logger := logger.NewZapLogger()
 
-	testServer := httptest.NewServer(routes.Init())
+	db, _ := db.NewDatabase(
+		config.DBHost,
+		config.DBName,
+		config.DBPort,
+		config.DBUser,
+		config.DBPassword,
+		config.DBSSL,
+	)
+
+	store := store.NewGormStore(db)
+
+	controllers := controllers.NewControllers(store, config, logger)
+	router := chi.NewRouter()
+	server := server.NewServer(router, controllers, config, logger)
+
+	db.Exec("truncate table reviews cascade")
+	db.Exec("truncate table users cascade")
+
+	testServer := httptest.NewServer(server.Routes())
 	defer testServer.Close()
 
 	firstName := "firstName"
   user := models.User{ FirstName: &firstName }
 
-  db.DB.Create(&user)
+  db.Create(&user)
 
 	req, errCreated := http.NewRequest(http.MethodDelete, fmt.Sprint(testServer.URL, "/api/users/", user.UserID), nil)
 	assert.Nil(t, errCreated)
@@ -258,7 +349,7 @@ func TestDeleteUser(t *testing.T) {
 	assert.Equal(t, res.StatusCode, http.StatusNoContent)
 
 	var userFound models.User
-  errFound := db.DB.Where("user_id = ?", user.UserID).First(&userFound).Error
+  errFound := db.Where("user_id = ?", user.UserID).First(&userFound).Error
 
 	assert.Equal(t, errFound, gorm.ErrRecordNotFound)
 }
