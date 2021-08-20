@@ -1,16 +1,13 @@
 package controllers
 
 import (
-	"net/http"
 	"encoding/json"
-
 	"go_server/internal/models"
+	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
-
-  // "github.com/dgrijalva/jwt-go"
 )
 
 func (c *Controllers) GetUser(w http.ResponseWriter, r *http.Request) {
@@ -33,9 +30,9 @@ func (c *Controllers) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var userPayload models.User
 
 	err := json.NewDecoder(r.Body).Decode(&userPayload)
+	if err != nil {
+		w.WriteHeader(HTTP400)
 
-	if (err != nil) {
-		w.WriteHeader(400)
 		return
 	}
 
@@ -52,12 +49,13 @@ func (c *Controllers) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 func (c *Controllers) ModifyUser(w http.ResponseWriter, r *http.Request) {
 	var userPayload models.User
+
 	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "userID")))
 
 	err := json.NewDecoder(r.Body).Decode(&userPayload)
+	if err != nil {
+		w.WriteHeader(HTTP400)
 
-	if (err != nil) {
-		w.WriteHeader(400)
 		return
 	}
 

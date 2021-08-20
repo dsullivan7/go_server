@@ -45,5 +45,5 @@ func NewDatabase(
 		&gorm.Config{},
 	)
 
-	return database, err
+	return database, fmt.Errorf("failed to open db connection: %w", err)
 }

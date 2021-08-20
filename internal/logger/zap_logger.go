@@ -1,19 +1,24 @@
 package logger
 
 import (
-  "go.uber.org/zap"
+	"fmt"
+
+	"go.uber.org/zap"
 )
 
 type ZapLogger struct {
-  logger *zap.Logger
+	logger *zap.Logger
 }
 
-func NewZapLogger() Logger {
-  logger, _ := zap.NewProduction()
+func NewZapLogger() (Logger, error) {
+	logger, err := zap.NewProduction()
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize zap logger: %w", err)
+	}
 
-  return &ZapLogger{ logger: logger }
+	return &ZapLogger{logger: logger}, nil
 }
 
-func (l *ZapLogger) Info(args ...interface{}) {
-	println("blah")
+func (logger *ZapLogger) Info(message string) {
+	logger.logger.Info(message)
 }

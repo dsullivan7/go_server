@@ -1,23 +1,24 @@
-package integration
+package integration_test
 
 import (
-	// jwt "github.com/dgrijalva/jwt-go"
-	"fmt"
+	// jwt "github.com/dgrijalva/jwt-go".
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"go_server/internal/config"
+	"go_server/internal/controllers"
+	"go_server/internal/db"
+	"go_server/internal/logger"
+	"go_server/internal/models"
+	"go_server/internal/server"
+	"go_server/internal/store"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"gorm.io/gorm"
-	"go_server/internal/config"
-	"go_server/internal/models"
-	"go_server/internal/store"
-	"go_server/internal/controllers"
-	"go_server/internal/server"
-	"go_server/internal/logger"
-	"go_server/internal/db"
+
 	"github.com/go-chi/chi"
 
+	"gorm.io/gorm"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -26,17 +27,19 @@ import (
 // const userKey = userString("user")
 
 // func init() {
-	// middlewares.Auth = func(h http.Handler) http.Handler {
-	// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	// 		jwtToken := &jwt.Token{ Claims: jwt.MapClaims{ "sub": "auth0|loggedInUser" } }
-	//     newContext := context.WithValue(r.Context(), userKey, jwtToken)
-  //     h.ServeHTTP(w, r.WithContext(newContext))
-	//   })
-	// }
+// middlewares.Auth = func(h http.Handler) http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		jwtToken := &jwt.Token{ Claims: jwt.MapClaims{ "sub": "auth0|loggedInUser" } }
+//     newContext := context.WithValue(r.Context(), userKey, jwtToken)
+//     h.ServeHTTP(w, r.WithContext(newContext))
+//   })
 // }
+// }
+
 func TestUsers(t *testing.T) {
 	config := config.NewConfig()
-	logger := logger.NewZapLogger()
+	logger, errLogger := logger.NewZapLogger()
+	assert.Nil(t, errLogger)
 
 	db, _ := db.NewDatabase(
 		config.DBHost,
@@ -64,13 +67,13 @@ func TestUsers(t *testing.T) {
 		lastName := "lastName"
 		auth0ID := "auth0ID"
 
-	  user := models.User{
+		user := models.User{
 			FirstName: &firstName,
-			LastName: &lastName,
-			Auth0ID: &auth0ID,
-		 }
+			LastName:  &lastName,
+			Auth0ID:   &auth0ID,
+		}
 
-	  db.Create(&user)
+		db.Create(&user)
 
 		res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/users/", user.UserID))
 
@@ -102,19 +105,19 @@ func TestUsers(t *testing.T) {
 		lastName2 := "lastName2"
 		auth0Id2 := "auth0Id2"
 
-	  user1 := models.User{
+		user1 := models.User{
 			FirstName: &firstName1,
-			LastName: &lastName1,
-			Auth0ID: &auth0Id1,
+			LastName:  &lastName1,
+			Auth0ID:   &auth0Id1,
 		}
 
-	  user2 := models.User{
+		user2 := models.User{
 			FirstName: &firstName2,
-			LastName: &lastName2,
-			Auth0ID: &auth0Id2,
+			LastName:  &lastName2,
+			Auth0ID:   &auth0Id2,
 		}
 
-	  db.Create(&user1)
+		db.Create(&user1)
 		db.Create(&user2)
 
 		res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/users"))
@@ -134,10 +137,11 @@ func TestUsers(t *testing.T) {
 		var userResponse models.User
 
 		for _, value := range usersFound {
-	    if value.UserID == user1.UserID {
+			if value.UserID == user1.UserID {
 				userResponse = value
+
 				break
-	    }
+			}
 		}
 
 		assert.Equal(t, user1.UserID, userResponse.UserID)
@@ -146,10 +150,11 @@ func TestUsers(t *testing.T) {
 		assert.Equal(t, *user1.Auth0ID, *userResponse.Auth0ID)
 
 		for _, value := range usersFound {
-	    if value.UserID == user2.UserID {
+			if value.UserID == user2.UserID {
 				userResponse = value
+
 				break
-	    }
+			}
 		}
 
 		assert.Equal(t, user2.UserID, userResponse.UserID)
@@ -162,7 +167,7 @@ func TestUsers(t *testing.T) {
 		db.Exec("truncate table reviews cascade")
 		db.Exec("truncate table users cascade")
 
-		var jsonStr = []byte(`{
+		jsonStr := []byte(`{
 			"first_name":"FirstName",
 			"last_name":"LastName"
 		}`)
@@ -198,25 +203,28 @@ func TestUsers(t *testing.T) {
 		db.Exec("truncate table reviews cascade")
 		db.Exec("truncate table users cascade")
 
-		firstName:= "FirstName"
-		lastName:= "LastName"
-		auth0ID:= "Auth0ID"
-	  user := models.User{
+		firstName := "FirstName"
+		lastName := "LastName"
+		auth0ID := "Auth0ID"
+		user := models.User{
 			FirstName: &firstName,
-			LastName: &lastName,
-			Auth0ID: &auth0ID,
+			LastName:  &lastName,
+			Auth0ID:   &auth0ID,
 		}
 
-	  db.Create(&user)
+		db.Create(&user)
 
-		var jsonStr = []byte(`{
+		jsonStr := []byte(`{
 			"first_name":"FirstNameDifferent",
 			"last_name": "LastNameDifferent",
 			"auth0_id": "Auth0IDDifferent"
 		}`)
 
-		req, errCreated := http.NewRequest(http.MethodPut, fmt.Sprint(testServer.URL, "/api/users/", user.UserID), bytes.NewBuffer(jsonStr))
-		assert.Nil(t, errCreated)
+		req, errCreate := http.NewRequest(
+			http.MethodPut,
+			fmt.Sprint(testServer.URL, "/api/users/", user.UserID), bytes.NewBuffer(jsonStr),
+		)
+		assert.Nil(t, errCreate)
 
 		client := &http.Client{}
 		res, errRequest := client.Do(req)
@@ -236,7 +244,7 @@ func TestUsers(t *testing.T) {
 		assert.Equal(t, *userResponse.Auth0ID, "Auth0IDDifferent")
 
 		var userFound models.User
-	  errFound := db.Where("user_id = ?", user.UserID).First(&userFound).Error
+		errFound := db.Where("user_id = ?", user.UserID).First(&userFound).Error
 
 		assert.Nil(t, errFound)
 
@@ -250,12 +258,16 @@ func TestUsers(t *testing.T) {
 		db.Exec("truncate table users cascade")
 
 		firstName := "firstName"
-	  user := models.User{ FirstName: &firstName }
+		user := models.User{FirstName: &firstName}
 
-	  db.Create(&user)
+		db.Create(&user)
 
-		req, errCreated := http.NewRequest(http.MethodDelete, fmt.Sprint(testServer.URL, "/api/users/", user.UserID), nil)
-		assert.Nil(t, errCreated)
+		req, errCreate := http.NewRequest(
+			http.MethodDelete,
+			fmt.Sprint(testServer.URL, "/api/users/", user.UserID),
+			nil,
+		)
+		assert.Nil(t, errCreate)
 
 		client := &http.Client{}
 		res, errRequest := client.Do(req)
@@ -265,7 +277,7 @@ func TestUsers(t *testing.T) {
 		assert.Equal(t, res.StatusCode, http.StatusNoContent)
 
 		var userFound models.User
-	  errFound := db.Where("user_id = ?", user.UserID).First(&userFound).Error
+		errFound := db.Where("user_id = ?", user.UserID).First(&userFound).Error
 
 		assert.Equal(t, errFound, gorm.ErrRecordNotFound)
 	})

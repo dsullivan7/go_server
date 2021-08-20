@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
+	"go_server/internal/models"
 	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
-	"go_server/internal/models"
 )
 
 func (c *Controllers) GetReview(w http.ResponseWriter, r *http.Request) {
@@ -18,16 +18,16 @@ func (c *Controllers) GetReview(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, review)
 }
 
-func (c *Controllers)  ListReviews(w http.ResponseWriter, r *http.Request) {
+func (c *Controllers) ListReviews(w http.ResponseWriter, r *http.Request) {
 	query := map[string]interface{}{}
 	fromUserID := r.URL.Query().Get("from_user_id")
 	toUserID := r.URL.Query().Get("to_user_id")
 
-	if (fromUserID != "") {
+	if fromUserID != "" {
 		query["from_user_id"] = fromUserID
 	}
 
-	if (toUserID != "") {
+	if toUserID != "" {
 		query["to_user_id"] = toUserID
 	}
 
@@ -40,9 +40,9 @@ func (c *Controllers) CreateReview(w http.ResponseWriter, r *http.Request) {
 	var reviewPayload models.Review
 
 	err := json.NewDecoder(r.Body).Decode(&reviewPayload)
+	if err != nil {
+		w.WriteHeader(HTTP400)
 
-	if (err != nil) {
-		w.WriteHeader(400)
 		return
 	}
 
@@ -54,12 +54,13 @@ func (c *Controllers) CreateReview(w http.ResponseWriter, r *http.Request) {
 
 func (c *Controllers) ModifyReview(w http.ResponseWriter, r *http.Request) {
 	var reviewPayload models.Review
+
 	reviewID := uuid.Must(uuid.Parse(chi.URLParam(r, "reviewID")))
 
 	err := json.NewDecoder(r.Body).Decode(&reviewPayload)
+	if err != nil {
+		w.WriteHeader(HTTP400)
 
-	if (err != nil) {
-		w.WriteHeader(400)
 		return
 	}
 

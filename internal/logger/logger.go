@@ -1,5 +1,5 @@
 package logger
 
 type Logger interface {
-  Info(args ...interface{})
+	Info(message string)
 }

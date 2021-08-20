@@ -2,8 +2,30 @@ linters:
   enable-all: true
   disable:
     - gci
+    - gofmt
     - scopelint
     - interfacer
     - golint
     - maligned
     - exhaustivestruct
+linters-settings:
+  tagliatelle:
+    case:
+      rules:
+        json: snake
+  gomnd:
+    settings:
+      mnd:
+        ignored-files: config.go
+issues:
+  exclude-rules:
+    - path: internal/store/
+      linters:
+        - dupl
+    - path: _test\.go
+      linters:
+        - funlen
+        - goconst
+    - path: test/integration
+      linters:
+        - paralleltest

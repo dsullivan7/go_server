@@ -2,11 +2,10 @@ package middlewares
 
 import (
 	"net/http"
-  "time"
+	"time"
 
-  "go.uber.org/zap"
-
-  "github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/middleware"
+	"go.uber.org/zap"
 )
 
 func Logger(l *zap.Logger) func(next http.Handler) http.Handler {
@@ -29,6 +28,7 @@ func Logger(l *zap.Logger) func(next http.Handler) http.Handler {
 
 			next.ServeHTTP(ww, r)
 		}
+
 		return http.HandlerFunc(fn)
 	}
 }
