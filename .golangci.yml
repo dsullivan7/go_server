@@ -20,7 +20,7 @@ linters-settings:
         ignored-files: config.go
   gofumpt:
     lang-version: "1.17"
-    extra-rules: false
+    extra-rules: true
 
 issues:
   exclude-rules:
