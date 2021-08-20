@@ -67,8 +67,7 @@ func TestUsers(t *testing.T) {
 	defer testServer.Close()
 
 	t.Run("Test Get", func(t *testing.T) {
-		db.Exec("truncate table reviews cascade")
-		db.Exec("truncate table users cascade")
+		store.TruncateAll()
 
 		firstName := "firstName"
 		lastName := "lastName"
@@ -111,8 +110,7 @@ func TestUsers(t *testing.T) {
 	})
 
 	t.Run("Test List", func(t *testing.T) {
-		db.Exec("truncate table reviews cascade")
-		db.Exec("truncate table users cascade")
+		store.TruncateAll()
 
 		firstName1 := "firstName1"
 		lastName1 := "lastName1"
@@ -191,8 +189,7 @@ func TestUsers(t *testing.T) {
 	})
 
 	t.Run("Test Create", func(t *testing.T) {
-		db.Exec("truncate table reviews cascade")
-		db.Exec("truncate table users cascade")
+		store.TruncateAll()
 
 		jsonStr := []byte(`{
 			"first_name":"FirstName",
@@ -237,8 +234,7 @@ func TestUsers(t *testing.T) {
 	})
 
 	t.Run("Test Modify", func(t *testing.T) {
-		db.Exec("truncate table reviews cascade")
-		db.Exec("truncate table users cascade")
+		store.TruncateAll()
 
 		firstName := "FirstName"
 		lastName := "LastName"
@@ -294,8 +290,7 @@ func TestUsers(t *testing.T) {
 	})
 
 	t.Run("Test Delete", func(t *testing.T) {
-		db.Exec("truncate table reviews cascade")
-		db.Exec("truncate table users cascade")
+		store.TruncateAll()
 
 		firstName := "firstName"
 		user := models.User{FirstName: &firstName}

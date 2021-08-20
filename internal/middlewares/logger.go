@@ -18,6 +18,7 @@ func Logger(l logger.Logger) func(next http.Handler) http.Handler {
 			defer func() {
 				meta := map[string]interface{}{
 					"proto":        r.Proto,
+					"method":       r.Method,
 					"path":         r.URL.Path,
 					"query":        r.URL.Query(),
 					"responseTime": time.Since(t1),

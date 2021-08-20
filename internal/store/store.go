@@ -8,6 +8,8 @@ import (
 )
 
 type Store interface {
+	TruncateAll()
+
 	GetUser(userID uuid.UUID) models.User
 	ListUsers(query map[string]interface{}) []models.User
 	CreateUser(userPayload models.User) models.User
@@ -27,4 +29,18 @@ type GormStore struct {
 
 func NewGormStore(database *gorm.DB) Store {
 	return &GormStore{database: database}
+}
+
+func (gormStore *GormStore) TruncateAll() {
+	gormStore.database.Exec(`
+		do $$
+		begin
+			execute (
+				select 'truncate table ' || string_agg('"' || tablename || '"', ', ')
+				from pg_tables
+				where schemaname = 'public'
+			);
+		end;
+		$$
+	`)
 }

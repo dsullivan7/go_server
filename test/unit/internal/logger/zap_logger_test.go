@@ -2,8 +2,8 @@ package logger_test
 
 import (
 	"go_server/internal/logger"
-	"time"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -26,10 +26,10 @@ func TestZapLogger(t *testing.T) {
 	logger.InfoWithMeta(
 		"someMessage",
 		map[string]interface{}{
-			"someString": "someStringValue",
-			"someInt": 52,
+			"someString":   "someStringValue",
+			"someInt":      52,
 			"someDuration": timeSince,
-			"someAny": map[string]interface{}{ "someKey": "someValue"},
+			"someAny":      map[string]interface{}{"someKey": "someValue"},
 		},
 	)
 
@@ -41,6 +41,6 @@ func TestZapLogger(t *testing.T) {
 		zap.String("someString", "someStringValue"),
 		zap.Int("someInt", 52),
 		zap.Duration("someDuration", timeSince),
-		zap.Any("someAny", map[string]interface{}{ "someKey": "someValue"}),
+		zap.Any("someAny", map[string]interface{}{"someKey": "someValue"}),
 	}, logs[0].Context)
 }
