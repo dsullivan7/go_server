@@ -3,6 +3,7 @@ package integration_test
 import (
 	// jwt "github.com/dgrijalva/jwt-go".
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"go_server/internal/config"
@@ -57,6 +58,8 @@ func TestUsers(t *testing.T) {
 	server := server.NewServer(router, controllers, config, logger)
 
 	testServer := httptest.NewServer(server.Routes())
+	context := context.Background()
+
 	defer testServer.Close()
 
 	t.Run("Test Get", func(t *testing.T) {
@@ -75,9 +78,19 @@ func TestUsers(t *testing.T) {
 
 		db.Create(&user)
 
-		res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/users/", user.UserID))
-
+		req, errRequest := http.NewRequestWithContext(
+			context,
+			http.MethodGet,
+			fmt.Sprint(testServer.URL, "/api/users/", user.UserID),
+			nil,
+		)
 		assert.Nil(t, errRequest)
+
+		res, errResponse := http.DefaultClient.Do(req)
+
+		assert.Nil(t, errResponse)
+
+		defer res.Body.Close()
 
 		assert.Equal(t, res.StatusCode, http.StatusOK)
 
@@ -120,9 +133,19 @@ func TestUsers(t *testing.T) {
 		db.Create(&user1)
 		db.Create(&user2)
 
-		res, errRequest := http.Get(fmt.Sprint(testServer.URL, "/api/users"))
-
+		req, errRequest := http.NewRequestWithContext(
+			context,
+			http.MethodGet,
+			fmt.Sprint(testServer.URL, "/api/users"),
+			nil,
+		)
 		assert.Nil(t, errRequest)
+
+		res, errResponse := http.DefaultClient.Do(req)
+
+		assert.Nil(t, errResponse)
+
+		defer res.Body.Close()
 
 		assert.Equal(t, res.StatusCode, http.StatusOK)
 
@@ -172,9 +195,19 @@ func TestUsers(t *testing.T) {
 			"last_name":"LastName"
 		}`)
 
-		res, errRequest := http.Post(fmt.Sprint(testServer.URL, "/api/users"), "application/json", bytes.NewBuffer(jsonStr))
-
+		req, errRequest := http.NewRequestWithContext(
+			context,
+			http.MethodPost,
+			fmt.Sprint(testServer.URL, "/api/users"),
+			bytes.NewBuffer(jsonStr),
+		)
 		assert.Nil(t, errRequest)
+
+		res, errResponse := http.DefaultClient.Do(req)
+
+		assert.Nil(t, errResponse)
+
+		defer res.Body.Close()
 
 		assert.Equal(t, res.StatusCode, http.StatusCreated)
 
@@ -220,16 +253,19 @@ func TestUsers(t *testing.T) {
 			"auth0_id": "Auth0IDDifferent"
 		}`)
 
-		req, errCreate := http.NewRequest(
+		req, errRequest := http.NewRequestWithContext(
+			context,
 			http.MethodPut,
-			fmt.Sprint(testServer.URL, "/api/users/", user.UserID), bytes.NewBuffer(jsonStr),
+			fmt.Sprint(testServer.URL, "/api/users/", user.UserID),
+			bytes.NewBuffer(jsonStr),
 		)
-		assert.Nil(t, errCreate)
-
-		client := &http.Client{}
-		res, errRequest := client.Do(req)
-
 		assert.Nil(t, errRequest)
+
+		res, errResponse := http.DefaultClient.Do(req)
+
+		assert.Nil(t, errResponse)
+
+		defer res.Body.Close()
 
 		assert.Equal(t, res.StatusCode, http.StatusOK)
 
@@ -262,17 +298,19 @@ func TestUsers(t *testing.T) {
 
 		db.Create(&user)
 
-		req, errCreate := http.NewRequest(
+		req, errRequest := http.NewRequestWithContext(
+			context,
 			http.MethodDelete,
 			fmt.Sprint(testServer.URL, "/api/users/", user.UserID),
 			nil,
 		)
-		assert.Nil(t, errCreate)
-
-		client := &http.Client{}
-		res, errRequest := client.Do(req)
-
 		assert.Nil(t, errRequest)
+
+		res, errResponse := http.DefaultClient.Do(req)
+
+		assert.Nil(t, errResponse)
+
+		defer res.Body.Close()
 
 		assert.Equal(t, res.StatusCode, http.StatusNoContent)
 
