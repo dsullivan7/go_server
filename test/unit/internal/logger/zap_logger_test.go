@@ -2,8 +2,8 @@ package logger_test
 
 import (
 	"go_server/internal/logger"
+	"time"
 	"testing"
-	"encoding/json"
 
 	"github.com/stretchr/testify/assert"
 
@@ -20,21 +20,27 @@ func TestZapLogger(t *testing.T) {
 
 	logger := logger.NewZapLogger(zapLogger)
 
+	timeNow := time.Now()
+	timeSince := time.Since(timeNow)
+
 	logger.InfoWithMeta(
-		"blah",
+		"someMessage",
 		map[string]interface{}{
-			"some": "key",
+			"someString": "someStringValue",
+			"someInt": 52,
+			"someDuration": timeSince,
+			"someAny": map[string]interface{}{ "someKey": "someValue"},
 		},
 	)
 
 	logs := recordedLogs.All()
 
 	assert.Equal(t, 1, len(logs))
-
-	var logJSON map[string]string
-
-	errDecode := json.Unmarshal([]byte(`{"some":"key"}`), &logJSON)
-	assert.Nil(t, errDecode)
-
-	assert.Equal(t, "key", logJSON["some"])
+	assert.Equal(t, "someMessage", logs[0].Message)
+	assert.ElementsMatch(t, []zap.Field{
+		zap.String("someString", "someStringValue"),
+		zap.Int("someInt", 52),
+		zap.Duration("someDuration", timeSince),
+		zap.Any("someAny", map[string]interface{}{ "someKey": "someValue"}),
+	}, logs[0].Context)
 }
