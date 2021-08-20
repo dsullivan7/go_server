@@ -17,13 +17,13 @@ func Logger(l logger.Logger) func(next http.Handler) http.Handler {
 
 			defer func() {
 				meta := map[string]interface{}{
-					"proto":  r.Proto,
-					"path":   r.URL.Path,
-					"query":  r.URL.Query(),
-					"lat":    time.Since(t1),
-					"status": ww.Status(),
-					"size":   ww.BytesWritten(),
-					"reqId":  middleware.GetReqID(r.Context()),
+					"proto":        r.Proto,
+					"path":         r.URL.Path,
+					"query":        r.URL.Query(),
+					"responseTime": time.Since(t1),
+					"status":       ww.Status(),
+					"size":         ww.BytesWritten(),
+					"reqId":        middleware.GetReqID(r.Context()),
 				}
 
 				l.InfoWithMeta("Response", meta)

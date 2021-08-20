@@ -29,7 +29,7 @@ func (logger *ZapLogger) InfoWithMeta(message string, meta map[string]interface{
 		} else if valueWithType, ok := value.(time.Duration); ok {
 			args = append(args, zap.Duration(key, valueWithType))
 		} else {
-			args = append(args, zap.Any(key, valueWithType))
+			args = append(args, zap.Any(key, value))
 		}
 	}
 
