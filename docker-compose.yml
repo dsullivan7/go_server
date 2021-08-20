@@ -6,6 +6,7 @@ x-app-environment: &app-environment
   DB_USER: $DB_USER
   DB_NAME: $DB_NAME
   DB_PASSWORD: $DB_PASSWORD
+  DB_SSL: $DB_SSL
   PORT: $PORT
   AUTH0_DOMAIN: $AUTH0_DOMAIN
   ALLOWED_ORIGINS: $ALLOWED_ORIGINS
@@ -22,7 +23,7 @@ x-db-environment: &db-environment
 
 services:
   app:
-    image: golang:1.16.7-alpine
+    image: golang:1.17.0-alpine
     working_dir: /app
     volumes:
       - ./:/app
@@ -44,7 +45,7 @@ services:
       *app-environment
 
   go-get:
-    image: golang:1.16.7-alpine
+    image: golang:1.17.0-alpine
     working_dir: /app
     volumes:
       - ./:/app
@@ -62,7 +63,7 @@ services:
       *app-environment
 
   build:
-    image: golang:1.16.7-alpine
+    image: golang:1.17.0-alpine
     working_dir: /app
     volumes:
       - ./:/app

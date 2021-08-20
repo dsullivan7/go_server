@@ -1,6 +1,6 @@
 DOCKER_POSTGRES = postgres:12.7
 DOCKER_ALPINE = alpine:3.13.5
-DOCKER_GOLANG = golang:1.16.7-alpine
+DOCKER_GOLANG = golang:1.17.0-alpine
 DOCKER_GOLANG_LINT = golangci/golangci-lint:v1.41.1
 
 ENVFILE ?= .env

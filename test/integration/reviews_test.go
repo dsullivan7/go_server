@@ -22,11 +22,13 @@ import (
 )
 
 func TestReviews(t *testing.T) {
-	config := config.NewConfig()
+	config, configError := config.NewConfig()
+	assert.Nil(t, configError)
+
 	logger, errLogger := logger.NewZapLogger()
 	assert.Nil(t, errLogger)
 
-	db, _ := db.NewDatabase(
+	db, errDatabase := db.NewDatabase(
 		config.DBHost,
 		config.DBName,
 		config.DBPort,
@@ -34,6 +36,7 @@ func TestReviews(t *testing.T) {
 		config.DBPassword,
 		config.DBSSL,
 	)
+	assert.Nil(t, errDatabase)
 
 	store := store.NewGormStore(db)
 

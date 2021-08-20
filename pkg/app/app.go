@@ -13,7 +13,11 @@ import (
 )
 
 func Run() {
-	config := config.NewConfig()
+	config, configErr := config.NewConfig()
+
+	if configErr != nil {
+		log.Fatal(configErr)
+	}
 
 	logger, loggerErr := logger.NewZapLogger()
 

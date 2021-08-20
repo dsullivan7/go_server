@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 )
@@ -22,11 +23,11 @@ type Config struct {
 	RouterMaxAge   int
 }
 
-func NewConfig() *Config {
+func NewConfig() (*Config, error) {
 	dbSSL, dbSSLError := strconv.ParseBool(os.Getenv("DB_SSL"))
 
 	if dbSSLError != nil {
-		os.Exit(1)
+		return nil, fmt.Errorf("error parsing dbSSL: %w", dbSSLError)
 	}
 
 	config := &Config{
@@ -43,5 +44,5 @@ func NewConfig() *Config {
 		RouterMaxAge:   300,
 	}
 
-	return config
+	return config, nil
 }
