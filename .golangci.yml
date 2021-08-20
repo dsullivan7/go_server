@@ -8,6 +8,7 @@ linters:
     - golint
     - maligned
     - exhaustivestruct
+    - gofumpt
 linters-settings:
   tagliatelle:
     case:
@@ -17,6 +18,10 @@ linters-settings:
     settings:
       mnd:
         ignored-files: config.go
+  gofumpt:
+    lang-version: "1.17"
+    extra-rules: false
+
 issues:
   exclude-rules:
     - path: internal/store/

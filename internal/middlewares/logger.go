@@ -1,14 +1,14 @@
 package middlewares
 
 import (
+	"go_server/internal/logger"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/middleware"
-	"go.uber.org/zap"
 )
 
-func Logger(l *zap.Logger) func(next http.Handler) http.Handler {
+func Logger(l logger.Logger) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
@@ -16,14 +16,17 @@ func Logger(l *zap.Logger) func(next http.Handler) http.Handler {
 			t1 := time.Now()
 
 			defer func() {
-				l.Info("Response",
-					zap.String("proto", r.Proto),
-					zap.String("path", r.URL.Path),
-					zap.Any("query", r.URL.Query()),
-					zap.Duration("lat", time.Since(t1)),
-					zap.Int("status", ww.Status()),
-					zap.Int("size", ww.BytesWritten()),
-					zap.String("reqId", middleware.GetReqID(r.Context())))
+				meta := map[string]interface{}{
+					"proto":  r.Proto,
+					"path":   r.URL.Path,
+					"query":  r.URL.Query(),
+					"lat":    time.Since(t1),
+					"status": ww.Status(),
+					"size":   ww.BytesWritten(),
+					"reqId":  middleware.GetReqID(r.Context()),
+				}
+
+				l.InfoWithMeta("Response", meta)
 			}()
 
 			next.ServeHTTP(ww, r)

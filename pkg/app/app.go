@@ -9,6 +9,8 @@ import (
 	"go_server/internal/store"
 	"log"
 
+	"go.uber.org/zap"
+
 	"github.com/go-chi/chi"
 )
 
@@ -19,11 +21,13 @@ func Run() {
 		log.Fatal(configErr)
 	}
 
-	logger, loggerErr := logger.NewZapLogger()
+	zapLogger, errZap := zap.NewProduction()
 
-	if loggerErr != nil {
-		log.Fatal(loggerErr)
+	if errZap != nil {
+		log.Fatal(errZap)
 	}
+
+	logger := logger.NewZapLogger(zapLogger)
 
 	db, dbErr := db.NewDatabase(
 		config.DBHost,

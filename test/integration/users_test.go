@@ -18,10 +18,9 @@ import (
 	"testing"
 
 	"github.com/go-chi/chi"
-
-	"gorm.io/gorm"
-
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 // type userString string
@@ -41,8 +40,10 @@ func TestUsers(t *testing.T) {
 	config, configError := config.NewConfig()
 	assert.Nil(t, configError)
 
-	logger, errLogger := logger.NewZapLogger()
-	assert.Nil(t, errLogger)
+	zapLogger, errZap := zap.NewProduction()
+	assert.Nil(t, errZap)
+
+	logger := logger.NewZapLogger(zapLogger)
 
 	db, errDatabase := db.NewDatabase(
 		config.DBHost,
