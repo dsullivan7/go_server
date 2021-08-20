@@ -55,7 +55,7 @@ jobs:
     working_directory: ~/data
     steps:
       - checkout
-      - run: make lint
+      - run: make lint-docker
 
   test:
     machine:
@@ -66,7 +66,7 @@ jobs:
       - run: make db-start
       - run: make db-init
       - run: make db-migrate
-      - run: make test
+      - run: make test-docker
 
   build:
     machine:
@@ -74,7 +74,7 @@ jobs:
     working_directory: ~/data
     steps:
       - checkout
-      - run: make build
+      - run: make build-docker
       - persist_to_workspace:
           root: .
           paths:

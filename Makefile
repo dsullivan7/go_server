@@ -32,29 +32,25 @@ db-init:
 	docker-compose up --build db-init
 
 .PHONY: app
-app:
+app-docker:
 	docker-compose run --service-ports app go run ./cmd/app.go
 
 .PHONY: app-dev
-app-dev:
+app-dev-docker:
 	docker-compose up --build app-dev
 
-.PHONY: run
-run:
+.PHONY: run-docker
+run-docker:
 	docker-compose run --service-ports golang ./app
 
-.PHONY: go-mod-tidy
-go-mod-tidy:
-	docker run --rm -v ${PWD}:/data -w /data ${DOCKER_GOLANG} go mod tidy
-
-.PHONY: build
-build:
+.PHONY: build-docker
+build-docker:
 	docker-compose run build go build -o bin/app ./cmd/app.go
 
-.PHONY: test
-test:
+.PHONY: test-docker
+test-docker:
 	docker-compose run --rm -e CGO_ENABLED=0 app go test -v $(TESTS)
 
-.PHONY: lint
-lint:
+.PHONY: lint-docker
+lint-docker:
 	docker run --rm -v ${PWD}:/data -w /data ${DOCKER_GOLANG_LINT} golangci-lint run

@@ -24,25 +24,19 @@ make db-migrate
 ### Run the web server
 
 ```
-make run
+make run-docker
 ```
 
 ### Test
 
 ```
-make test
+make test-docker
 ```
 
 ### Build
 
 ```
-make build
-```
-
-### Build Docker Image
-
-```
-docker build -t tchr-voice-app -f Dockerfile.app .
+make build-docker
 ```
 
 ## Operations
