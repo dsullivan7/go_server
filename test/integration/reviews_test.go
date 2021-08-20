@@ -2,9 +2,9 @@ package integration_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
-	"context"
 	"go_server/internal/config"
 	"go_server/internal/controllers"
 	"go_server/internal/db"
