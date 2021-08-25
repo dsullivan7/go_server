@@ -42,14 +42,7 @@ func TestReviews(t *testing.T) {
 	)
 	assert.Nil(t, errDriver)
 
-	db, errDatabase := db.NewDatabase(
-		config.DBHost,
-		config.DBName,
-		config.DBPort,
-		config.DBUser,
-		config.DBPassword,
-		config.DBSSL,
-	)
+	db, errDatabase := db.NewDatabase(driver)
 	assert.Nil(t, errDatabase)
 
 	dbUtility := utilities.NewSQLDatabaseUtility(driver)

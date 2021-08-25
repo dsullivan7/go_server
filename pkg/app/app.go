@@ -29,7 +29,7 @@ func Run() {
 
 	logger := logger.NewZapLogger(zapLogger)
 
-	db, dbErr := db.NewDatabase(
+	driver, errDriver := db.NewDatabaseDiver(
 		config.DBHost,
 		config.DBName,
 		config.DBPort,
@@ -38,8 +38,14 @@ func Run() {
 		config.DBSSL,
 	)
 
-	if dbErr != nil {
-		log.Fatal(dbErr)
+	if errDriver != nil {
+		log.Fatal(errDriver)
+	}
+
+	db, errDatabase := db.NewDatabase(driver)
+
+	if errDatabase != nil {
+		log.Fatal(errDatabase)
 	}
 
 	store := store.NewGormStore(db)

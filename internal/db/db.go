@@ -11,20 +11,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func NewDatabase(
-	dbHost string,
-	dbName string,
-	dbPort string,
-	dbUser string,
-	dbPassword string,
-	dbSSL bool,
-) (*gorm.DB, error) {
-	sqlDB, errSQL := NewDatabaseDiver(dbHost, dbName, dbPort, dbUser, dbPassword, dbSSL)
-
-	if errSQL != nil {
-		return nil, fmt.Errorf("failed to open db connection: %w", errSQL)
-	}
-
+func NewDatabase(sqlDB *sql.DB) (*gorm.DB, error) {
 	database, err := gorm.Open(
 		postgres.New(postgres.Config{
 		  Conn: sqlDB,
