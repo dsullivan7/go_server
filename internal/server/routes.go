@@ -18,6 +18,7 @@ func (server *Server) Routes() *chi.Mux {
 	router.Use(middleware.RealIP)
 	router.Use(middleware.Recoverer)
 	router.Use(goServerMiddlewares.Logger(server.logger))
+	router.Use(goServerMiddlewares.ContentType("application/json"))
 
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   strings.Split(server.config.AllowedOrigins, ","),
