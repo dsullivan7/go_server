@@ -12,6 +12,7 @@ import (
 	"go_server/internal/models"
 	"go_server/internal/server"
 	"go_server/internal/store"
+	"go_server/test/utilities"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -41,6 +42,7 @@ func TestReviews(t *testing.T) {
 	)
 	assert.Nil(t, errDatabase)
 
+	dbUtility := utilities.NewGormDatabaseUtility(db)
 	store := store.NewGormStore(db)
 	controllers := controllers.NewControllers(store, config, logger)
 	router := chi.NewRouter()
@@ -53,7 +55,7 @@ func TestReviews(t *testing.T) {
 	defer testServer.Close()
 
 	t.Run("Test Get", func(t *testing.T) {
-		store.TruncateAll()
+		dbUtility.TruncateAll()
 
 		user1 := models.User{}
 		user2 := models.User{}
@@ -97,7 +99,7 @@ func TestReviews(t *testing.T) {
 	})
 
 	t.Run("Test List", func(t *testing.T) {
-		store.TruncateAll()
+		dbUtility.TruncateAll()
 
 		user1 := models.User{}
 		user2 := models.User{}
@@ -205,7 +207,7 @@ func TestReviews(t *testing.T) {
 	})
 
 	t.Run("Test Create", func(t *testing.T) {
-		store.TruncateAll()
+		dbUtility.TruncateAll()
 
 		user1 := models.User{}
 		user2 := models.User{}
@@ -258,7 +260,7 @@ func TestReviews(t *testing.T) {
 	})
 
 	t.Run("Test Modify", func(t *testing.T) {
-		store.TruncateAll()
+		dbUtility.TruncateAll()
 
 		user1 := models.User{}
 		user2 := models.User{}
@@ -309,7 +311,7 @@ func TestReviews(t *testing.T) {
 	})
 
 	t.Run("Test Delete", func(t *testing.T) {
-		store.TruncateAll()
+		dbUtility.TruncateAll()
 
 		user1 := models.User{}
 		user2 := models.User{}
