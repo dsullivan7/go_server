@@ -30,8 +30,9 @@ func (dbUtility *SQLDatabaseUtility) TruncateAll() error {
 		$$
 	`)
 
-	if (err != nil) {
+	if err != nil {
 		return fmt.Errorf("failed to truncate tables: %w", err)
 	}
+
 	return nil
 }
