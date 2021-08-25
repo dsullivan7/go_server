@@ -10,11 +10,11 @@ import (
 type Store interface {
 	TruncateAll()
 
-	GetUser(userID uuid.UUID) models.User
-	ListUsers(query map[string]interface{}) []models.User
-	CreateUser(userPayload models.User) models.User
-	ModifyUser(userID uuid.UUID, userPayload models.User) models.User
-	DeleteUser(userID uuid.UUID)
+	GetUser(userID uuid.UUID) (*models.User, error)
+	ListUsers(query map[string]interface{}) ([]models.User, error)
+	CreateUser(userPayload models.User) (*models.User, error)
+	ModifyUser(userID uuid.UUID, userPayload models.User) (*models.User, error)
+	DeleteUser(userID uuid.UUID) error
 
 	GetReview(userID uuid.UUID) (*models.Review, error)
 	ListReviews(query map[string]interface{}) ([]models.Review, error)

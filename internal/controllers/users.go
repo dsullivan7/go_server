@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"go_server/internal/models"
+	"go_server/internal/errors"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -13,7 +14,13 @@ import (
 func (c *Controllers) GetUser(w http.ResponseWriter, r *http.Request) {
 	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "userID")))
 
-	user := c.store.GetUser(userID)
+	user, err := c.store.GetUser(userID)
+
+	if err != nil {
+		c.handleError(w, r, errors.HTTPUserError{Err: err})
+
+		return
+	}
 
 	render.JSON(w, r, user)
 }
@@ -21,7 +28,13 @@ func (c *Controllers) GetUser(w http.ResponseWriter, r *http.Request) {
 func (c *Controllers) ListUsers(w http.ResponseWriter, r *http.Request) {
 	query := map[string]interface{}{}
 
-	users := c.store.ListUsers(query)
+	users, err := c.store.ListUsers(query)
+
+	if err != nil {
+		c.handleError(w, r, errors.HTTPUserError{Err: err})
+
+		return
+	}
 
 	render.JSON(w, r, users)
 }
@@ -29,9 +42,9 @@ func (c *Controllers) ListUsers(w http.ResponseWriter, r *http.Request) {
 func (c *Controllers) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var userPayload models.User
 
-	err := json.NewDecoder(r.Body).Decode(&userPayload)
-	if err != nil {
-		w.WriteHeader(HTTP400)
+	errDecode := json.NewDecoder(r.Body).Decode(&userPayload)
+	if errDecode != nil {
+		c.handleError(w, r, errors.HTTPUserError{Err: errDecode})
 
 		return
 	}
@@ -41,7 +54,13 @@ func (c *Controllers) CreateUser(w http.ResponseWriter, r *http.Request) {
 	// 	userPayload.Auth0ID = auth0Id
 	// }
 
-	user := c.store.CreateUser(userPayload)
+	user, err := c.store.CreateUser(userPayload)
+
+	if err != nil {
+		c.handleError(w, r, errors.HTTPUserError{Err: err})
+
+		return
+	}
 
 	w.WriteHeader(http.StatusCreated)
 	render.JSON(w, r, user)
@@ -52,14 +71,20 @@ func (c *Controllers) ModifyUser(w http.ResponseWriter, r *http.Request) {
 
 	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "userID")))
 
-	err := json.NewDecoder(r.Body).Decode(&userPayload)
-	if err != nil {
-		w.WriteHeader(HTTP400)
+	errDecode := json.NewDecoder(r.Body).Decode(&userPayload)
+	if errDecode != nil {
+		c.handleError(w, r, errors.HTTPUserError{Err: errDecode})
 
 		return
 	}
 
-	user := c.store.ModifyUser(userID, userPayload)
+	user, err := c.store.ModifyUser(userID, userPayload)
+
+	if err != nil {
+		c.handleError(w, r, errors.HTTPUserError{Err: err})
+
+		return
+	}
 
 	render.JSON(w, r, user)
 }
@@ -67,7 +92,13 @@ func (c *Controllers) ModifyUser(w http.ResponseWriter, r *http.Request) {
 func (c *Controllers) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "userID")))
 
-	c.store.DeleteUser(userID)
+	err := c.store.DeleteUser(userID)
+
+	if err != nil {
+		c.handleError(w, r, errors.HTTPUserError{Err: err})
+
+		return
+	}
 
 	w.WriteHeader(http.StatusNoContent)
 }

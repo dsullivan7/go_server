@@ -72,9 +72,5 @@ func (gormStore *GormStore) ModifyReview(reviewID uuid.UUID, reviewPayload model
 func (gormStore *GormStore) DeleteReview(reviewID uuid.UUID) error {
 	err := gormStore.database.Delete(&models.Review{}, reviewID).Error
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
