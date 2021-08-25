@@ -46,6 +46,16 @@ func TestUsers(t *testing.T) {
 
 	logger := logger.NewZapLogger(zapLogger)
 
+	driver, errDriver := db.NewDatabaseDiver(
+		config.DBHost,
+		config.DBName,
+		config.DBPort,
+		config.DBUser,
+		config.DBPassword,
+		config.DBSSL,
+	)
+	assert.Nil(t, errDriver)
+
 	db, errDatabase := db.NewDatabase(
 		config.DBHost,
 		config.DBName,
@@ -56,7 +66,7 @@ func TestUsers(t *testing.T) {
 	)
 	assert.Nil(t, errDatabase)
 
-	dbUtility := utilities.NewGormDatabaseUtility(db)
+	dbUtility := utilities.NewSQLDatabaseUtility(driver)
 	store := store.NewGormStore(db)
 	controllers := controllers.NewControllers(store, config, logger)
 	router := chi.NewRouter()

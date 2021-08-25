@@ -1,23 +1,23 @@
 package utilities
 
 import (
-	"gorm.io/gorm"
+	"database/sql"
 )
 
 type DatabaseUtility interface {
-	TruncateAll()
+	TruncateAll() error
 }
 
-type GormDatabaseUtility struct {
-	database *gorm.DB
+type SQLDatabaseUtility struct {
+	database *sql.DB
 }
 
-func NewGormDatabaseUtility(database *gorm.DB) DatabaseUtility {
-	return &GormDatabaseUtility{database: database}
+func NewSQLDatabaseUtility(database *sql.DB) DatabaseUtility {
+	return &SQLDatabaseUtility{database: database}
 }
 
-func (gormDatabaseUtility *GormDatabaseUtility) TruncateAll() {
-	gormDatabaseUtility.database.Exec(`
+func (dbUtility *SQLDatabaseUtility) TruncateAll() error {
+	_, err := dbUtility.database.Exec(`
 		do $$
 		begin
 			execute (
@@ -28,4 +28,6 @@ func (gormDatabaseUtility *GormDatabaseUtility) TruncateAll() {
 		end;
 		$$
 	`)
+
+  return err
 }
