@@ -95,7 +95,8 @@ func TestUsers(t *testing.T) {
 
 		defer res.Body.Close()
 
-		assert.Equal(t, res.StatusCode, http.StatusOK)
+		assert.Equal(t, http.StatusOK, res.StatusCode)
+		assert.Equal(t, "application/json; charset=utf-8", res.Header.Get("Content-Type"))
 
 		decoder := json.NewDecoder(res.Body)
 
@@ -103,10 +104,10 @@ func TestUsers(t *testing.T) {
 		errDecoder := decoder.Decode(&userResponse)
 		assert.Nil(t, errDecoder)
 
-		assert.Equal(t, user.UserID, userResponse.UserID)
-		assert.Equal(t, *user.FirstName, *userResponse.FirstName)
-		assert.Equal(t, *user.LastName, *userResponse.LastName)
-		assert.Equal(t, *user.Auth0ID, *userResponse.Auth0ID)
+		assert.Equal(t, userResponse.UserID, user.UserID)
+		assert.Equal(t, *userResponse.FirstName, *user.FirstName)
+		assert.Equal(t, *userResponse.LastName, *user.LastName)
+		assert.Equal(t, *userResponse.Auth0ID, *user.Auth0ID)
 	})
 
 	t.Run("Test List", func(t *testing.T) {
@@ -149,7 +150,8 @@ func TestUsers(t *testing.T) {
 
 		defer res.Body.Close()
 
-		assert.Equal(t, res.StatusCode, http.StatusOK)
+		assert.Equal(t, http.StatusOK, res.StatusCode)
+		assert.Equal(t, "application/json; charset=utf-8", res.Header.Get("Content-Type"))
 
 		decoder := json.NewDecoder(res.Body)
 
@@ -157,7 +159,7 @@ func TestUsers(t *testing.T) {
 		errDecoder := decoder.Decode(&usersFound)
 		assert.Nil(t, errDecoder)
 
-		assert.Equal(t, len(usersFound), 2)
+		assert.Equal(t, 2, len(usersFound))
 
 		var userResponse models.User
 
@@ -169,10 +171,10 @@ func TestUsers(t *testing.T) {
 			}
 		}
 
-		assert.Equal(t, user1.UserID, userResponse.UserID)
-		assert.Equal(t, *user1.FirstName, *userResponse.FirstName)
-		assert.Equal(t, *user1.LastName, *userResponse.LastName)
-		assert.Equal(t, *user1.Auth0ID, *userResponse.Auth0ID)
+		assert.Equal(t, userResponse.UserID, user1.UserID)
+		assert.Equal(t, *userResponse.FirstName, *user1.FirstName)
+		assert.Equal(t, *userResponse.LastName, *user1.LastName)
+		assert.Equal(t, *userResponse.Auth0ID, *user1.Auth0ID)
 
 		for _, value := range usersFound {
 			if value.UserID == user2.UserID {
@@ -182,10 +184,10 @@ func TestUsers(t *testing.T) {
 			}
 		}
 
-		assert.Equal(t, user2.UserID, userResponse.UserID)
-		assert.Equal(t, *user2.FirstName, *userResponse.FirstName)
-		assert.Equal(t, *user2.LastName, *userResponse.LastName)
-		assert.Equal(t, *user2.Auth0ID, *userResponse.Auth0ID)
+		assert.Equal(t, userResponse.UserID, user2.UserID)
+		assert.Equal(t, *userResponse.FirstName, *user2.FirstName)
+		assert.Equal(t, *userResponse.LastName, *user2.LastName)
+		assert.Equal(t, *userResponse.Auth0ID, *user2.Auth0ID)
 	})
 
 	t.Run("Test Create", func(t *testing.T) {
@@ -210,7 +212,8 @@ func TestUsers(t *testing.T) {
 
 		defer res.Body.Close()
 
-		assert.Equal(t, res.StatusCode, http.StatusCreated)
+		assert.Equal(t, http.StatusCreated, res.StatusCode)
+		assert.Equal(t, "application/json; charset=utf-8", res.Header.Get("Content-Type"))
 
 		decoder := json.NewDecoder(res.Body)
 
@@ -219,8 +222,8 @@ func TestUsers(t *testing.T) {
 		assert.Nil(t, errDecoder)
 
 		assert.NotNil(t, userResponse.UserID)
-		assert.Equal(t, *userResponse.FirstName, "FirstName")
-		assert.Equal(t, *userResponse.LastName, "LastName")
+		assert.Equal(t, "FirstName", *userResponse.FirstName)
+		assert.Equal(t, "LastName", *userResponse.LastName)
 		// assert.Equal(t, *userResponse.Auth0ID, "auth0|loggedInUser")
 
 		var userFound models.User
@@ -228,8 +231,8 @@ func TestUsers(t *testing.T) {
 
 		assert.Nil(t, errFound)
 
-		assert.Equal(t, *userFound.FirstName, "FirstName")
-		assert.Equal(t, *userFound.LastName, "LastName")
+		assert.Equal(t, "FirstName", *userFound.FirstName)
+		assert.Equal(t, "LastName", *userFound.LastName)
 		// assert.Equal(t, *userFound.Auth0ID, "auth0|loggedInUser")
 	})
 
@@ -267,7 +270,8 @@ func TestUsers(t *testing.T) {
 
 		defer res.Body.Close()
 
-		assert.Equal(t, res.StatusCode, http.StatusOK)
+		assert.Equal(t, http.StatusOK, res.StatusCode)
+		assert.Equal(t, "application/json; charset=utf-8", res.Header.Get("Content-Type"))
 
 		decoder := json.NewDecoder(res.Body)
 
@@ -275,18 +279,18 @@ func TestUsers(t *testing.T) {
 		errDecoder := decoder.Decode(&userResponse)
 		assert.Nil(t, errDecoder)
 
-		assert.Equal(t, *userResponse.FirstName, "FirstNameDifferent")
-		assert.Equal(t, *userResponse.LastName, "LastNameDifferent")
-		assert.Equal(t, *userResponse.Auth0ID, "Auth0IDDifferent")
+		assert.Equal(t, "FirstNameDifferent", *userResponse.FirstName)
+		assert.Equal(t, "LastNameDifferent", *userResponse.LastName)
+		assert.Equal(t, "Auth0IDDifferent", *userResponse.Auth0ID)
 
 		var userFound models.User
 		errFound := db.Where("user_id = ?", user.UserID).First(&userFound).Error
 
 		assert.Nil(t, errFound)
 
-		assert.Equal(t, *userFound.FirstName, "FirstNameDifferent")
-		assert.Equal(t, *userFound.LastName, "LastNameDifferent")
-		assert.Equal(t, *userFound.Auth0ID, "Auth0IDDifferent")
+		assert.Equal(t, "FirstNameDifferent", *userFound.FirstName)
+		assert.Equal(t, "LastNameDifferent", *userFound.LastName)
+		assert.Equal(t, "Auth0IDDifferent", *userFound.Auth0ID)
 	})
 
 	t.Run("Test Delete", func(t *testing.T) {
@@ -311,7 +315,7 @@ func TestUsers(t *testing.T) {
 
 		defer res.Body.Close()
 
-		assert.Equal(t, res.StatusCode, http.StatusNoContent)
+		assert.Equal(t, http.StatusNoContent, res.StatusCode)
 
 		var userFound models.User
 		errFound := db.Where("user_id = ?", user.UserID).First(&userFound).Error

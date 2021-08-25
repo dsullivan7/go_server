@@ -80,7 +80,8 @@ func TestReviews(t *testing.T) {
 
 		defer res.Body.Close()
 
-		assert.Equal(t, res.StatusCode, http.StatusOK)
+		assert.Equal(t, http.StatusOK, res.StatusCode)
+		assert.Equal(t, "application/json; charset=utf-8", res.Header.Get("Content-Type"))
 
 		decoder := json.NewDecoder(res.Body)
 
@@ -89,10 +90,10 @@ func TestReviews(t *testing.T) {
 		errDecode := decoder.Decode(&reviewResponse)
 		assert.Nil(t, errDecode)
 
-		assert.Equal(t, review.ReviewID, reviewResponse.ReviewID)
-		assert.Equal(t, *review.Text, *reviewResponse.Text)
-		assert.Equal(t, *review.FromUserID, *reviewResponse.FromUserID)
-		assert.Equal(t, *review.ToUserID, *reviewResponse.ToUserID)
+		assert.Equal(t, reviewResponse.ReviewID, review.ReviewID)
+		assert.Equal(t, *reviewResponse.Text, *review.Text)
+		assert.Equal(t, *reviewResponse.FromUserID, *review.FromUserID)
+		assert.Equal(t, *reviewResponse.ToUserID, *review.ToUserID)
 	})
 
 	t.Run("Test List", func(t *testing.T) {
@@ -131,7 +132,8 @@ func TestReviews(t *testing.T) {
 
 		defer res.Body.Close()
 
-		assert.Equal(t, res.StatusCode, http.StatusOK)
+		assert.Equal(t, http.StatusOK, res.StatusCode)
+		assert.Equal(t, "application/json; charset=utf-8", res.Header.Get("Content-Type"))
 
 		decoder := json.NewDecoder(res.Body)
 
@@ -151,10 +153,10 @@ func TestReviews(t *testing.T) {
 			}
 		}
 
-		assert.Equal(t, review1.ReviewID, reviewResponse.ReviewID)
-		assert.Equal(t, *review1.FromUserID, *reviewResponse.FromUserID)
-		assert.Equal(t, *review1.ToUserID, *reviewResponse.ToUserID)
-		assert.Equal(t, *review1.Text, *reviewResponse.Text)
+		assert.Equal(t, reviewResponse.ReviewID, review1.ReviewID)
+		assert.Equal(t, *reviewResponse.FromUserID, *review1.FromUserID)
+		assert.Equal(t, *reviewResponse.ToUserID, *review1.ToUserID)
+		assert.Equal(t, *reviewResponse.Text, *review1.Text)
 
 		for _, value := range reviewsFound {
 			if value.ReviewID == review2.ReviewID {
@@ -164,10 +166,10 @@ func TestReviews(t *testing.T) {
 			}
 		}
 
-		assert.Equal(t, review2.ReviewID, reviewResponse.ReviewID)
-		assert.Equal(t, *review2.FromUserID, *reviewResponse.FromUserID)
-		assert.Equal(t, *review2.ToUserID, *reviewResponse.ToUserID)
-		assert.Equal(t, *review2.Text, *reviewResponse.Text)
+		assert.Equal(t, reviewResponse.ReviewID, review2.ReviewID)
+		assert.Equal(t, *reviewResponse.FromUserID, *review2.FromUserID)
+		assert.Equal(t, *reviewResponse.ToUserID, *review2.ToUserID)
+		assert.Equal(t, *reviewResponse.Text, *review2.Text)
 
 		// test request with query
 		req, errRequest = http.NewRequestWithContext(
@@ -184,7 +186,8 @@ func TestReviews(t *testing.T) {
 
 		defer res.Body.Close()
 
-		assert.Equal(t, res.StatusCode, http.StatusOK)
+		assert.Equal(t, http.StatusOK, res.StatusCode)
+		assert.Equal(t, "application/json; charset=utf-8", res.Header.Get("Content-Type"))
 
 		decoder = json.NewDecoder(res.Body)
 
@@ -195,10 +198,10 @@ func TestReviews(t *testing.T) {
 
 		reviewResponse = reviewsFound[0]
 
-		assert.Equal(t, review2.ReviewID, reviewResponse.ReviewID)
-		assert.Equal(t, *review2.FromUserID, *reviewResponse.FromUserID)
-		assert.Equal(t, *review2.ToUserID, *reviewResponse.ToUserID)
-		assert.Equal(t, *review2.Text, *reviewResponse.Text)
+		assert.Equal(t, reviewResponse.ReviewID, review2.ReviewID)
+		assert.Equal(t, *reviewResponse.FromUserID, *review2.FromUserID)
+		assert.Equal(t, *reviewResponse.ToUserID, *review2.ToUserID)
+		assert.Equal(t, *reviewResponse.Text, *review2.Text)
 	})
 
 	t.Run("Test Create", func(t *testing.T) {
@@ -230,7 +233,8 @@ func TestReviews(t *testing.T) {
 
 		defer res.Body.Close()
 
-		assert.Equal(t, res.StatusCode, http.StatusCreated)
+		assert.Equal(t, http.StatusCreated, res.StatusCode)
+		assert.Equal(t, "application/json; charset=utf-8", res.Header.Get("Content-Type"))
 
 		decoder := json.NewDecoder(res.Body)
 
@@ -239,18 +243,18 @@ func TestReviews(t *testing.T) {
 		assert.Nil(t, errDecode)
 
 		assert.NotNil(t, reviewResponse.ReviewID)
-		assert.Equal(t, *reviewResponse.FromUserID, user1.UserID)
-		assert.Equal(t, *reviewResponse.ToUserID, user2.UserID)
-		assert.Equal(t, *reviewResponse.Text, "Text")
+		assert.Equal(t, user1.UserID, *reviewResponse.FromUserID)
+		assert.Equal(t, user2.UserID, *reviewResponse.ToUserID)
+		assert.Equal(t, "Text", *reviewResponse.Text)
 
 		var reviewFound models.Review
 		errFound := db.Where("review_id = ?", reviewResponse.ReviewID).First(&reviewFound).Error
 
 		assert.Nil(t, errFound)
 
-		assert.Equal(t, *reviewFound.FromUserID, user1.UserID)
-		assert.Equal(t, *reviewFound.ToUserID, user2.UserID)
-		assert.Equal(t, *reviewFound.Text, "Text")
+		assert.Equal(t, user1.UserID, *reviewFound.FromUserID)
+		assert.Equal(t, user2.UserID, *reviewFound.ToUserID)
+		assert.Equal(t, "Text", *reviewFound.Text)
 	})
 
 	t.Run("Test Modify", func(t *testing.T) {
@@ -283,7 +287,8 @@ func TestReviews(t *testing.T) {
 
 		defer res.Body.Close()
 
-		assert.Equal(t, res.StatusCode, http.StatusOK)
+		assert.Equal(t, http.StatusOK, res.StatusCode)
+		assert.Equal(t, "application/json; charset=utf-8", res.Header.Get("Content-Type"))
 
 		decoder := json.NewDecoder(res.Body)
 
@@ -291,16 +296,16 @@ func TestReviews(t *testing.T) {
 		errDecode := decoder.Decode(&reviewResponse)
 		assert.Nil(t, errDecode)
 
-		assert.Equal(t, review.ReviewID, reviewResponse.ReviewID)
-		assert.Equal(t, *reviewResponse.Text, "TextDifferent")
+		assert.Equal(t, reviewResponse.ReviewID, review.ReviewID)
+		assert.Equal(t, "TextDifferent", *reviewResponse.Text)
 
 		var reviewFound models.Review
 		errFound := db.Where("review_id = ?", review.ReviewID).First(&reviewFound).Error
 
 		assert.Nil(t, errFound)
 
-		assert.Equal(t, review.ReviewID, reviewFound.ReviewID)
-		assert.Equal(t, *reviewFound.Text, "TextDifferent")
+		assert.Equal(t, reviewFound.ReviewID, review.ReviewID)
+		assert.Equal(t, "TextDifferent", *reviewFound.Text)
 	})
 
 	t.Run("Test Delete", func(t *testing.T) {
@@ -331,11 +336,11 @@ func TestReviews(t *testing.T) {
 
 		defer res.Body.Close()
 
-		assert.Equal(t, res.StatusCode, http.StatusNoContent)
+		assert.Equal(t, http.StatusNoContent, res.StatusCode)
 
 		var reviewFound models.Review
 		errFound := db.Where("review_id = ?", review.ReviewID).First(&reviewFound).Error
 
-		assert.Equal(t, errFound, gorm.ErrRecordNotFound)
+		assert.Equal(t, gorm.ErrRecordNotFound, errFound)
 	})
 }
