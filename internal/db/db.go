@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"strings"
 
+	"database/sql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	_ "github.com/lib/pq"
 )
 
 func NewDatabase(
@@ -17,6 +19,36 @@ func NewDatabase(
 	dbPassword string,
 	dbSSL bool,
 ) (*gorm.DB, error) {
+	sqlDB, errSQL := NewDatabaseDiver(dbHost, dbName, dbPort, dbUser, dbPassword, dbSSL)
+
+	if errSQL != nil {
+		return nil, fmt.Errorf("failed to open db connection: %w", errSQL)
+	}
+
+	database, err := gorm.Open(
+		postgres.New(postgres.Config{
+		  Conn: sqlDB,
+		}),
+		&gorm.Config{
+			Logger: logger.Default.LogMode(logger.Silent),
+		},
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to open db connection: %w", err)
+	}
+
+	return database, nil
+}
+
+func NewDatabaseDiver(
+	dbHost string,
+	dbName string,
+	dbPort string,
+	dbUser string,
+	dbPassword string,
+	dbSSL bool,
+) (*sql.DB, error) {
 	var DSN strings.Builder
 
 	DSN.WriteString(fmt.Sprintf("host=%s dbname=%s", dbHost, dbName))
@@ -37,19 +69,11 @@ func NewDatabase(
 		DSN.WriteString(" sslmode=disable")
 	}
 
-	database, err := gorm.Open(
-		postgres.New(
-			postgres.Config{
-				DSN: DSN.String(),
-			},
-		),
-		&gorm.Config{
-			Logger: logger.Default.LogMode(logger.Silent),
-		},
-	)
+	sqlDB, err := sql.Open("postgres", DSN.String())
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to open db connection: %w", err)
 	}
 
-	return database, nil
+	return sqlDB, nil
 }
