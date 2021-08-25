@@ -4,6 +4,7 @@ import (
 	"go_server/internal/logger"
 	"testing"
 	"time"
+	"errors"
 
 	"github.com/stretchr/testify/assert"
 
@@ -12,7 +13,26 @@ import (
 	"go.uber.org/zap/zaptest/observer"
 )
 
-func TestZapLogger(t *testing.T) {
+var errTest = errors.New("this is an error")
+
+func TestZapLoggerInfo(t *testing.T) {
+	t.Parallel()
+
+	core, recordedLogs := observer.New(zapcore.InfoLevel)
+	zapLogger := zap.New(core)
+
+	logger := logger.NewZapLogger(zapLogger)
+
+	logger.Info("someMessage")
+
+	logs := recordedLogs.All()
+
+	assert.Equal(t, 1, len(logs))
+	assert.Equal(t, zapcore.Level(0), logs[0].Level)
+	assert.Equal(t, "someMessage", logs[0].Message)
+}
+
+func TestZapLoggerInfoWithMeta(t *testing.T) {
 	t.Parallel()
 
 	core, recordedLogs := observer.New(zapcore.InfoLevel)
@@ -36,11 +56,54 @@ func TestZapLogger(t *testing.T) {
 	logs := recordedLogs.All()
 
 	assert.Equal(t, 1, len(logs))
+	assert.Equal(t, zapcore.Level(0), logs[0].Level)
 	assert.Equal(t, "someMessage", logs[0].Message)
 	assert.ElementsMatch(t, []zap.Field{
 		zap.String("someString", "someStringValue"),
 		zap.Int("someInt", 52),
 		zap.Duration("someDuration", timeSince),
 		zap.Any("someAny", map[string]interface{}{"someKey": "someValue"}),
+	}, logs[0].Context)
+}
+
+func TestZapLoggerError(t *testing.T) {
+	t.Parallel()
+
+	core, recordedLogs := observer.New(zapcore.InfoLevel)
+	zapLogger := zap.New(core)
+
+	logger := logger.NewZapLogger(zapLogger)
+
+	logger.Error("someError")
+
+	logs := recordedLogs.All()
+
+	assert.Equal(t, 1, len(logs))
+	assert.Equal(t, zapcore.Level(2), logs[0].Level)
+	assert.Equal(t, "someError", logs[0].Message)
+}
+
+func TestZapLoggerErrorWithMeta(t *testing.T) {
+	t.Parallel()
+
+	core, recordedLogs := observer.New(zapcore.InfoLevel)
+	zapLogger := zap.New(core)
+
+	logger := logger.NewZapLogger(zapLogger)
+
+	logger.ErrorWithMeta(
+		"someError",
+		map[string]interface{}{
+			"someError":   errTest,
+		},
+	)
+
+	logs := recordedLogs.All()
+
+	assert.Equal(t, 1, len(logs))
+	assert.Equal(t, zapcore.Level(2), logs[0].Level)
+	assert.Equal(t, "someError", logs[0].Message)
+	assert.ElementsMatch(t, []zap.Field{
+		zap.Error(errTest),
 	}, logs[0].Context)
 }

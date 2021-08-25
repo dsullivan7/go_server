@@ -16,11 +16,11 @@ type Store interface {
 	ModifyUser(userID uuid.UUID, userPayload models.User) models.User
 	DeleteUser(userID uuid.UUID)
 
-	GetReview(userID uuid.UUID) models.Review
-	ListReviews(query map[string]interface{}) []models.Review
-	CreateReview(userPayload models.Review) models.Review
-	ModifyReview(userID uuid.UUID, userPayload models.Review) models.Review
-	DeleteReview(userID uuid.UUID)
+	GetReview(userID uuid.UUID) (*models.Review, error)
+	ListReviews(query map[string]interface{}) ([]models.Review, error)
+	CreateReview(userPayload models.Review) (*models.Review, error)
+	ModifyReview(userID uuid.UUID, userPayload models.Review) (*models.Review, error)
+	DeleteReview(userID uuid.UUID) error
 }
 
 type GormStore struct {

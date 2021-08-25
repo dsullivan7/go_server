@@ -6,46 +6,46 @@ import (
 	"github.com/google/uuid"
 )
 
-func (gormStore *GormStore) GetReview(reviewID uuid.UUID) models.Review {
+func (gormStore *GormStore) GetReview(reviewID uuid.UUID) (*models.Review, error) {
 	var review models.Review
 
 	err := gormStore.database.First(&review, reviewID).Error
 	if err != nil {
-		panic("Error finding review")
+		return nil, err
 	}
 
-	return review
+	return &review, nil
 }
 
-func (gormStore *GormStore) ListReviews(query map[string]interface{}) []models.Review {
+func (gormStore *GormStore) ListReviews(query map[string]interface{}) ([]models.Review, error) {
 	var reviews []models.Review
 
 	err := gormStore.database.Where(query).Order("created_at desc").Find(&reviews).Error
 	if err != nil {
-		panic("Error listing reviews")
+		return nil, err
 	}
 
-	return reviews
+	return reviews, nil
 }
 
-func (gormStore *GormStore) CreateReview(reviewPayload models.Review) models.Review {
+func (gormStore *GormStore) CreateReview(reviewPayload models.Review) (*models.Review, error) {
 	review := reviewPayload
 
 	err := gormStore.database.Create(&review).Error
 	if err != nil {
-		panic("Error creating review")
+		return nil, err
 	}
 
-	return review
+	return &review, nil
 }
 
-func (gormStore *GormStore) ModifyReview(reviewID uuid.UUID, reviewPayload models.Review) models.Review {
+func (gormStore *GormStore) ModifyReview(reviewID uuid.UUID, reviewPayload models.Review) (*models.Review, error) {
 	var reviewFound models.Review
 
 	errFind := gormStore.database.Where("review_id = ?", reviewID).First(&reviewFound).Error
 
 	if errFind != nil {
-		panic("Error finding review")
+		return nil, errFind
 	}
 
 	if reviewPayload.FromUserID != nil {
@@ -63,16 +63,18 @@ func (gormStore *GormStore) ModifyReview(reviewID uuid.UUID, reviewPayload model
 	errUpdate := gormStore.database.Save(&reviewFound).Error
 
 	if errUpdate != nil {
-		panic("Error updating review")
+		return nil, errUpdate
 	}
 
-	return reviewFound
+	return &reviewFound, nil
 }
 
-func (gormStore *GormStore) DeleteReview(reviewID uuid.UUID) {
-	errUpdate := gormStore.database.Delete(&models.Review{}, reviewID).Error
+func (gormStore *GormStore) DeleteReview(reviewID uuid.UUID) error {
+	err := gormStore.database.Delete(&models.Review{}, reviewID).Error
 
-	if errUpdate != nil {
-		panic("Error deleting review")
+	if err != nil {
+		return err
 	}
+
+	return nil
 }
