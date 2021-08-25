@@ -7,11 +7,11 @@ import (
 type HTTPUserError struct {
 	HTTPStatus int
 	Message    string
-	Err      error
+	Err        error
 }
 
 func (err HTTPUserError) GetHTTPStatus() int {
-	if (err.HTTPStatus == 0) {
+	if err.HTTPStatus == 0 {
 		return http.StatusBadRequest
 	}
 
@@ -19,7 +19,7 @@ func (err HTTPUserError) GetHTTPStatus() int {
 }
 
 func (err HTTPUserError) GetMessage() string {
-	if (err.Message == "") {
+	if err.Message == "" {
 		return "Something went wrong, try again."
 	}
 

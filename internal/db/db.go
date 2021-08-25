@@ -5,16 +5,18 @@ import (
 	"strings"
 
 	"database/sql"
+
+	// import the postgres driver.
+	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	_ "github.com/lib/pq"
 )
 
 func NewDatabase(sqlDB *sql.DB) (*gorm.DB, error) {
 	database, err := gorm.Open(
 		postgres.New(postgres.Config{
-		  Conn: sqlDB,
+			Conn: sqlDB,
 		}),
 		&gorm.Config{
 			Logger: logger.Default.LogMode(logger.Silent),

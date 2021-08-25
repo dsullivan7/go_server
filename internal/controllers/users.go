@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
-	"go_server/internal/models"
 	"go_server/internal/errors"
+	"go_server/internal/models"
 	"net/http"
 
 	"github.com/go-chi/chi"

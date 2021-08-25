@@ -1,10 +1,10 @@
 package logger_test
 
 import (
+	"errors"
 	"go_server/internal/logger"
 	"testing"
 	"time"
-	"errors"
 
 	"github.com/stretchr/testify/assert"
 
@@ -94,7 +94,7 @@ func TestZapLoggerErrorWithMeta(t *testing.T) {
 	logger.ErrorWithMeta(
 		"someError",
 		map[string]interface{}{
-			"someError":   errTest,
+			"someError": errTest,
 		},
 	)
 

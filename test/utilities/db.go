@@ -2,6 +2,7 @@ package utilities
 
 import (
 	"database/sql"
+	"fmt"
 )
 
 type DatabaseUtility interface {
@@ -29,5 +30,5 @@ func (dbUtility *SQLDatabaseUtility) TruncateAll() error {
 		$$
 	`)
 
-  return err
+	return fmt.Errorf("failed to truncate tables: %w", err)
 }

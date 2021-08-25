@@ -24,20 +24,19 @@ func NewControllers(store store.Store, config *config.Config, logger logger.Logg
 	}
 }
 
-
 func (c *Controllers) HandlePanic(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
 				var foundError error
 				switch x := err.(type) {
-	        case string:
-            foundError = goServerErrors.RunTimeError{ ErrorText: x }
-	        case error:
-            foundError = x
-	        default:
-						foundError = goServerErrors.RunTimeError{ ErrorText: "unknown" }
-	      }
+				case string:
+					foundError = goServerErrors.RunTimeError{ErrorText: x}
+				case error:
+					foundError = x
+				default:
+					foundError = goServerErrors.RunTimeError{ErrorText: "unknown"}
+				}
 
 				c.handleError(w, r, goServerErrors.HTTPServerError{Err: foundError})
 			}

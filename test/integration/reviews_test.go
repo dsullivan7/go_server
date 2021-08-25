@@ -58,7 +58,8 @@ func TestReviews(t *testing.T) {
 	defer testServer.Close()
 
 	t.Run("Test Get", func(t *testing.T) {
-		dbUtility.TruncateAll()
+		errTruncate := dbUtility.TruncateAll()
+		assert.Nil(t, errTruncate)
 
 		user1 := models.User{}
 		user2 := models.User{}
@@ -102,7 +103,8 @@ func TestReviews(t *testing.T) {
 	})
 
 	t.Run("Test List", func(t *testing.T) {
-		dbUtility.TruncateAll()
+		errTruncate := dbUtility.TruncateAll()
+		assert.Nil(t, errTruncate)
 
 		user1 := models.User{}
 		user2 := models.User{}
@@ -210,7 +212,8 @@ func TestReviews(t *testing.T) {
 	})
 
 	t.Run("Test Create", func(t *testing.T) {
-		dbUtility.TruncateAll()
+		errTruncate := dbUtility.TruncateAll()
+		assert.Nil(t, errTruncate)
 
 		user1 := models.User{}
 		user2 := models.User{}
@@ -263,7 +266,8 @@ func TestReviews(t *testing.T) {
 	})
 
 	t.Run("Test Modify", func(t *testing.T) {
-		dbUtility.TruncateAll()
+		errTruncate := dbUtility.TruncateAll()
+		assert.Nil(t, errTruncate)
 
 		user1 := models.User{}
 		user2 := models.User{}
@@ -314,7 +318,8 @@ func TestReviews(t *testing.T) {
 	})
 
 	t.Run("Test Delete", func(t *testing.T) {
-		dbUtility.TruncateAll()
+		errTruncate := dbUtility.TruncateAll()
+		assert.Nil(t, errTruncate)
 
 		user1 := models.User{}
 		user2 := models.User{}
