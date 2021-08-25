@@ -6,6 +6,7 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func NewDatabase(
@@ -42,7 +43,9 @@ func NewDatabase(
 				DSN: DSN.String(),
 			},
 		),
-		&gorm.Config{},
+		&gorm.Config{
+			Logger: logger.Default.LogMode(logger.Silent),
+		},
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open db connection: %w", err)
