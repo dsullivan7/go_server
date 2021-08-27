@@ -1,12 +1,12 @@
 package app
 
 import (
+	"fmt"
 	"go_server/internal/config"
 	"go_server/internal/db"
 	goServerZapLogger "go_server/internal/logger/zap"
 	"go_server/internal/server"
 	"go_server/internal/store/gorm"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -55,9 +55,9 @@ func Run() {
 
 	handler := server.NewChiServer(config, router, store, logger)
 
-	httpServer := http.Server {
-    Addr: fmt.Sprintf(":%s", config.Port),
-    Handler: handler.Init(),
+	httpServer := http.Server{
+		Addr:    fmt.Sprintf(":%s", config.Port),
+		Handler: handler.Init(),
 	}
 
 	log.Fatal(httpServer.ListenAndServe())

@@ -5,24 +5,24 @@ import (
 
 	"go_server/internal/config"
 	"go_server/internal/logger"
-	"go_server/internal/store"
-	"go_server/internal/server/utils"
 	"go_server/internal/server/controllers"
 	"go_server/internal/server/middlewares"
+	"go_server/internal/server/utils"
+	"go_server/internal/store"
 
 	"github.com/go-chi/chi"
 )
 
 type Server interface {
-  Init() http.Handler
+	Init() http.Handler
 }
 
 type ChiServer struct {
-	router *chi.Mux
-	config *config.Config
-  controllers *controllers.Controllers
-  middlewares *middlewares.Middlewares
-	logger logger.Logger
+	router      *chi.Mux
+	config      *config.Config
+	controllers *controllers.Controllers
+	middlewares *middlewares.Middlewares
+	logger      logger.Logger
 }
 
 func NewChiServer(config *config.Config, router *chi.Mux, store store.Store, logger logger.Logger) Server {
@@ -31,9 +31,9 @@ func NewChiServer(config *config.Config, router *chi.Mux, store store.Store, log
 	middlewares := middlewares.NewMiddlewares(config, store, utils, logger)
 
 	return &ChiServer{
-		router: router,
-		config: config,
-		logger: logger,
+		router:      router,
+		config:      config,
+		logger:      logger,
 		controllers: controllers,
 		middlewares: middlewares,
 	}
