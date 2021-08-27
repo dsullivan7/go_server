@@ -8,17 +8,17 @@ import (
 )
 
 type Controllers struct {
-	store  store.Store
 	config *config.Config
-	logger logger.Logger
+	store  store.Store
 	utils  *utils.ServerUtils
+	logger logger.Logger
 }
 
 func NewControllers(
-	store store.Store,
 	config *config.Config,
-	logger logger.Logger,
+	store store.Store,
 	utils *utils.ServerUtils,
+	logger logger.Logger,
 ) *Controllers {
 	return &Controllers{
 		store:  store,

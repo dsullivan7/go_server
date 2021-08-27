@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"go_server/internal/config"
 	"go_server/internal/logger"
+	"go_server/internal/store"
+	"go_server/internal/server/utils"
 	"go_server/internal/server/controllers"
 	"go_server/internal/server/middlewares"
 	"log"
@@ -21,12 +23,15 @@ type Server struct {
 }
 
 func NewServer(
-	router *chi.Mux,
-	controllers *controllers.Controllers,
-	middlewares *middlewares.Middlewares,
 	config *config.Config,
+	router *chi.Mux,
+	store store.Store,
 	logger logger.Logger,
 ) *Server {
+	utils := utils.NewServerUtils(logger)
+	controllers := controllers.NewControllers(config, store, utils, logger)
+	middlewares := middlewares.NewMiddlewares(config, store, utils, logger)
+
 	return &Server{
 		router:      router,
 		controllers: controllers,

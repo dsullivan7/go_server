@@ -15,15 +15,15 @@ type Middlewares struct {
 }
 
 func NewMiddlewares(
-	store store.Store,
 	config *config.Config,
-	logger logger.Logger,
+	store store.Store,
 	utils *utils.ServerUtils,
+	logger logger.Logger,
 ) *Middlewares {
 	return &Middlewares{
-		store:  store,
 		config: config,
-		logger: logger,
+		store:  store,
 		utils:  utils,
+		logger: logger,
 	}
 }

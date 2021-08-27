@@ -11,9 +11,6 @@ import (
 	"go_server/internal/logger"
 	"go_server/internal/models"
 	"go_server/internal/server"
-	"go_server/internal/server/controllers"
-	"go_server/internal/server/middlewares"
-	"go_server/internal/server/utils"
 	"go_server/internal/store"
 	testUtils "go_server/test/utils"
 	"net/http"
@@ -62,15 +59,12 @@ func TestUsers(t *testing.T) {
 	assert.Nil(t, errDatabase)
 
 	dbUtility := testUtils.NewSQLDatabaseUtility(connection)
-	store := store.NewGormStore(db)
 
-	utils := utils.NewServerUtils(logger)
-	controllers := controllers.NewControllers(store, config, logger, utils)
-	middlewares := middlewares.NewMiddlewares(store, config, logger, utils)
+	store := store.NewGormStore(db)
 
 	router := chi.NewRouter()
 
-	server := server.NewServer(router, controllers, middlewares, config, logger)
+	server := server.NewServer(config, router, store, logger)
 
 	testServer := httptest.NewServer(server.Routes())
 	context := context.Background()

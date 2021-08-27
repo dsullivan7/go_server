@@ -52,13 +52,9 @@ func Run() {
 
 	store := store.NewGormStore(db)
 
-	utils := utils.NewServerUtils(logger)
-	controllers := controllers.NewControllers(store, config, logger, utils)
-	middlewares := middlewares.NewMiddlewares(store, config, logger, utils)
-
 	router := chi.NewRouter()
 
-	server := server.NewServer(router, controllers, middlewares, config, logger)
+	server := server.NewServer(config, router, store, logger)
 
 	server.Run()
 }
