@@ -1,27 +1,29 @@
-package logger
+package zap
 
 import (
 	"time"
+
+	"go_server/internal/logger"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-type ZapLogger struct {
+type Logger struct {
 	logger *zap.Logger
 }
 
 type zapLog func(string, ...zapcore.Field)
 
-func NewZapLogger(logger *zap.Logger) Logger {
-	return &ZapLogger{logger: logger}
+func NewLogger(logger *zap.Logger) logger.Logger {
+	return &Logger{logger: logger}
 }
 
-func (logger *ZapLogger) log(fn zapLog, message string) {
+func (logger *Logger) log(fn zapLog, message string) {
 	fn(message)
 }
 
-func (logger *ZapLogger) logWithMeta(fn zapLog, message string, meta map[string]interface{}) {
+func (logger *Logger) logWithMeta(fn zapLog, message string, meta map[string]interface{}) {
 	var args []zap.Field
 
 	for key, value := range meta {
@@ -42,18 +44,18 @@ func (logger *ZapLogger) logWithMeta(fn zapLog, message string, meta map[string]
 	fn(message, args...)
 }
 
-func (logger *ZapLogger) Info(message string) {
+func (logger *Logger) Info(message string) {
 	logger.log(logger.logger.Info, message)
 }
 
-func (logger *ZapLogger) InfoWithMeta(message string, meta map[string]interface{}) {
+func (logger *Logger) InfoWithMeta(message string, meta map[string]interface{}) {
 	logger.logWithMeta(logger.logger.Info, message, meta)
 }
 
-func (logger *ZapLogger) Error(message string) {
+func (logger *Logger) Error(message string) {
 	logger.log(logger.logger.Error, message)
 }
 
-func (logger *ZapLogger) ErrorWithMeta(message string, meta map[string]interface{}) {
+func (logger *Logger) ErrorWithMeta(message string, meta map[string]interface{}) {
 	logger.logWithMeta(logger.logger.Error, message, meta)
 }

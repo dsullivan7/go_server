@@ -3,7 +3,7 @@ package app
 import (
 	"go_server/internal/config"
 	"go_server/internal/db"
-	"go_server/internal/logger"
+	goServerZapLogger "go_server/internal/logger/zap"
 	"go_server/internal/server"
 	"go_server/internal/store/gorm"
 	"fmt"
@@ -28,7 +28,7 @@ func Run() {
 		log.Fatal(errZap)
 	}
 
-	logger := logger.NewZapLogger(zapLogger)
+	logger := goServerZapLogger.NewLogger(zapLogger)
 
 	connection, errConnection := db.NewSQLConnection(
 		config.DBHost,

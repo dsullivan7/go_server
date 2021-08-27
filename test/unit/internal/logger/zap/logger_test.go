@@ -1,8 +1,8 @@
-package logger_test
+package zap_test
 
 import (
 	"errors"
-	"go_server/internal/logger"
+	goServerZapLogger "go_server/internal/logger/zap"
 	"testing"
 	"time"
 
@@ -21,7 +21,7 @@ func TestZapLoggerInfo(t *testing.T) {
 	core, recordedLogs := observer.New(zapcore.InfoLevel)
 	zapLogger := zap.New(core)
 
-	logger := logger.NewZapLogger(zapLogger)
+	logger := goServerZapLogger.NewLogger(zapLogger)
 
 	logger.Info("someMessage")
 
@@ -38,7 +38,7 @@ func TestZapLoggerInfoWithMeta(t *testing.T) {
 	core, recordedLogs := observer.New(zapcore.InfoLevel)
 	zapLogger := zap.New(core)
 
-	logger := logger.NewZapLogger(zapLogger)
+	logger := goServerZapLogger.NewLogger(zapLogger)
 
 	timeNow := time.Now()
 	timeSince := time.Since(timeNow)
@@ -72,7 +72,7 @@ func TestZapLoggerError(t *testing.T) {
 	core, recordedLogs := observer.New(zapcore.InfoLevel)
 	zapLogger := zap.New(core)
 
-	logger := logger.NewZapLogger(zapLogger)
+	logger := goServerZapLogger.NewLogger(zapLogger)
 
 	logger.Error("someError")
 
@@ -89,7 +89,7 @@ func TestZapLoggerErrorWithMeta(t *testing.T) {
 	core, recordedLogs := observer.New(zapcore.InfoLevel)
 	zapLogger := zap.New(core)
 
-	logger := logger.NewZapLogger(zapLogger)
+	logger := goServerZapLogger.NewLogger(zapLogger)
 
 	logger.ErrorWithMeta(
 		"someError",

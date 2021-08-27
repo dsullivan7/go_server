@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"go_server/internal/config"
 	"go_server/internal/db"
-	"go_server/internal/logger"
 	"go_server/internal/models"
 	"go_server/internal/server"
 	goServerGormStore "go_server/internal/store/gorm"
+	goServerZapLogger "go_server/internal/logger/zap"
 	testUtils "go_server/test/utils"
 	"net/http"
 	"net/http/httptest"
@@ -43,7 +43,7 @@ func TestUsers(t *testing.T) {
 	zapLogger, errZap := zap.NewProduction()
 	assert.Nil(t, errZap)
 
-	logger := logger.NewZapLogger(zapLogger)
+	logger := goServerZapLogger.NewLogger(zapLogger)
 
 	connection, errConnection := db.NewSQLConnection(
 		config.DBHost,
