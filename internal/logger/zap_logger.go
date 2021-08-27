@@ -25,15 +25,16 @@ func (logger *ZapLogger) logWithMeta(fn zapLog, message string, meta map[string]
 	var args []zap.Field
 
 	for key, value := range meta {
-		if valueWithType, ok := value.(string); ok {
+		switch valueWithType := value.(type) {
+		case string:
 			args = append(args, zap.String(key, valueWithType))
-		} else if valueWithType, ok := value.(int); ok {
+		case int:
 			args = append(args, zap.Int(key, valueWithType))
-		} else if valueWithType, ok := value.(time.Duration); ok {
+		case time.Duration:
 			args = append(args, zap.Duration(key, valueWithType))
-		} else if valueWithType, ok := value.(error); ok {
+		case error:
 			args = append(args, zap.Error(valueWithType))
-		} else {
+		default:
 			args = append(args, zap.Any(key, value))
 		}
 	}
