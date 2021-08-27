@@ -17,7 +17,7 @@ func (c *Controllers) GetUser(w http.ResponseWriter, r *http.Request) {
 	user, err := c.store.GetUser(userID)
 
 	if err != nil {
-		c.handleError(w, r, errors.HTTPUserError{Err: err})
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: err})
 
 		return
 	}
@@ -31,7 +31,7 @@ func (c *Controllers) ListUsers(w http.ResponseWriter, r *http.Request) {
 	users, err := c.store.ListUsers(query)
 
 	if err != nil {
-		c.handleError(w, r, errors.HTTPUserError{Err: err})
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: err})
 
 		return
 	}
@@ -44,7 +44,7 @@ func (c *Controllers) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	errDecode := json.NewDecoder(r.Body).Decode(&userPayload)
 	if errDecode != nil {
-		c.handleError(w, r, errors.HTTPUserError{Err: errDecode})
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errDecode})
 
 		return
 	}
@@ -57,7 +57,7 @@ func (c *Controllers) CreateUser(w http.ResponseWriter, r *http.Request) {
 	user, err := c.store.CreateUser(userPayload)
 
 	if err != nil {
-		c.handleError(w, r, errors.HTTPUserError{Err: err})
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: err})
 
 		return
 	}
@@ -73,7 +73,7 @@ func (c *Controllers) ModifyUser(w http.ResponseWriter, r *http.Request) {
 
 	errDecode := json.NewDecoder(r.Body).Decode(&userPayload)
 	if errDecode != nil {
-		c.handleError(w, r, errors.HTTPUserError{Err: errDecode})
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errDecode})
 
 		return
 	}
@@ -81,7 +81,7 @@ func (c *Controllers) ModifyUser(w http.ResponseWriter, r *http.Request) {
 	user, err := c.store.ModifyUser(userID, userPayload)
 
 	if err != nil {
-		c.handleError(w, r, errors.HTTPUserError{Err: err})
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: err})
 
 		return
 	}
@@ -95,7 +95,7 @@ func (c *Controllers) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	err := c.store.DeleteUser(userID)
 
 	if err != nil {
-		c.handleError(w, r, errors.HTTPUserError{Err: err})
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: err})
 
 		return
 	}

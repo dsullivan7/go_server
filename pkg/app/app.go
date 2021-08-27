@@ -2,10 +2,12 @@ package app
 
 import (
 	"go_server/internal/config"
-	"go_server/internal/controllers"
 	"go_server/internal/db"
 	"go_server/internal/logger"
 	"go_server/internal/server"
+	"go_server/internal/server/controllers"
+	"go_server/internal/server/middlewares"
+	"go_server/internal/server/utils"
 	"go_server/internal/store"
 	"log"
 
@@ -50,11 +52,13 @@ func Run() {
 
 	store := store.NewGormStore(db)
 
-	controllers := controllers.NewControllers(store, config, logger)
+	utils := utils.NewServerUtils(logger)
+	controllers := controllers.NewControllers(store, config, logger, utils)
+	middlewares := middlewares.NewMiddlewares(store, config, logger, utils)
 
 	router := chi.NewRouter()
 
-	server := server.NewServer(router, controllers, config, logger)
+	server := server.NewServer(router, controllers, middlewares, config, logger)
 
 	server.Run()
 }

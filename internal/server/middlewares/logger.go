@@ -1,16 +1,15 @@
 package middlewares
 
 import (
-	"go_server/internal/logger"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/middleware"
 )
 
-func Logger(l logger.Logger) func(next http.Handler) http.Handler {
+func (m *Middlewares) Logger() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
-		fn := func(w http.ResponseWriter, r *http.Request) {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
 
 			t1 := time.Now()
@@ -27,12 +26,10 @@ func Logger(l logger.Logger) func(next http.Handler) http.Handler {
 					"reqId":        middleware.GetReqID(r.Context()),
 				}
 
-				l.InfoWithMeta("Response", meta)
+				m.logger.InfoWithMeta("Response", meta)
 			}()
 
 			next.ServeHTTP(ww, r)
-		}
-
-		return http.HandlerFunc(fn)
+		})
 	}
 }

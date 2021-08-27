@@ -7,13 +7,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"go_server/internal/config"
-	"go_server/internal/controllers"
 	"go_server/internal/db"
 	"go_server/internal/logger"
 	"go_server/internal/models"
 	"go_server/internal/server"
+	"go_server/internal/server/controllers"
+	"go_server/internal/server/middlewares"
+	"go_server/internal/server/utils"
 	"go_server/internal/store"
-	"go_server/test/utilities"
+	testUtils "go_server/test/utils"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -59,11 +61,16 @@ func TestUsers(t *testing.T) {
 	db, errDatabase := db.NewGormDB(connection)
 	assert.Nil(t, errDatabase)
 
-	dbUtility := utilities.NewSQLDatabaseUtility(connection)
+	dbUtility := testUtils.NewSQLDatabaseUtility(connection)
 	store := store.NewGormStore(db)
-	controllers := controllers.NewControllers(store, config, logger)
+
+	utils := utils.NewServerUtils(logger)
+	controllers := controllers.NewControllers(store, config, logger, utils)
+	middlewares := middlewares.NewMiddlewares(store, config, logger, utils)
+
 	router := chi.NewRouter()
-	server := server.NewServer(router, controllers, config, logger)
+
+	server := server.NewServer(router, controllers, middlewares, config, logger)
 
 	testServer := httptest.NewServer(server.Routes())
 	context := context.Background()

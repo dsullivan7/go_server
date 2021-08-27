@@ -3,8 +3,6 @@ package server
 import (
 	"strings"
 
-	goServerMiddlewares "go_server/internal/middlewares"
-
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
@@ -17,9 +15,9 @@ func (server *Server) Routes() *chi.Mux {
 	router.Use(middleware.RequestID)
 	router.Use(middleware.RealIP)
 	router.Use(middleware.Recoverer)
-	router.Use(goServerMiddlewares.Logger(server.logger))
-	router.Use(goServerMiddlewares.ContentType("application/json; charset=utf-8"))
-	router.Use(controllers.HandlePanic)
+	router.Use(server.middlewares.Logger())
+	router.Use(server.middlewares.ContentType("application/json; charset=utf-8"))
+	router.Use(server.middlewares.HandlePanic())
 
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   strings.Split(server.config.AllowedOrigins, ","),

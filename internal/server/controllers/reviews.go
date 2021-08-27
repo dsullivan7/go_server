@@ -17,7 +17,7 @@ func (c *Controllers) GetReview(w http.ResponseWriter, r *http.Request) {
 	review, err := c.store.GetReview(reviewID)
 
 	if err != nil {
-		c.handleError(w, r, errors.HTTPUserError{Err: err})
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: err})
 
 		return
 	}
@@ -41,7 +41,7 @@ func (c *Controllers) ListReviews(w http.ResponseWriter, r *http.Request) {
 	reviews, err := c.store.ListReviews(query)
 
 	if err != nil {
-		c.handleError(w, r, errors.HTTPUserError{Err: err})
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: err})
 
 		return
 	}
@@ -54,7 +54,7 @@ func (c *Controllers) CreateReview(w http.ResponseWriter, r *http.Request) {
 
 	errDecode := json.NewDecoder(r.Body).Decode(&reviewPayload)
 	if errDecode != nil {
-		c.handleError(w, r, errors.HTTPUserError{Err: errDecode})
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errDecode})
 
 		return
 	}
@@ -62,7 +62,7 @@ func (c *Controllers) CreateReview(w http.ResponseWriter, r *http.Request) {
 	review, err := c.store.CreateReview(reviewPayload)
 
 	if err != nil {
-		c.handleError(w, r, errors.HTTPUserError{Err: err})
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: err})
 
 		return
 	}
@@ -78,7 +78,7 @@ func (c *Controllers) ModifyReview(w http.ResponseWriter, r *http.Request) {
 
 	errDecode := json.NewDecoder(r.Body).Decode(&reviewPayload)
 	if errDecode != nil {
-		c.handleError(w, r, errors.HTTPUserError{Err: errDecode})
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errDecode})
 
 		return
 	}
@@ -86,7 +86,7 @@ func (c *Controllers) ModifyReview(w http.ResponseWriter, r *http.Request) {
 	review, err := c.store.ModifyReview(reviewID, reviewPayload)
 
 	if err != nil {
-		c.handleError(w, r, errors.HTTPUserError{Err: err})
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: err})
 
 		return
 	}
@@ -100,7 +100,7 @@ func (c *Controllers) DeleteReview(w http.ResponseWriter, r *http.Request) {
 	err := c.store.DeleteReview(reviewID)
 
 	if err != nil {
-		c.handleError(w, r, errors.HTTPUserError{Err: err})
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: err})
 
 		return
 	}
