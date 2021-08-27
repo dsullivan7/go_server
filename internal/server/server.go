@@ -41,10 +41,15 @@ func NewServer(
 	}
 }
 
+func (server *Server) GetRouter() *chi.Mux {
+	return server.router
+}
+
+func (server *Server) Init() {
+	server.initRoutes()
+}
+
 func (server *Server) Run() {
-	server.Routes()
-
 	server.logger.Info(fmt.Sprintf("Server started on port %s", server.config.Port))
-
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), server.router))
 }

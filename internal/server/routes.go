@@ -8,7 +8,7 @@ import (
 	"github.com/go-chi/cors"
 )
 
-func (server *Server) Routes() *chi.Mux {
+func (server *Server) initRoutes() *chi.Mux {
 	router := server.router
 	controllers := server.controllers
 

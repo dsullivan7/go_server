@@ -51,8 +51,9 @@ func TestReviews(t *testing.T) {
 	router := chi.NewRouter()
 
 	server := server.NewServer(config, router, store, logger)
+	server.Init()
 
-	testServer := httptest.NewServer(server.Routes())
+	testServer := httptest.NewServer(server.GetRouter())
 
 	context := context.Background()
 

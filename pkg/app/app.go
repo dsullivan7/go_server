@@ -5,9 +5,6 @@ import (
 	"go_server/internal/db"
 	"go_server/internal/logger"
 	"go_server/internal/server"
-	"go_server/internal/server/controllers"
-	"go_server/internal/server/middlewares"
-	"go_server/internal/server/utils"
 	"go_server/internal/store"
 	"log"
 
@@ -56,5 +53,6 @@ func Run() {
 
 	server := server.NewServer(config, router, store, logger)
 
+	server.Init()
 	server.Run()
 }
