@@ -1,4 +1,4 @@
-package store
+package gorm
 
 import (
 	"go_server/internal/models"
@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (gormStore *GormStore) GetReview(reviewID uuid.UUID) (*models.Review, error) {
+func (gormStore *Store) GetReview(reviewID uuid.UUID) (*models.Review, error) {
 	var review models.Review
 
 	err := gormStore.database.First(&review, reviewID).Error
@@ -17,7 +17,7 @@ func (gormStore *GormStore) GetReview(reviewID uuid.UUID) (*models.Review, error
 	return &review, nil
 }
 
-func (gormStore *GormStore) ListReviews(query map[string]interface{}) ([]models.Review, error) {
+func (gormStore *Store) ListReviews(query map[string]interface{}) ([]models.Review, error) {
 	var reviews []models.Review
 
 	err := gormStore.database.Where(query).Order("created_at desc").Find(&reviews).Error
@@ -28,7 +28,7 @@ func (gormStore *GormStore) ListReviews(query map[string]interface{}) ([]models.
 	return reviews, nil
 }
 
-func (gormStore *GormStore) CreateReview(reviewPayload models.Review) (*models.Review, error) {
+func (gormStore *Store) CreateReview(reviewPayload models.Review) (*models.Review, error) {
 	review := reviewPayload
 
 	err := gormStore.database.Create(&review).Error
@@ -39,7 +39,7 @@ func (gormStore *GormStore) CreateReview(reviewPayload models.Review) (*models.R
 	return &review, nil
 }
 
-func (gormStore *GormStore) ModifyReview(reviewID uuid.UUID, reviewPayload models.Review) (*models.Review, error) {
+func (gormStore *Store) ModifyReview(reviewID uuid.UUID, reviewPayload models.Review) (*models.Review, error) {
 	var reviewFound models.Review
 
 	errFind := gormStore.database.Where("review_id = ?", reviewID).First(&reviewFound).Error
@@ -69,7 +69,7 @@ func (gormStore *GormStore) ModifyReview(reviewID uuid.UUID, reviewPayload model
 	return &reviewFound, nil
 }
 
-func (gormStore *GormStore) DeleteReview(reviewID uuid.UUID) error {
+func (gormStore *Store) DeleteReview(reviewID uuid.UUID) error {
 	err := gormStore.database.Delete(&models.Review{}, reviewID).Error
 
 	return err

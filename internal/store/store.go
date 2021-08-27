@@ -4,7 +4,6 @@ import (
 	"go_server/internal/models"
 
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 type Store interface {
@@ -19,12 +18,4 @@ type Store interface {
 	CreateReview(userPayload models.Review) (*models.Review, error)
 	ModifyReview(userID uuid.UUID, userPayload models.Review) (*models.Review, error)
 	DeleteReview(userID uuid.UUID) error
-}
-
-type GormStore struct {
-	database *gorm.DB
-}
-
-func NewGormStore(database *gorm.DB) Store {
-	return &GormStore{database: database}
 }

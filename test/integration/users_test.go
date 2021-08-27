@@ -11,7 +11,7 @@ import (
 	"go_server/internal/logger"
 	"go_server/internal/models"
 	"go_server/internal/server"
-	"go_server/internal/store"
+	goServerGormStore "go_server/internal/store/gorm"
 	testUtils "go_server/test/utils"
 	"net/http"
 	"net/http/httptest"
@@ -60,14 +60,14 @@ func TestUsers(t *testing.T) {
 
 	dbUtility := testUtils.NewSQLDatabaseUtility(connection)
 
-	store := store.NewGormStore(db)
+	store := goServerGormStore.NewStore(db)
 
 	router := chi.NewRouter()
 
-	server := server.NewServer(config, router, store, logger)
-	server.Init()
+	handler := server.NewChiServer(config, router, store, logger)
 
-	testServer := httptest.NewServer(server.GetRouter())
+	testServer := httptest.NewServer(handler.Init())
+
 	context := context.Background()
 
 	defer testServer.Close()

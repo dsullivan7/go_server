@@ -1,55 +1,40 @@
 package server
 
 import (
-	"fmt"
+	"net/http"
+
 	"go_server/internal/config"
 	"go_server/internal/logger"
 	"go_server/internal/store"
 	"go_server/internal/server/utils"
 	"go_server/internal/server/controllers"
 	"go_server/internal/server/middlewares"
-	"log"
-	"net/http"
 
 	"github.com/go-chi/chi"
 )
 
-type Server struct {
-	router      *chi.Mux
-	controllers *controllers.Controllers
-	middlewares *middlewares.Middlewares
-	logger      logger.Logger
-	config      *config.Config
+type Server interface {
+  Init() http.Handler
 }
 
-func NewServer(
-	config *config.Config,
-	router *chi.Mux,
-	store store.Store,
-	logger logger.Logger,
-) *Server {
+type ChiServer struct {
+	router *chi.Mux
+	config *config.Config
+  controllers *controllers.Controllers
+  middlewares *middlewares.Middlewares
+	logger logger.Logger
+}
+
+func NewChiServer(config *config.Config, router *chi.Mux, store store.Store, logger logger.Logger) Server {
 	utils := utils.NewServerUtils(logger)
 	controllers := controllers.NewControllers(config, store, utils, logger)
 	middlewares := middlewares.NewMiddlewares(config, store, utils, logger)
 
-	return &Server{
-		router:      router,
+	return &ChiServer{
+		router: router,
+		config: config,
+		logger: logger,
 		controllers: controllers,
 		middlewares: middlewares,
-		config:      config,
-		logger:      logger,
 	}
-}
-
-func (server *Server) GetRouter() *chi.Mux {
-	return server.router
-}
-
-func (server *Server) Init() {
-	server.initRoutes()
-}
-
-func (server *Server) Run() {
-	server.logger.Info(fmt.Sprintf("Server started on port %s", server.config.Port))
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), server.router))
 }

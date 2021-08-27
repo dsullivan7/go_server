@@ -1,31 +1,32 @@
 package server
 
 import (
+	"net/http"
 	"strings"
 
-	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
 )
 
-func (server *Server) initRoutes() *chi.Mux {
-	router := server.router
-	controllers := server.controllers
+func (s *ChiServer) Init() http.Handler {
+	router := s.router
+	controllers := s.controllers
+	middlewares := s.middlewares
 
 	router.Use(middleware.RequestID)
 	router.Use(middleware.RealIP)
 	router.Use(middleware.Recoverer)
-	router.Use(server.middlewares.Logger())
-	router.Use(server.middlewares.ContentType("application/json; charset=utf-8"))
-	router.Use(server.middlewares.HandlePanic())
+	router.Use(middlewares.Logger())
+	router.Use(middlewares.ContentType("application/json; charset=utf-8"))
+	router.Use(middlewares.HandlePanic())
 
 	router.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   strings.Split(server.config.AllowedOrigins, ","),
+		AllowedOrigins:   strings.Split(s.config.AllowedOrigins, ","),
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: false,
-		MaxAge:           server.config.RouterMaxAge,
+		MaxAge:           s.config.RouterMaxAge,
 	}))
 
 	router.Get("/api/users/{userID}", controllers.GetUser)

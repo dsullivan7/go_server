@@ -5,8 +5,10 @@ import (
 	"go_server/internal/db"
 	"go_server/internal/logger"
 	"go_server/internal/server"
-	"go_server/internal/store"
+	"go_server/internal/store/gorm"
+	"fmt"
 	"log"
+	"net/http"
 
 	"go.uber.org/zap"
 
@@ -47,12 +49,16 @@ func Run() {
 		log.Fatal(errDatabase)
 	}
 
-	store := store.NewGormStore(db)
+	store := gorm.NewStore(db)
 
 	router := chi.NewRouter()
 
-	server := server.NewServer(config, router, store, logger)
+	handler := server.NewChiServer(config, router, store, logger)
 
-	server.Init()
-	server.Run()
+	httpServer := http.Server {
+    Addr: fmt.Sprintf(":%s", config.Port),
+    Handler: handler.Init(),
+	}
+
+	log.Fatal(httpServer.ListenAndServe())
 }
