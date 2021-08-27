@@ -24,7 +24,6 @@ linters-settings:
   forbidigo:
     forbid:
       - ^(fmt\.Print.*|print|println)$
-      - ^else$
       - ^panic$
 
 issues:
