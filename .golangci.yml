@@ -21,6 +21,11 @@ linters-settings:
   gofumpt:
     lang-version: "1.17"
     extra-rules: true
+  forbidigo:
+    forbid:
+      - ^(fmt\.Print.*|print|println)$
+      - ^else$
+      - ^panic$
 
 issues:
   exclude-rules:

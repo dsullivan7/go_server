@@ -13,7 +13,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-func NewDatabase(sqlDB *sql.DB) (*gorm.DB, error) {
+func NewGormDB(sqlDB *sql.DB) (*gorm.DB, error) {
 	database, err := gorm.Open(
 		postgres.New(postgres.Config{
 			Conn: sqlDB,
@@ -24,13 +24,13 @@ func NewDatabase(sqlDB *sql.DB) (*gorm.DB, error) {
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to open db connection: %w", err)
+		return nil, fmt.Errorf("failed to open gorm connection: %w", err)
 	}
 
 	return database, nil
 }
 
-func NewDatabaseDiver(
+func NewSQLConnection(
 	dbHost string,
 	dbName string,
 	dbPort string,
@@ -61,7 +61,7 @@ func NewDatabaseDiver(
 	sqlDB, err := sql.Open("postgres", DSN.String())
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to open db connection: %w", err)
+		return nil, fmt.Errorf("failed to open sql connection: %w", err)
 	}
 
 	return sqlDB, nil

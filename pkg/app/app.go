@@ -29,7 +29,7 @@ func Run() {
 
 	logger := logger.NewZapLogger(zapLogger)
 
-	driver, errDriver := db.NewDatabaseDiver(
+	connection, errConnection := db.NewSQLConnection(
 		config.DBHost,
 		config.DBName,
 		config.DBPort,
@@ -38,11 +38,11 @@ func Run() {
 		config.DBSSL,
 	)
 
-	if errDriver != nil {
-		log.Fatal(errDriver)
+	if errConnection != nil {
+		log.Fatal(errConnection)
 	}
 
-	db, errDatabase := db.NewDatabase(driver)
+	db, errDatabase := db.NewGormDB(connection)
 
 	if errDatabase != nil {
 		log.Fatal(errDatabase)

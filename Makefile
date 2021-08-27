@@ -51,6 +51,14 @@ build-docker:
 test-docker:
 	docker-compose run --rm -e CGO_ENABLED=0 app go test -v $(TESTS)
 
+.PHONY: lint
+lint:
+	golangci-lint run
+
+.PHONY: lint-fix
+lint-fix:
+	golangci-lint run --fix
+
 .PHONY: lint-docker
 lint-docker:
 	docker run --rm -v ${PWD}:/data -w /data ${DOCKER_GOLANG_LINT} golangci-lint run

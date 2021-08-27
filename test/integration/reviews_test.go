@@ -32,7 +32,7 @@ func TestReviews(t *testing.T) {
 
 	logger := logger.NewZapLogger(zapLogger)
 
-	driver, errDriver := db.NewDatabaseDiver(
+	connection, errConnection := db.NewSQLConnection(
 		config.DBHost,
 		config.DBName,
 		config.DBPort,
@@ -40,12 +40,12 @@ func TestReviews(t *testing.T) {
 		config.DBPassword,
 		config.DBSSL,
 	)
-	assert.Nil(t, errDriver)
+	assert.Nil(t, errConnection)
 
-	db, errDatabase := db.NewDatabase(driver)
+	db, errDatabase := db.NewGormDB(connection)
 	assert.Nil(t, errDatabase)
 
-	dbUtility := utilities.NewSQLDatabaseUtility(driver)
+	dbUtility := utilities.NewSQLDatabaseUtility(connection)
 	store := store.NewGormStore(db)
 	controllers := controllers.NewControllers(store, config, logger)
 	router := chi.NewRouter()
