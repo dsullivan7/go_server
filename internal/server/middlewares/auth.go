@@ -1,12 +1,13 @@
 package middlewares
 
 import (
-	"fmt"
+	"context"
 	"encoding/json"
+	"fmt"
+	"go_server/internal/errors"
 	"net/http"
-	"errors"
 
-	jwtmiddleware "github.com/auth0/go-jwt-middleware"
+	jwtMiddleware "github.com/auth0/go-jwt-middleware"
 	jwt "github.com/form3tech-oss/jwt-go"
 )
 
@@ -19,28 +20,44 @@ type Jwks struct {
 }
 
 type JSONWebKeys struct {
-	Kty string `json:"kty"`
-	Kid string `json:"kid"`
-	Use string `json:"use"`
-	N string `json:"n"`
-	E string `json:"e"`
+	Kty string   `json:"kty"`
+	Kid string   `json:"kid"`
+	Use string   `json:"use"`
+	N   string   `json:"n"`
+	E   string   `json:"e"`
 	X5c []string `json:"x5c"`
 }
 
-func getPemCert(token *jwt.Token, domain string) (string, error) {
-	cert := ""
-	resp, err := http.Get(fmt.Sprintf("https://%s/.well-known/jwks.json", domain))
+var errCert = fmt.Errorf("unable to find appropriate key")
+var errAudience = fmt.Errorf("invalid audience")
+var errIssuer = fmt.Errorf("invalid issuers")
 
-	if err != nil {
-		return cert, err
+func getPemCert(context context.Context, token *jwt.Token, domain string) (string, error) {
+	cert := ""
+
+	req, errRequest := http.NewRequestWithContext(
+		context,
+		http.MethodGet,
+		fmt.Sprintf("https://%s/.well-known/jwks.json", domain),
+		nil,
+	)
+
+	if errRequest != nil {
+		return cert, fmt.Errorf("failed to create request: %w", errRequest)
 	}
-	defer resp.Body.Close()
+
+	res, errResponse := http.DefaultClient.Do(req)
+
+	if errResponse != nil {
+		return cert, fmt.Errorf("failed to request jwks endpoint: %w", errResponse)
+	}
+	defer res.Body.Close()
 
 	var jwks = Jwks{}
-	err = json.NewDecoder(resp.Body).Decode(&jwks)
+	errDecode := json.NewDecoder(res.Body).Decode(&jwks)
 
-	if err != nil {
-		return cert, err
+	if errDecode != nil {
+		return cert, fmt.Errorf("failed to decode jwks response: %w", errDecode)
 	}
 
 	for k := range jwks.Keys {
@@ -50,40 +67,55 @@ func getPemCert(token *jwt.Token, domain string) (string, error) {
 	}
 
 	if cert == "" {
-		err := errors.New("Unable to find appropriate key.")
-		return cert, err
+		return cert, errCert
 	}
 
 	return cert, nil
 }
 
-func (m *Middlewares) Auth() func(next http.Handler) http.Handler {
-	return jwtmiddleware.New(jwtmiddleware.Options {
-    ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
-      // Verify 'aud' claim
-      aud := m.config.Auth0Audience
+func (m *Middlewares) Auth() func(http.Handler) http.Handler {
+	jwtm := jwtMiddleware.New(jwtMiddleware.Options{
+		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
+			// Verify 'aud' claim
+			aud := m.config.Auth0Audience
 
-      checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(aud, false)
+			checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(aud, false)
 
-      if !checkAud {
-        return token, errors.New("Invalid audience.")
-      }
-      // Verify 'iss' claim
-      iss := fmt.Sprintf("https://%s/", m.config.Auth0Domain)
-      checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, false)
-      if !checkIss {
-        return token, errors.New("Invalid issuer.")
-      }
+			if !checkAud {
+				return token, errAudience
+			}
+			// Verify 'iss' claim
+			iss := fmt.Sprintf("https://%s/", m.config.Auth0Domain)
+			checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, false)
+			if !checkIss {
+				return token, errIssuer
+			}
 
-      cert, err := getPemCert(token, m.config.Auth0Domain)
+			c := context.Background()
+			cert, err := getPemCert(c, token, m.config.Auth0Domain)
 
-      if err != nil {
-        return nil, err
-      }
+			if err != nil {
+				return nil, err
+			}
 
-      result, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
-      return result, nil
-    },
-    SigningMethod: jwt.SigningMethodRS256,
-  }).Handler
+			result, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
+
+			return result, nil
+		},
+		SigningMethod: jwt.SigningMethodRS256,
+		// we will handle errors on return
+		ErrorHandler: func(w http.ResponseWriter, r *http.Request, err string) {},
+	})
+
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			err := jwtm.CheckJWT(w, r)
+			if err != nil {
+				m.utils.HandleError(w, r, errors.HTTPAuthError{Err: err})
+
+				return
+			}
+			next.ServeHTTP(w, r)
+		})
+	}
 }

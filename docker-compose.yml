@@ -9,6 +9,7 @@ x-app-environment: &app-environment
   DB_SSL: $DB_SSL
   PORT: $PORT
   AUTH0_DOMAIN: $AUTH0_DOMAIN
+  AUTH0_AUDIENCE: $AUTH0_AUDIENCE
   ALLOWED_ORIGINS: $ALLOWED_ORIGINS
 
 x-db-environment: &db-environment

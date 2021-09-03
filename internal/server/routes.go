@@ -16,8 +16,8 @@ func (s *ChiServer) Init() http.Handler {
 	router.Use(middleware.RequestID)
 	router.Use(middleware.RealIP)
 	router.Use(middleware.Recoverer)
-	router.Use(middlewares.Logger())
 	router.Use(middlewares.ContentType("application/json; charset=utf-8"))
+	router.Use(middlewares.Logger())
 	router.Use(middlewares.HandlePanic())
 
 	router.Use(cors.Handler(cors.Options{
@@ -28,6 +28,8 @@ func (s *ChiServer) Init() http.Handler {
 		AllowCredentials: false,
 		MaxAge:           s.config.RouterMaxAge,
 	}))
+
+	router.Use(middlewares.Auth())
 
 	router.Get("/api/users/{userID}", controllers.GetUser)
 	router.Get("/api/users", controllers.ListUsers)
