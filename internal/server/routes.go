@@ -2,7 +2,6 @@ package server
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
@@ -21,7 +20,7 @@ func (s *ChiServer) Init() http.Handler {
 	router.Use(middlewares.HandlePanic())
 
 	router.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   strings.Split(s.config.AllowedOrigins, ","),
+		AllowedOrigins:   s.config.AllowedOrigins,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},

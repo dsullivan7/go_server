@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
 type Config struct {
@@ -19,7 +20,7 @@ type Config struct {
 	Auth0Domain   string
 	Auth0Audience string
 
-	AllowedOrigins string
+	AllowedOrigins []string
 	RouterMaxAge   int
 }
 
@@ -40,7 +41,7 @@ func NewConfig() (*Config, error) {
 		DBSSL:          dbSSL,
 		Auth0Domain:    os.Getenv("AUTH0_DOMAIN"),
 		Auth0Audience:  os.Getenv("AUTH0_AUDIENCE"),
-		AllowedOrigins: os.Getenv("ALLOWED_ORIGINS"),
+		AllowedOrigins: strings.Split(os.Getenv("ALLOWED_ORIGINS"), ","),
 		RouterMaxAge:   300,
 	}
 
