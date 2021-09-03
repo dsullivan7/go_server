@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (m *Middlewares) HandlePanic() func(next http.Handler) http.Handler {
+func (m *Middlewares) HandlePanic() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			defer func() {

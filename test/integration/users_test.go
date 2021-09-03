@@ -12,6 +12,7 @@ import (
 	"go_server/internal/models"
 	"go_server/internal/server"
 	goServerGormStore "go_server/internal/store/gorm"
+	"go_server/test/mocks/auth"
 	testUtils "go_server/test/utils"
 	"net/http"
 	"net/http/httptest"
@@ -64,7 +65,9 @@ func TestUsers(t *testing.T) {
 
 	router := chi.NewRouter()
 
-	handler := server.NewChiServer(config, router, store, logger)
+	authMock := auth.NewAuth()
+
+	handler := server.NewChiServer(config, router, store, authMock, logger)
 
 	testServer := httptest.NewServer(handler.Init())
 

@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 
+	"go_server/internal/auth"
 	"go_server/internal/config"
 	"go_server/internal/logger"
 	"go_server/internal/server/controllers"
@@ -25,10 +26,16 @@ type ChiServer struct {
 	logger      logger.Logger
 }
 
-func NewChiServer(config *config.Config, router *chi.Mux, store store.Store, logger logger.Logger) Server {
+func NewChiServer(
+	config *config.Config,
+	router *chi.Mux,
+	store store.Store,
+	auth auth.Auth,
+	logger logger.Logger,
+) Server {
 	utils := utils.NewServerUtils(logger)
 	controllers := controllers.NewControllers(config, store, utils, logger)
-	middlewares := middlewares.NewMiddlewares(config, store, utils, logger)
+	middlewares := middlewares.NewMiddlewares(config, store, auth, utils, logger)
 
 	return &ChiServer{
 		router:      router,

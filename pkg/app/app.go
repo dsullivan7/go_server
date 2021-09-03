@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"go_server/internal/auth/auth0"
 	"go_server/internal/config"
 	"go_server/internal/db"
 	goServerZapLogger "go_server/internal/logger/zap"
@@ -51,9 +52,12 @@ func Run() {
 
 	store := gorm.NewStore(db)
 
+	auth := auth0.NewAuth(config.Auth0Domain, config.Auth0Audience)
+	auth.Init()
+
 	router := chi.NewRouter()
 
-	handler := server.NewChiServer(config, router, store, logger)
+	handler := server.NewChiServer(config, router, store, auth, logger)
 
 	httpServer := http.Server{
 		Addr:    fmt.Sprintf(":%s", config.Port),
