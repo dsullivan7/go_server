@@ -7,10 +7,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-type userString string
-
-const userKey = userString("user")
-
 type Auth struct{}
 
 func NewAuth() *Auth {
@@ -19,7 +15,8 @@ func NewAuth() *Auth {
 
 func (auth *Auth) CheckJWT(w http.ResponseWriter, r *http.Request) error {
 	jwtToken := &jwt.Token{Claims: jwt.MapClaims{"sub": "auth0|loggedInUser"}}
-	newRequest := r.WithContext(context.WithValue(r.Context(), userKey, jwtToken))
+
+	newRequest := r.WithContext(context.WithValue(r.Context(), "user", jwtToken)) //nolint:revive,staticcheck
 	*r = *newRequest
 
 	return nil

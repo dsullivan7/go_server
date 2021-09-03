@@ -29,6 +29,7 @@ func (s *ChiServer) Init() http.Handler {
 	}))
 
 	router.Use(middlewares.Auth())
+	router.Use(middlewares.User())
 
 	router.Get("/api/users/{userID}", controllers.GetUser)
 	router.Get("/api/users", controllers.ListUsers)
