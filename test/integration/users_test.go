@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	// jwt "github.com/dgrijalva/jwt-go".
 	"bytes"
 	"context"
 	"encoding/json"
@@ -23,19 +22,6 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
-
-// type userString string
-// const userKey = userString("user")
-
-// func init() {
-// middlewares.Auth = func(h http.Handler) http.Handler {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		jwtToken := &jwt.Token{ Claims: jwt.MapClaims{ "sub": "auth0|loggedInUser" } }
-//     newContext := context.WithValue(r.Context(), userKey, jwtToken)
-//     h.ServeHTTP(w, r.WithContext(newContext))
-//   })
-// }
-// }
 
 func TestUsers(t *testing.T) {
 	config, configError := config.NewConfig()
