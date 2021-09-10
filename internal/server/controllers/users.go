@@ -49,11 +49,6 @@ func (c *Controllers) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// if (userPayload.Auth0ID == "") {
-	// 	auth0Id := r.Context().Value("user").(*jwt.Token).Claims.(jwt.MapClaims)["sub"].(string)
-	// 	userPayload.Auth0ID = auth0Id
-	// }
-
 	user, err := c.store.CreateUser(userPayload)
 
 	if err != nil {
