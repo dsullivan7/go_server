@@ -65,7 +65,7 @@ func (c *Controllers) CreateUser(w http.ResponseWriter, r *http.Request) {
 func (c *Controllers) ModifyUser(w http.ResponseWriter, r *http.Request) {
 	var userPayload models.User
 
-	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "userID")))
+	userID := utils.GetURLParamUUID(r, "userID")
 
 	errDecode := json.NewDecoder(r.Body).Decode(&userPayload)
 	if errDecode != nil {
