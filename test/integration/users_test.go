@@ -12,6 +12,7 @@ import (
 	"go_server/internal/server"
 	goServerGormStore "go_server/internal/store/gorm"
 	"go_server/test/mocks/auth"
+	"go_server/test/mocks/consts"
 	testUtils "go_server/test/utils"
 	"net/http"
 	"net/http/httptest"
@@ -67,7 +68,7 @@ func TestUsers(t *testing.T) {
 
 		firstName := "firstName"
 		lastName := "lastName"
-		auth0ID := "auth0ID"
+		auth0ID := consts.LoggedInAuth0Id
 
 		user := models.User{
 			FirstName: &firstName,
@@ -81,6 +82,51 @@ func TestUsers(t *testing.T) {
 			context,
 			http.MethodGet,
 			fmt.Sprint(testServer.URL, "/api/users/", user.UserID),
+			nil,
+		)
+		assert.Nil(t, errRequest)
+
+		res, errResponse := http.DefaultClient.Do(req)
+
+		assert.Nil(t, errResponse)
+
+		defer res.Body.Close()
+
+		assert.Equal(t, http.StatusOK, res.StatusCode)
+		assert.Equal(t, "application/json; charset=utf-8", res.Header.Get("Content-Type"))
+
+		decoder := json.NewDecoder(res.Body)
+
+		var userResponse models.User
+		errDecoder := decoder.Decode(&userResponse)
+		assert.Nil(t, errDecoder)
+
+		assert.Equal(t, userResponse.UserID, user.UserID)
+		assert.Equal(t, *userResponse.FirstName, *user.FirstName)
+		assert.Equal(t, *userResponse.LastName, *user.LastName)
+		assert.Equal(t, *userResponse.Auth0ID, *user.Auth0ID)
+	})
+
+	t.Run("Test Get Me", func(t *testing.T) {
+		errTruncate := dbUtility.TruncateAll()
+		assert.Nil(t, errTruncate)
+
+		firstName := "firstName"
+		lastName := "lastName"
+		auth0ID := consts.LoggedInAuth0Id
+
+		user := models.User{
+			FirstName: &firstName,
+			LastName:  &lastName,
+			Auth0ID:   &auth0ID,
+		}
+
+		db.Create(&user)
+
+		req, errRequest := http.NewRequestWithContext(
+			context,
+			http.MethodGet,
+			fmt.Sprint(testServer.URL, "/api/users/me"),
 			nil,
 		)
 		assert.Nil(t, errRequest)

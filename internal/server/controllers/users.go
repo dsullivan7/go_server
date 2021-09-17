@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"go_server/internal/errors"
 	"go_server/internal/models"
+	"go_server/internal/server/utils"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -12,7 +13,7 @@ import (
 )
 
 func (c *Controllers) GetUser(w http.ResponseWriter, r *http.Request) {
-	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "userID")))
+	userID := utils.GetURLParamUUID(r, "userID")
 
 	user, err := c.store.GetUser(userID)
 

@@ -7,13 +7,11 @@ import (
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
+
+	"go_server/internal/server/consts"
 )
 
-type userString string
-
-const userKey = userString("user")
-
-var errAuth0SubString = fmt.Errorf("auth0 sub should be a string")
+var errAuth0SubString = fmt.Errorf("auth0 sub must be a string")
 
 func (m *Middlewares) User() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
@@ -35,7 +33,7 @@ func (m *Middlewares) User() func(http.Handler) http.Handler {
 
 			if len(users) == 1 {
 				// Store the user making this request in the userModel field
-				newContext := context.WithValue(r.Context(), userKey, users[0])
+				newContext := context.WithValue(r.Context(), consts.UserModelKey, users[0])
 				next.ServeHTTP(w, r.WithContext(newContext))
 
 				return
