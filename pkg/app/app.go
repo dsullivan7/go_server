@@ -57,7 +57,7 @@ func Run() {
 
 	router := chi.NewRouter()
 
-	handler := server.NewChiServer(config, router, store, auth, logger)
+	handler := rest.NewChiServer(config, router, store, auth, logger)
 
 	httpServer := http.Server{
 		Addr:    fmt.Sprintf(":%s", config.Port),

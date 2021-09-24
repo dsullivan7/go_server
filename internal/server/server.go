@@ -1,4 +1,4 @@
-package server
+package rest
 
 import (
 	"net/http"
@@ -6,6 +6,7 @@ import (
 	"go_server/internal/auth"
 	"go_server/internal/config"
 	"go_server/internal/logger"
+	"go_server/internal/server/graph"
 	"go_server/internal/server/controllers"
 	"go_server/internal/server/middlewares"
 	"go_server/internal/server/utils"
@@ -22,6 +23,7 @@ type ChiServer struct {
 	router      *chi.Mux
 	config      *config.Config
 	controllers *controllers.Controllers
+	resolver 		*graph.Resolver
 	middlewares *middlewares.Middlewares
 	logger      logger.Logger
 }
@@ -35,6 +37,7 @@ func NewChiServer(
 ) Server {
 	utils := utils.NewServerUtils(logger)
 	controllers := controllers.NewControllers(config, store, utils, logger)
+	resolver := graph.NewResolver(config, store, logger)
 	middlewares := middlewares.NewMiddlewares(config, store, auth, utils, logger)
 
 	return &ChiServer{
@@ -42,6 +45,7 @@ func NewChiServer(
 		config:      config,
 		logger:      logger,
 		controllers: controllers,
+		resolver: resolver,
 		middlewares: middlewares,
 	}
 }
