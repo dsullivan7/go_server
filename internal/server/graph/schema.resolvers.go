@@ -15,12 +15,24 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 }
 
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	user := &model.User{
-		FirstName: "FirstName",
-		LastName:  "LastName",
-		UserID:    "UserID",
+	query := map[string]interface{}{}
+
+	dbUsers, err := r.store.ListUsers(query)
+
+	if err != nil {
+		return nil, err
 	}
-	users := []*model.User{user}
+
+	users := []*model.User{}
+	for _, user := range dbUsers {
+		users = append(
+			users,
+			&model.User{
+				FirstName: *user.FirstName,
+				LastName: *user.LastName,
+				UserID: user.UserID.String(),
+			})
+	}
 
 	return users, nil
 }
