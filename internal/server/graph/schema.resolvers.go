@@ -29,8 +29,11 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 			users,
 			&model.User{
 				FirstName: *user.FirstName,
-				LastName: *user.LastName,
-				UserID: user.UserID.String(),
+				LastName:  *user.LastName,
+				Auth0ID:  *user.Auth0ID,
+				UserID:    user.UserID.String(),
+				CreatedAt:    user.CreatedAt.String(),
+				UpdatedAt:    user.UpdatedAt.String(),
 			})
 	}
 
