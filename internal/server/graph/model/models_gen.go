@@ -2,6 +2,10 @@
 
 package model
 
+import (
+	"time"
+)
+
 type NewUser struct {
 	Auth0ID   string `json:"auth0_id"`
 	FirstName string `json:"first_name"`
@@ -9,10 +13,10 @@ type NewUser struct {
 }
 
 type User struct {
-	UserID    string `json:"user_id"`
-	Auth0ID   string `json:"auth0_id"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+	UserID    string    `json:"user_id"`
+	Auth0ID   string    `json:"auth0_id"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

@@ -8,8 +8,8 @@ import (
 	"go_server/internal/store"
 )
 
-type Resolver struct{
-  config *config.Config
+type Resolver struct {
+	config *config.Config
 	store  store.Store
 	logger logger.Logger
 }

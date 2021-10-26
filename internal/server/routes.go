@@ -1,9 +1,10 @@
 package server
 
 import (
-	"net/http"
-	"github.com/99designs/gqlgen/graphql/handler"
 	"go_server/internal/server/graph/generated"
+	"net/http"
+
+	"github.com/99designs/gqlgen/graphql/handler"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
@@ -46,7 +47,7 @@ func (s *ChiServer) Init() http.Handler {
 	router.Delete("/api/reviews/{reviewID}", controllers.DeleteReview)
 	router.Put("/api/reviews/{reviewID}", controllers.ModifyReview)
 
-	handler := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver }))
+	handler := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
 	router.Handle("/query", handler)
 
 	return router

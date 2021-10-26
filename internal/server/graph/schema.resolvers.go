@@ -11,7 +11,9 @@ import (
 )
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	r.logger.Error("not implemented")
+
+	return nil, nil
 }
 
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
@@ -20,7 +22,7 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	dbUsers, err := r.store.ListUsers(query)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to query users: %w", err)
 	}
 
 	users := []*model.User{}
@@ -30,10 +32,10 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 			&model.User{
 				FirstName: *user.FirstName,
 				LastName:  *user.LastName,
-				Auth0ID:  *user.Auth0ID,
+				Auth0ID:   *user.Auth0ID,
 				UserID:    user.UserID.String(),
-				CreatedAt:    user.CreatedAt.String(),
-				UpdatedAt:    user.UpdatedAt.String(),
+				CreatedAt: user.CreatedAt,
+				UpdatedAt: user.UpdatedAt,
 			})
 	}
 
