@@ -1,7 +1,7 @@
-name: CI
+name: pipeline
 on: [push]
 jobs:
-  ci:
+  test:
     runs-on: ubuntu-latest
     env:
       DB_DROP: yes
@@ -20,3 +20,15 @@ jobs:
       - run: make db-init
       - run: make db-migrate
       - run: make test-docker
+  deploy:
+    name: deploy to aws
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+
+    - name: configure aws credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        role-to-assume: arn:aws:iam::408204130528:role/SunburstDevAdmin
+        aws-region: us-east-2
