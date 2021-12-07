@@ -34,3 +34,6 @@ jobs:
       with:
         role-to-assume: arn:aws:iam::408204130528:role/tchr_voice_github_role
         aws-region: us-east-2
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
