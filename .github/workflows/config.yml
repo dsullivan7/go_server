@@ -48,3 +48,17 @@ jobs:
         docker build -f $DOCKER_FILE -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+    - name: Build, tag, and push db-init image to Amazon ECR
+      id: env-substitution
+      env:
+        INPUT: task-definition-db-init.template.json
+        OUTPUT: task-definition.json
+        AWS_ACCOUNT_ID: 408204130528
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        envsubst < << $INPUT >> > << $OUTPUT >>
+    - name: Deploy to Amazon ECS
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: task-definition.json
+        wait-for-service-stability: true
