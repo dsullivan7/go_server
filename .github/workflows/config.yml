@@ -13,7 +13,7 @@ jobs:
       DB_SSL: false
       DB_SSL_MODE: disable
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v2
       - run: make lint-docker
       - run: make db-start
@@ -21,15 +21,15 @@ jobs:
       - run: make db-migrate
       - run: make test-docker
   deploy:
-    name: deploy to aws
+    name: Deploy to AWS
     runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
     steps:
-    - name: checkout
+    - name: Checkout
       uses: actions/checkout@v2
-    - name: configure aws credentials
+    - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
         role-to-assume: arn:aws:iam::408204130528:role/tchr_voice_github_role
@@ -37,3 +37,14 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
+    - name: Build, tag, and push db-init image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: tchr-voice-db-init
+        DOCKER_FILE: Dockerfile.db-init
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -f $DOCKER_FILE -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
