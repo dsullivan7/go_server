@@ -34,20 +34,28 @@ func (captcha *Captcha) createReCaptchaV2Request(googleKey string, url string) (
 	captchaURL := fmt.Sprintf(TwoCaptchaRequestToCompleteURL, captcha.captchaKey, googleKey, url)
 
 	// send the request to 2captcha to complete a captcha
-	resToComplete, errToComplete := http.NewRequestWithContext(
+	req, errReq := http.NewRequestWithContext(
 		context,
 		http.MethodGet,
 		captchaURL,
 		nil,
 	)
 
-	if errToComplete != nil {
-		return nil, fmt.Errorf("failed to send request to complete captcha: %w", errToComplete)
+	if errReq != nil {
+		return nil, fmt.Errorf("failed to send request to complete captcha: %w", errReq)
 	}
+
+	res, errRes := http.DefaultClient.Do(req)
+
+	if errRes != nil {
+		return nil, fmt.Errorf("failed to get response to complete captcha: %w", errRes)
+	}
+
+	defer res.Body.Close()
 
 	captcha.logger.Info("sent request to 2captcha")
 
-	bodyToComplete, errReadToComplete := ioutil.ReadAll(resToComplete.Body)
+	bodyToComplete, errReadToComplete := ioutil.ReadAll(res.Body)
 
 	if errReadToComplete != nil {
 		return nil, fmt.Errorf("failed to read response to complete captcha: %w", errReadToComplete)
@@ -73,18 +81,26 @@ func (captcha *Captcha) getReCaptchaV2Response(captchaID string) (*string, error
 		// ping 2captcha every 5 seconds to determine if the request has finished
 		time.Sleep(TwoCaptchaRetry * time.Second)
 
-		resComplete, errComplete := http.NewRequestWithContext(
+		req, errReq := http.NewRequestWithContext(
 			context,
 			http.MethodGet,
 			captchaCompleteURL,
 			nil,
 		)
 
-		if errComplete != nil {
-			return nil, fmt.Errorf("failed to send request to check status of captcha: %w", errComplete)
+		if errReq != nil {
+			return nil, fmt.Errorf("failed to send request to check captcha: %w", errReq)
 		}
 
-		bodyComplete, errReadComplete := ioutil.ReadAll(resComplete.Body)
+		res, errRes := http.DefaultClient.Do(req)
+
+		if errRes != nil {
+			return nil, fmt.Errorf("failed to get response to check captcha: %w", errRes)
+		}
+
+		defer res.Body.Close()
+
+		bodyComplete, errReadComplete := ioutil.ReadAll(res.Body)
 
 		if errReadComplete != nil {
 			return nil, fmt.Errorf("failed to read captcha response: %w", errReadComplete)

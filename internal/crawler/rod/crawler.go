@@ -3,9 +3,7 @@ package rod
 import (
 	"fmt"
 	"go_server/internal/crawler"
-	"io/ioutil"
-	"net/http"
-	"strings"
+	"go_server/internal/captcha"
 	"time"
 
 	"github.com/go-rod/rod"
@@ -13,11 +11,13 @@ import (
 
 type Crawler struct {
 	browser *rod.Browser
+	captcha captcha.Captcha
 }
 
-func NewCrawler(browser *rod.Browser) crawler.Crawler {
+func NewCrawler(browser *rod.Browser, captcha captcha.Captcha) crawler.Crawler {
 	return &Crawler{
 		browser: browser,
+		captcha: captcha,
 	}
 }
 
@@ -31,34 +31,12 @@ func (crawler *Crawler) Login(url string, username string, password string) {
 	googleKeyPointer := fr.MustElement(".g-recaptcha").MustAttribute("data-sitekey")
 	googleKey := *googleKeyPointer
 
-	captchaKey := "6da1d998757220665e090850725519bd"
-	captchaUrl := fmt.Sprintf("http://2captcha.com/in.php?key=%s&method=userrecaptcha&googlekey=%s&pageurl=%s", captchaKey, googleKey, url)
+	captchaComplete, _ := crawler.captcha.SolveReCaptchaV2(googleKey, url)
 
-	resp1, _ := http.Get(captchaUrl)
-	body1, _ := ioutil.ReadAll(resp1.Body)
-
-	println(string(body1))
-
-	captchaArray := strings.Split(string(body1), "|")
-	captchaID := captchaArray[1]
-
-	// captchaID := "68880267324"
-
-	time.Sleep(120 * time.Second)
-	captchaCompleteURL := fmt.Sprintf("http://2captcha.com/res.php?key=%s&action=get&id=%s", captchaKey, captchaID)
-
-	resp2, _ := http.Get(captchaCompleteURL)
-	body2, _ := ioutil.ReadAll(resp2.Body)
-
-	println(string(body2))
-
-	captchaCompleteArray := strings.Split(string(body2), "|")
-	captchaComplete := captchaCompleteArray[1]
-
-	fr.MustEval(fmt.Sprintf("onCaptchaFinished('%s')", captchaComplete))
-	// fr.MustEval("console.log('Hello!')")
+	fr.MustEval(fmt.Sprintf("onCaptchaFinished('%s')", *captchaComplete))
 
 	time.Sleep(5 * time.Second)
+
 	text := page.MustElement("body").MustText()
 
 	println("text")
