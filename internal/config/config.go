@@ -17,7 +17,7 @@ type Config struct {
 	DBPassword string
 	DBSSL      bool
 
-	TwoCaptchaKey   string
+	TwoCaptchaKey string
 
 	Auth0Domain   string
 	Auth0Audience string

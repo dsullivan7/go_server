@@ -2,9 +2,9 @@ package rod
 
 import (
 	"fmt"
-	"time"
-	"go_server/internal/crawler"
 	"go_server/internal/captcha"
+	"go_server/internal/crawler"
+	"time"
 
 	"github.com/go-rod/rod"
 )

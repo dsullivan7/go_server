@@ -1,9 +1,9 @@
 package crawler_test
 
 import (
+	"go_server/internal/captcha/twocaptcha"
 	goServerRodCrawler "go_server/internal/crawler/rod"
 	goServerZapLogger "go_server/internal/logger/zap"
-	"go_server/internal/captcha/twocaptcha"
 
 	"testing"
 
@@ -12,6 +12,8 @@ import (
 )
 
 func TestCrawler(t *testing.T) {
+	t.Skip("No integration")
+
 	browser := rod.New()
 
 	zapLogger, _ := zap.NewProduction()

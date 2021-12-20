@@ -5,7 +5,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"go_server/internal/captcha/twocaptcha"
 	"go_server/internal/config"
+	goServerRodCrawler "go_server/internal/crawler/rod"
 	"go_server/internal/db"
 	goServerZapLogger "go_server/internal/logger/zap"
 	"go_server/internal/models"
@@ -18,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/go-chi/chi"
+	"github.com/go-rod/rod"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 )
@@ -58,7 +61,15 @@ func TestUsers(t *testing.T) {
 
 	authMock := auth.NewAuth()
 
-	handler := server.NewChiServer(config, router, store, authMock, logger)
+	browser := rod.New()
+
+	captchaKey := "key"
+
+	captcha := twocaptcha.NewTwoCaptcha(captchaKey, logger)
+
+	crawler := goServerRodCrawler.NewCrawler(browser, captcha)
+
+	handler := server.NewChiServer(config, router, store, crawler, authMock, logger)
 
 	testServer := httptest.NewServer(handler.Init())
 
