@@ -47,6 +47,8 @@ func (s *ChiServer) Init() http.Handler {
 	router.Delete("/api/reviews/{reviewID}", controllers.DeleteReview)
 	router.Put("/api/reviews/{reviewID}", controllers.ModifyReview)
 
+	router.Get("/api/snap", controllers.GetSnap)
+
 	handler := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
 	router.Handle("/query", handler)
 

@@ -18,7 +18,7 @@ func TestCrawler(t *testing.T) {
 
 	logger := goServerZapLogger.NewLogger(zapLogger)
 
-	captchaKey := "6da1d998757220665e090850725519bd"
+	captchaKey := "key"
 
 	captcha := twocaptcha.NewTwoCaptcha(captchaKey, logger)
 

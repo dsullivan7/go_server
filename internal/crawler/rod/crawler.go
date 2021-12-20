@@ -2,12 +2,14 @@ package rod
 
 import (
 	"fmt"
+	"time"
 	"go_server/internal/crawler"
 	"go_server/internal/captcha"
-	"time"
 
 	"github.com/go-rod/rod"
 )
+
+const RenderWait = 5
 
 type Crawler struct {
 	browser *rod.Browser
@@ -21,8 +23,9 @@ func NewCrawler(browser *rod.Browser, captcha captcha.Captcha) crawler.Crawler {
 	}
 }
 
-func (crawler *Crawler) Login(url string, username string, password string) {
+func (crawler *Crawler) Login(url string, username string, password string) string {
 	crawler.browser.MustConnect()
+	defer crawler.browser.MustClose()
 
 	page := crawler.browser.MustPage(url)
 
@@ -35,12 +38,9 @@ func (crawler *Crawler) Login(url string, username string, password string) {
 
 	fr.MustEval(fmt.Sprintf("onCaptchaFinished('%s')", *captchaComplete))
 
-	time.Sleep(5 * time.Second)
+	time.Sleep(RenderWait * time.Second)
 
 	text := page.MustElement("body").MustText()
 
-	println("text")
-	println(text)
-
-	defer crawler.browser.MustClose()
+	return text
 }

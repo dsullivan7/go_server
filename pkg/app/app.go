@@ -6,10 +6,14 @@ import (
 	"go_server/internal/config"
 	"go_server/internal/db"
 	goServerZapLogger "go_server/internal/logger/zap"
+	goServerRodCrawler "go_server/internal/crawler/rod"
 	"go_server/internal/server"
+	"go_server/internal/captcha/twocaptcha"
 	"go_server/internal/store/gorm"
 	"log"
 	"net/http"
+
+	"github.com/go-rod/rod"
 
 	"go.uber.org/zap"
 
@@ -52,12 +56,20 @@ func Run() {
 
 	store := gorm.NewStore(db)
 
+	captchaKey := config.TwoCaptchaKey
+
+	browser := rod.New()
+
+	captcha := twocaptcha.NewTwoCaptcha(captchaKey, logger)
+
+	crawler := goServerRodCrawler.NewCrawler(browser, captcha)
+
 	auth := auth0.NewAuth(config.Auth0Domain, config.Auth0Audience)
 	auth.Init()
 
 	router := chi.NewRouter()
 
-	handler := server.NewChiServer(config, router, store, auth, logger)
+	handler := server.NewChiServer(config, router, store, crawler, auth, logger)
 
 	httpServer := http.Server{
 		Addr:    fmt.Sprintf(":%s", config.Port),

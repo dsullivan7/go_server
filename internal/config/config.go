@@ -17,6 +17,8 @@ type Config struct {
 	DBPassword string
 	DBSSL      bool
 
+	TwoCaptchaKey   string
+
 	Auth0Domain   string
 	Auth0Audience string
 
@@ -39,6 +41,7 @@ func NewConfig() (*Config, error) {
 		DBHost:         os.Getenv("DB_HOST"),
 		DBName:         os.Getenv("DB_NAME"),
 		DBSSL:          dbSSL,
+		TwoCaptchaKey:  os.Getenv("TWO_CAPTCHA_KEY"),
 		Auth0Domain:    os.Getenv("AUTH0_DOMAIN"),
 		Auth0Audience:  os.Getenv("AUTH0_AUDIENCE"),
 		AllowedOrigins: strings.Split(os.Getenv("ALLOWED_ORIGINS"), ","),

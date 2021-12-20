@@ -43,6 +43,10 @@ app-dev-docker:
 run-docker:
 	docker-compose run --service-ports golang ./app
 
+.PHONY: run
+run:
+	go run ./cmd/app.go
+
 .PHONY: build-docker
 build-docker:
 	docker-compose run build go build -o bin/app ./cmd/app.go
