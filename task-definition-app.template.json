@@ -58,6 +58,10 @@
           "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/DB_NAME"
         },
         {
+          "name": "TWO_CAPTCHA_KEY",
+          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/TWO_CAPTCHA_KEY"
+        },
+        {
           "name": "ALLOWED_ORIGINS",
           "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/ALLOWED_ORIGINS"
         }
