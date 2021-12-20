@@ -64,7 +64,7 @@ func Run() {
 
 	crawler := goServerRodCrawler.NewCrawler(browser, captcha)
 
-	auth := auth0.NewAuth(config.Auth0Domain, config.Auth0Audience)
+	auth := auth0.NewAuth(config.Auth0Domain, config.Auth0Audience, logger)
 	auth.Init()
 
 	router := chi.NewRouter()

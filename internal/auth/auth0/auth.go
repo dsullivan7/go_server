@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"go_server/internal/logger"
+
 	jwtMiddleware "github.com/auth0/go-jwt-middleware"
 	"github.com/dgrijalva/jwt-go"
 )
@@ -72,12 +74,16 @@ type Auth struct {
 	mw       *jwtMiddleware.JWTMiddleware
 	domain   string
 	audience string
+	logger 	 logger.Logger
 }
 
-func NewAuth(domain string, audience string) *Auth {
+func NewAuth(domain string, audience string, logger logger.Logger) *Auth {
+	logger.Info(fmt.Sprintf("Initialize auth with domain '%s' and audience '%s'", domain, audience))
+
 	return &Auth{
 		domain:   domain,
 		audience: audience,
+		logger: logger,
 	}
 }
 
