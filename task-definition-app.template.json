@@ -30,6 +30,18 @@
       ],
       "secrets": [
         {
+          "name": "ALLOWED_ORIGINS",
+          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/ALLOWED_ORIGINS"
+        },
+        {
+          "name": "AUTH0_DOMAIN",
+          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/AUTH0_DOMAIN"
+        },
+        {
+          "name": "AUTH0_AUDIENCE",
+          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/AUTH0_AUDIENCE"
+        },
+        {
           "name": "PORT",
           "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/PORT"
         },
@@ -60,10 +72,6 @@
         {
           "name": "TWO_CAPTCHA_KEY",
           "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/TWO_CAPTCHA_KEY"
-        },
-        {
-          "name": "ALLOWED_ORIGINS",
-          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/ALLOWED_ORIGINS"
         }
       ]
     }
