@@ -10,7 +10,7 @@
   "containerDefinitions": [
     {
       "name": "tchr-voice-db-init",
-      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-2.amazonaws.com/tchr-voice-db-init:${IMAGE_TAG}",
+      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-2.amazonaws.com/tchr-voice-db-init:${CIRCLE_SHA1}",
       "essential": true,
       "cpu": 10,
       "memory": 512,
