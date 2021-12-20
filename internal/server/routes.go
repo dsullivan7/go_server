@@ -6,6 +6,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 
+	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
 )
@@ -32,25 +33,29 @@ func (s *ChiServer) Init() http.Handler {
 		MaxAge:           s.config.RouterMaxAge,
 	}))
 
-	router.Use(middlewares.Auth())
-	router.Use(middlewares.User())
+	router.Get("/", controllers.GetHealth)
 
-	router.Get("/api/users/{userID}", controllers.GetUser)
-	router.Get("/api/users", controllers.ListUsers)
-	router.Post("/api/users", controllers.CreateUser)
-	router.Delete("/api/users/{userID}", controllers.DeleteUser)
-	router.Put("/api/users/{userID}", controllers.ModifyUser)
+	router.Group(func(r chi.Router) {
+		r.Use(middlewares.Auth())
+		r.Use(middlewares.User())
 
-	router.Get("/api/reviews/{reviewID}", controllers.GetReview)
-	router.Get("/api/reviews", controllers.ListReviews)
-	router.Post("/api/reviews", controllers.CreateReview)
-	router.Delete("/api/reviews/{reviewID}", controllers.DeleteReview)
-	router.Put("/api/reviews/{reviewID}", controllers.ModifyReview)
+		r.Get("/api/users/{userID}", controllers.GetUser)
+		r.Get("/api/users", controllers.ListUsers)
+		r.Post("/api/users", controllers.CreateUser)
+		r.Delete("/api/users/{userID}", controllers.DeleteUser)
+		r.Put("/api/users/{userID}", controllers.ModifyUser)
 
-	router.Get("/api/snap", controllers.GetSnap)
+		r.Get("/api/reviews/{reviewID}", controllers.GetReview)
+		r.Get("/api/reviews", controllers.ListReviews)
+		r.Post("/api/reviews", controllers.CreateReview)
+		r.Delete("/api/reviews/{reviewID}", controllers.DeleteReview)
+		r.Put("/api/reviews/{reviewID}", controllers.ModifyReview)
 
-	handler := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
-	router.Handle("/query", handler)
+		r.Get("/api/snap", controllers.GetSnap)
+
+		handler := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
+		r.Handle("/query", handler)
+	})
 
 	return router
 }
