@@ -33,10 +33,6 @@ func NewConfig() (*Config, error) {
 		return nil, fmt.Errorf("error parsing dbSSL: %w", dbSSLError)
 	}
 
-	println("TWO_CAPTCHA_KEY:", os.Getenv("TWO_CAPTCHA_KEY")) //nolint
-	println("AUTH0_DOMAIN:", os.Getenv("AUTH0_DOMAIN")) //nolint
-	println("AUTH0_AUDIENCE:", os.Getenv("AUTH0_AUDIENCE")) //nolint
-
 	config := &Config{
 		Port:           os.Getenv("PORT"),
 		DBUser:         os.Getenv("DB_USER"),
