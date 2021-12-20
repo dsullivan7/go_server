@@ -74,7 +74,7 @@ type Auth struct {
 	mw       *jwtMiddleware.JWTMiddleware
 	domain   string
 	audience string
-	logger 	 logger.Logger
+	logger   logger.Logger
 }
 
 func NewAuth(domain string, audience string, logger logger.Logger) *Auth {
@@ -83,7 +83,7 @@ func NewAuth(domain string, audience string, logger logger.Logger) *Auth {
 	return &Auth{
 		domain:   domain,
 		audience: audience,
-		logger: logger,
+		logger:   logger,
 	}
 }
 
