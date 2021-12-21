@@ -57,23 +57,18 @@ func Run() {
 
 	store := gorm.NewStore(db)
 
+	// initialize 2captcha
 	captchaKey := config.TwoCaptchaKey
-
 	path, _ := launcher.LookPath()
-
 	u := launcher.New().Bin(path).MustLaunch()
-
 	browser := rod.New().ControlURL(u)
-
 	captcha := twocaptcha.NewTwoCaptcha(captchaKey, logger)
-
 	crawler := goServerRodCrawler.NewCrawler(browser, captcha)
 
 	auth := auth0.NewAuth(config.Auth0Domain, config.Auth0Audience, logger)
 	auth.Init()
 
 	router := chi.NewRouter()
-
 	handler := server.NewChiServer(config, router, store, crawler, auth, logger)
 
 	httpServer := http.Server{
@@ -82,6 +77,5 @@ func Run() {
 	}
 
 	logger.Info(fmt.Sprintf("started on port: %s", config.Port))
-
 	log.Fatal(httpServer.ListenAndServe())
 }
