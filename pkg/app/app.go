@@ -15,6 +15,7 @@ import (
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
+	"github.com/go-rod/rod/lib/launcher/flags"
 
 	"go.uber.org/zap"
 
@@ -60,7 +61,7 @@ func Run() {
 	// initialize 2captcha
 	captchaKey := config.TwoCaptchaKey
 	path, _ := launcher.LookPath()
-	u := launcher.New().Set("no-sandbox").Bin(path).MustLaunch()
+	u := launcher.New().Set(flags.NoSandbox).Bin(path).MustLaunch()
 	browser := rod.New().ControlURL(u)
 	captcha := twocaptcha.NewTwoCaptcha(captchaKey, logger)
 	crawler := goServerRodCrawler.NewCrawler(browser, captcha)
