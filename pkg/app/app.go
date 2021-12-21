@@ -14,6 +14,7 @@ import (
 	"net/http"
 
 	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/launcher"
 
 	"go.uber.org/zap"
 
@@ -58,7 +59,11 @@ func Run() {
 
 	captchaKey := config.TwoCaptchaKey
 
-	browser := rod.New()
+	path, _ := launcher.LookPath()
+
+	u := launcher.New().Bin(path).MustLaunch()
+
+	browser := rod.New().ControlURL(u)
 
 	captcha := twocaptcha.NewTwoCaptcha(captchaKey, logger)
 
@@ -75,6 +80,8 @@ func Run() {
 		Addr:    fmt.Sprintf(":%s", config.Port),
 		Handler: handler.Init(),
 	}
+
+	logger.Info(fmt.Sprintf("started on port: %s", config.Port))
 
 	log.Fatal(httpServer.ListenAndServe())
 }

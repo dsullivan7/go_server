@@ -8,6 +8,7 @@ x-app-environment: &app-environment
   DB_PASSWORD: $DB_PASSWORD
   DB_SSL: $DB_SSL
   PORT: $PORT
+  TWO_CAPTCHA_KEY: $TWO_CAPTCHA_KEY
   AUTH0_DOMAIN: $AUTH0_DOMAIN
   AUTH0_AUDIENCE: $AUTH0_AUDIENCE
   ALLOWED_ORIGINS: $ALLOWED_ORIGINS
@@ -23,38 +24,10 @@ x-db-environment: &db-environment
   PGPASSWORD: $DB_PASSWORD
 
 services:
-  app:
-    image: golang:1.17.0-alpine
-    working_dir: /app
-    volumes:
-      - ./:/app
-    ports:
-      - '${PORT:-7000}:${PORT:-7000}'
-    environment:
-      *app-environment
-
-  app-dev:
+  run:
     build:
       context: .
-      dockerfile: Dockerfile.app-dev
-    working_dir: /app
-    volumes:
-      - ./:/app
-    ports:
-      - '${PORT:-7000}:${PORT:-7000}'
-    environment:
-      *app-environment
-
-  go-get:
-    image: golang:1.17.0-alpine
-    working_dir: /app
-    volumes:
-      - ./:/app
-    environment:
-      *app-environment
-
-  run:
-    image: alpine:3.13.5
+      dockerfile: Dockerfile.app
     working_dir: /app
     volumes:
       - ./bin:/app

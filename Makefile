@@ -31,21 +31,13 @@ db-migrate:
 db-init:
 	docker-compose up --build db-init
 
-.PHONY: app
-app-docker:
-	docker-compose run --service-ports app go run ./cmd/app.go
-
-.PHONY: app-dev
-app-dev-docker:
-	docker-compose up --build app-dev
-
-.PHONY: run-docker
-run-docker:
-	docker-compose run --service-ports golang ./app
-
 .PHONY: run
 run:
 	go run ./cmd/app.go
+
+.PHONY: run-docker
+run-docker:
+	docker-compose run --service-ports run ./app
 
 .PHONY: build-docker
 build-docker:
