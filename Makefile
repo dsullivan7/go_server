@@ -37,7 +37,7 @@ run:
 
 .PHONY: run-docker
 run-docker:
-	docker-compose run --service-ports run ./app
+	docker-compose run --service-ports run
 
 .PHONY: build-docker
 build-docker:

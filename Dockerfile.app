@@ -7,6 +7,4 @@ RUN \
 
 COPY ./bin/app /app/app
 
-EXPOSE 7000
-
 ENTRYPOINT ["/app/app"]
