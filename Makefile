@@ -45,7 +45,7 @@ build-docker:
 
 .PHONY: test-docker
 test-docker:
-	docker-compose run --rm -e CGO_ENABLED=0 app go test -v $(TESTS)
+	docker-compose run --rm -e CGO_ENABLED=0 build go test -v $(TESTS)
 
 .PHONY: lint
 lint:
