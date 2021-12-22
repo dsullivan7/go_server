@@ -1,10 +1,10 @@
 package rod
 
 import (
-	"fmt"
+	// "fmt"
 	"go_server/internal/captcha"
 	"go_server/internal/crawler"
-	"time"
+	// "time"
 
 	"github.com/go-rod/rod"
 )
@@ -28,17 +28,17 @@ func (crawler *Crawler) Login(url string, username string, password string) stri
 	defer crawler.browser.MustClose()
 
 	page := crawler.browser.MustPage(url)
-
-	fr := page.MustElement("#main-iframe").MustFrame()
-
-	googleKeyPointer := fr.MustElement(".g-recaptcha").MustAttribute("data-sitekey")
-	googleKey := *googleKeyPointer
-
-	captchaComplete, _ := crawler.captcha.SolveReCaptchaV2(googleKey, url)
-
-	fr.MustEval(fmt.Sprintf("onCaptchaFinished('%s')", *captchaComplete))
-
-	time.Sleep(RenderWait * time.Second)
+	//
+	// fr := page.MustElement("#main-iframe").MustFrame()
+	//
+	// googleKeyPointer := fr.MustElement(".g-recaptcha").MustAttribute("data-sitekey")
+	// googleKey := *googleKeyPointer
+	//
+	// captchaComplete, _ := crawler.captcha.SolveReCaptchaV2(googleKey, url)
+	//
+	// fr.MustEval(fmt.Sprintf("onCaptchaFinished('%s')", *captchaComplete))
+	//
+	// time.Sleep(RenderWait * time.Second)
 
 	text := page.MustElement("body").MustText()
 
