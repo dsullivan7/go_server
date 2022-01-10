@@ -51,6 +51,12 @@ func (s *ChiServer) Init() http.Handler {
 		r.Delete("/api/reviews/{reviewID}", controllers.DeleteReview)
 		r.Put("/api/reviews/{reviewID}", controllers.ModifyReview)
 
+		r.Get("/api/industries/{industryID}", controllers.GetIndustry)
+		r.Get("/api/industries", controllers.ListIndustries)
+		r.Post("/api/industries", controllers.CreateIndustry)
+		r.Delete("/api/industries/{industryID}", controllers.DeleteIndustry)
+		r.Put("/api/industries/{industryID}", controllers.ModifyIndustry)
+
 		r.Get("/api/snap", controllers.GetSnap)
 
 		handler := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
