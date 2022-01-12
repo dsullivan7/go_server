@@ -26,7 +26,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestIndustries(t *testing.T) {
+func TestUserIndustries(t *testing.T) {
 	config, configError := config.NewConfig()
 	assert.Nil(t, configError)
 
@@ -76,15 +76,21 @@ func TestIndustries(t *testing.T) {
 		errTruncate := dbUtility.TruncateAll()
 		assert.Nil(t, errTruncate)
 
+		user := models.User{}
+		db.Create(&user)
+
 		name := "Name"
 		industry := models.Industry{Name: &name}
-
 		db.Create(&industry)
+
+		userIndustry := models.UserIndustry{ UserID: user.UserID, IndustryID: industry.IndustryID }
+
+		db.Create(&userIndustry)
 
 		req, errRequest := http.NewRequestWithContext(
 			context,
 			http.MethodGet,
-			fmt.Sprint(testServer.URL, "/api/industries/", industry.IndustryID),
+			fmt.Sprint(testServer.URL, "/api/user-industries/", userIndustry.UserIndustryID),
 			nil,
 		)
 		assert.Nil(t, errRequest)
@@ -100,31 +106,40 @@ func TestIndustries(t *testing.T) {
 
 		decoder := json.NewDecoder(res.Body)
 
-		var industryResponse models.Industry
+		var userIndustryResponse models.UserIndustry
 
-		errDecode := decoder.Decode(&industryResponse)
+		errDecode := decoder.Decode(&userIndustryResponse)
 		assert.Nil(t, errDecode)
 
-		assert.Equal(t, *industryResponse.Name, *industry.Name)
+		assert.Equal(t, userIndustryResponse.UserID, userIndustry.UserID)
+		assert.Equal(t, userIndustryResponse.IndustryID, userIndustry.IndustryID)
 	})
 
 	t.Run("Test List", func(t *testing.T) {
 		errTruncate := dbUtility.TruncateAll()
 		assert.Nil(t, errTruncate)
 
+		user := models.User{}
+		db.Create(&user)
+
 		name1 := "Name1"
 		industry1 := models.Industry{Name: &name1}
+		db.Create(&industry1)
 
 		name2 := "Name2"
 		industry2 := models.Industry{Name: &name2}
-
-		db.Create(&industry1)
 		db.Create(&industry2)
+
+		userIndustry1 := models.UserIndustry{ UserID: user.UserID, IndustryID: industry1.IndustryID }
+		userIndustry2 := models.UserIndustry{ UserID: user.UserID, IndustryID: industry2.IndustryID }
+
+		db.Create(&userIndustry1)
+		db.Create(&userIndustry2)
 
 		req, errRequest := http.NewRequestWithContext(
 			context,
 			http.MethodGet,
-			fmt.Sprint(testServer.URL, "/api/industries"),
+			fmt.Sprint(testServer.URL, "/api/user-industries"),
 			nil,
 		)
 		assert.Nil(t, errRequest)
@@ -140,47 +155,56 @@ func TestIndustries(t *testing.T) {
 
 		decoder := json.NewDecoder(res.Body)
 
-		var industriesFound []models.Industry
-		errDecode1 := decoder.Decode(&industriesFound)
+		var userIndustriesFound []models.UserIndustry
+		errDecode1 := decoder.Decode(&userIndustriesFound)
 		assert.Nil(t, errDecode1)
 
-		assert.Equal(t, len(industriesFound), 2)
+		assert.Equal(t, len(userIndustriesFound), 2)
 
-		var industryResponse models.Industry
+		var userIndustryResponse models.UserIndustry
 
-		for _, value := range industriesFound {
-			if value.IndustryID == industry1.IndustryID {
-				industryResponse = value
-
-				break
-			}
-		}
-
-		assert.Equal(t, industryResponse.IndustryID, industry1.IndustryID)
-		assert.Equal(t, *industryResponse.Name, *industry1.Name)
-
-		for _, value := range industriesFound {
-			if value.IndustryID == industry2.IndustryID {
-				industryResponse = value
+		for _, value := range userIndustriesFound {
+			if value.UserIndustryID == userIndustry1.UserIndustryID {
+				userIndustryResponse = value
 
 				break
 			}
 		}
 
-		assert.Equal(t, industryResponse.IndustryID, industry2.IndustryID)
-		assert.Equal(t, *industryResponse.Name, *industry2.Name)
+		assert.Equal(t, userIndustryResponse.UserIndustryID, userIndustry1.UserIndustryID)
+		assert.Equal(t, userIndustryResponse.UserID, userIndustry1.UserID)
+		assert.Equal(t, userIndustryResponse.IndustryID, userIndustry1.IndustryID)
+
+		for _, value := range userIndustriesFound {
+			if value.UserIndustryID == userIndustry2.UserIndustryID {
+				userIndustryResponse = value
+
+				break
+			}
+		}
+
+		assert.Equal(t, userIndustryResponse.UserIndustryID, userIndustry2.UserIndustryID)
+		assert.Equal(t, userIndustryResponse.UserID, userIndustry2.UserID)
+		assert.Equal(t, userIndustryResponse.IndustryID, userIndustry2.IndustryID)
 	})
 
 	t.Run("Test Create", func(t *testing.T) {
 		errTruncate := dbUtility.TruncateAll()
 		assert.Nil(t, errTruncate)
 
-		jsonStr := []byte(`{"name":"Name"}`)
+		user := models.User{}
+		db.Create(&user)
+
+		name := "Name"
+		industry := models.Industry{Name: &name}
+		db.Create(&industry)
+
+		jsonStr := []byte(fmt.Sprintf(`{"user_id":"%s", "industry_id": "%s"}`, user.UserID, industry.IndustryID))
 
 		req, errRequest := http.NewRequestWithContext(
 			context,
 			http.MethodPost,
-			fmt.Sprint(testServer.URL, "/api/industries"),
+			fmt.Sprint(testServer.URL, "/api/user-industries"),
 			bytes.NewBuffer(jsonStr),
 		)
 		assert.Nil(t, errRequest)
@@ -196,36 +220,44 @@ func TestIndustries(t *testing.T) {
 
 		decoder := json.NewDecoder(res.Body)
 
-		var industryResponse models.Industry
-		errDecode := decoder.Decode(&industryResponse)
+		var userIndustryResponse models.UserIndustry
+		errDecode := decoder.Decode(&userIndustryResponse)
 		assert.Nil(t, errDecode)
 
-		assert.NotNil(t, industryResponse.IndustryID)
-		assert.Equal(t, "Name", *industryResponse.Name)
+		assert.NotNil(t, userIndustryResponse.UserIndustryID)
+		assert.Equal(t, user.UserID, userIndustryResponse.UserID)
+		assert.Equal(t, industry.IndustryID, userIndustryResponse.IndustryID)
 
-		var industryFound models.Industry
-		errFound := db.Where("industry_id = ?", industryResponse.IndustryID).First(&industryFound).Error
+		var userIndustryFound models.UserIndustry
+		errFound := db.Where("user_industry_id = ?", userIndustryResponse.UserIndustryID).First(&userIndustryFound).Error
 
 		assert.Nil(t, errFound)
 
-		assert.Equal(t, "Name", *industryFound.Name)
+		assert.Equal(t, user.UserID, userIndustryFound.UserID)
+		assert.Equal(t, industry.IndustryID, userIndustryFound.IndustryID)
 	})
 
 	t.Run("Test Modify", func(t *testing.T) {
 		errTruncate := dbUtility.TruncateAll()
 		assert.Nil(t, errTruncate)
 
+		user := models.User{}
+		db.Create(&user)
+
 		name := "Name"
 		industry := models.Industry{Name: &name}
-
 		db.Create(&industry)
 
-		jsonStr := []byte(`{"name":"NameDifferent"}`)
+		userIndustry := models.UserIndustry{ UserID: user.UserID, IndustryID: industry.IndustryID }
+
+		db.Create(&userIndustry)
+
+		jsonStr := []byte(`{}`)
 
 		req, errRequest := http.NewRequestWithContext(
 			context,
 			http.MethodPut,
-			fmt.Sprint(testServer.URL, "/api/industries/", industry.IndustryID),
+			fmt.Sprint(testServer.URL, "/api/user-industries/", userIndustry.UserIndustryID),
 			bytes.NewBuffer(jsonStr),
 		)
 		assert.Nil(t, errRequest)
@@ -241,35 +273,43 @@ func TestIndustries(t *testing.T) {
 
 		decoder := json.NewDecoder(res.Body)
 
-		var industryResponse models.Industry
-		errDecode := decoder.Decode(&industryResponse)
+		var userIndustryResponse models.UserIndustry
+		errDecode := decoder.Decode(&userIndustryResponse)
 		assert.Nil(t, errDecode)
 
-		assert.Equal(t, industryResponse.IndustryID, industry.IndustryID)
-		assert.Equal(t, "NameDifferent", *industryResponse.Name)
+		assert.Equal(t, userIndustryResponse.UserIndustryID, userIndustry.UserIndustryID)
+		assert.Equal(t, userIndustryResponse.UserID, userIndustry.UserID)
+		assert.Equal(t, userIndustryResponse.IndustryID, userIndustry.IndustryID)
 
-		var industryFound models.Industry
-		errFound := db.Where("industry_id = ?", industry.IndustryID).First(&industryFound).Error
+		var userIndustryFound models.UserIndustry
+		errFound := db.Where("user_industry_id = ?", userIndustry.UserIndustryID).First(&userIndustryFound).Error
 
 		assert.Nil(t, errFound)
 
-		assert.Equal(t, industryFound.IndustryID, industry.IndustryID)
-		assert.Equal(t, "NameDifferent", *industryFound.Name)
+		assert.Equal(t, userIndustryFound.UserIndustryID, userIndustry.UserIndustryID)
+		assert.Equal(t, user.UserID, userIndustryFound.UserID)
+		assert.Equal(t, industry.IndustryID, userIndustryFound.IndustryID)
 	})
 
 	t.Run("Test Delete", func(t *testing.T) {
 		errTruncate := dbUtility.TruncateAll()
 		assert.Nil(t, errTruncate)
 
+		user := models.User{}
+		db.Create(&user)
+
 		name := "Name"
 		industry := models.Industry{Name: &name}
-
 		db.Create(&industry)
+
+		userIndustry := models.UserIndustry{ UserID: user.UserID, IndustryID: industry.IndustryID }
+
+		db.Create(&userIndustry)
 
 		req, errRequest := http.NewRequestWithContext(
 			context,
 			http.MethodDelete,
-			fmt.Sprint(testServer.URL, "/api/industries/", industry.IndustryID),
+			fmt.Sprint(testServer.URL, "/api/user-industries/", userIndustry.UserIndustryID),
 			nil,
 		)
 		assert.Nil(t, errRequest)
@@ -282,8 +322,8 @@ func TestIndustries(t *testing.T) {
 
 		assert.Equal(t, http.StatusNoContent, res.StatusCode)
 
-		var industryFound models.Industry
-		errFound := db.Where("industry_id = ?", industry.IndustryID).First(&industryFound).Error
+		var userIndustryFound models.UserIndustry
+		errFound := db.Where("user_industry_id = ?", userIndustry.UserIndustryID).First(&userIndustryFound).Error
 
 		assert.Equal(t, gorm.ErrRecordNotFound, errFound)
 	})

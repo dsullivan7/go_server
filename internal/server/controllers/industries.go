@@ -26,6 +26,7 @@ func (c *Controllers) GetIndustry(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Controllers) ListIndustries(w http.ResponseWriter, r *http.Request) {
+	println("ListIndustries")
 	query := map[string]interface{}{}
 
 	industrys, err := c.store.ListIndustries(query)
