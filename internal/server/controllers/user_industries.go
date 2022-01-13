@@ -27,6 +27,11 @@ func (c *Controllers) GetUserIndustry(w http.ResponseWriter, r *http.Request) {
 
 func (c *Controllers) ListUserIndustries(w http.ResponseWriter, r *http.Request) {
 	query := map[string]interface{}{}
+	userID := r.URL.Query().Get("user_id")
+
+	if userID != "" {
+		query["user_id"] = userID
+	}
 
 	userIndustries, err := c.store.ListUserIndustries(query)
 
