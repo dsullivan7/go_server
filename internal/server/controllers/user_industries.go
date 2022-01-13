@@ -12,7 +12,7 @@ import (
 )
 
 func (c *Controllers) GetUserIndustry(w http.ResponseWriter, r *http.Request) {
-	userIndustryID := uuid.Must(uuid.Parse(chi.URLParam(r, "userIndustryID")))
+	userIndustryID := uuid.Must(uuid.Parse(chi.URLParam(r, "user_industry_id")))
 
 	userIndustry, err := c.store.GetUserIndustry(userIndustryID)
 
@@ -27,7 +27,7 @@ func (c *Controllers) GetUserIndustry(w http.ResponseWriter, r *http.Request) {
 
 func (c *Controllers) ListUserIndustries(w http.ResponseWriter, r *http.Request) {
 	query := map[string]interface{}{}
-	userID := c.utils.GetQueryParamUUID(r, "userID")
+	userID := c.utils.GetQueryParamUUID(r, "user_id")
 
 	if userID != uuid.Nil {
 		query["user_id"] = userID
@@ -69,7 +69,7 @@ func (c *Controllers) CreateUserIndustry(w http.ResponseWriter, r *http.Request)
 func (c *Controllers) ModifyUserIndustry(w http.ResponseWriter, r *http.Request) {
 	var userIndustryPayload models.UserIndustry
 
-	userIndustryID := uuid.Must(uuid.Parse(chi.URLParam(r, "userIndustryID")))
+	userIndustryID := uuid.Must(uuid.Parse(chi.URLParam(r, "user_industry_id")))
 
 	errDecode := json.NewDecoder(r.Body).Decode(&userIndustryPayload)
 	if errDecode != nil {
@@ -90,7 +90,7 @@ func (c *Controllers) ModifyUserIndustry(w http.ResponseWriter, r *http.Request)
 }
 
 func (c *Controllers) DeleteUserIndustry(w http.ResponseWriter, r *http.Request) {
-	userIndustryID := uuid.Must(uuid.Parse(chi.URLParam(r, "userIndustryID")))
+	userIndustryID := uuid.Must(uuid.Parse(chi.URLParam(r, "user_industry_id")))
 
 	err := c.store.DeleteUserIndustry(userIndustryID)
 

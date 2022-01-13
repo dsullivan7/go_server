@@ -12,7 +12,7 @@ import (
 )
 
 func (c *Controllers) GetUser(w http.ResponseWriter, r *http.Request) {
-	userID := c.utils.GetURLParamUUID(r, "userID")
+	userID := c.utils.GetURLParamUUID(r, "user_id")
 
 	user, err := c.store.GetUser(userID)
 
@@ -64,7 +64,7 @@ func (c *Controllers) CreateUser(w http.ResponseWriter, r *http.Request) {
 func (c *Controllers) ModifyUser(w http.ResponseWriter, r *http.Request) {
 	var userPayload models.User
 
-	userID := c.utils.GetURLParamUUID(r, "userID")
+	userID := c.utils.GetURLParamUUID(r, "user_id")
 
 	errDecode := json.NewDecoder(r.Body).Decode(&userPayload)
 	if errDecode != nil {
@@ -85,7 +85,7 @@ func (c *Controllers) ModifyUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Controllers) DeleteUser(w http.ResponseWriter, r *http.Request) {
-	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "userID")))
+	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "user_id")))
 
 	err := c.store.DeleteUser(userID)
 

@@ -12,7 +12,7 @@ import (
 )
 
 func (c *Controllers) GetIndustry(w http.ResponseWriter, r *http.Request) {
-	industryID := uuid.Must(uuid.Parse(chi.URLParam(r, "industryID")))
+	industryID := uuid.Must(uuid.Parse(chi.URLParam(r, "industry_id")))
 
 	industry, err := c.store.GetIndustry(industryID)
 
@@ -64,7 +64,7 @@ func (c *Controllers) CreateIndustry(w http.ResponseWriter, r *http.Request) {
 func (c *Controllers) ModifyIndustry(w http.ResponseWriter, r *http.Request) {
 	var industryPayload models.Industry
 
-	industryID := uuid.Must(uuid.Parse(chi.URLParam(r, "industryID")))
+	industryID := uuid.Must(uuid.Parse(chi.URLParam(r, "industry_id")))
 
 	errDecode := json.NewDecoder(r.Body).Decode(&industryPayload)
 	if errDecode != nil {
@@ -85,7 +85,7 @@ func (c *Controllers) ModifyIndustry(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Controllers) DeleteIndustry(w http.ResponseWriter, r *http.Request) {
-	industryID := uuid.Must(uuid.Parse(chi.URLParam(r, "industryID")))
+	industryID := uuid.Must(uuid.Parse(chi.URLParam(r, "industry_id")))
 
 	err := c.store.DeleteIndustry(industryID)
 

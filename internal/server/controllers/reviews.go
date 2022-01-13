@@ -12,7 +12,7 @@ import (
 )
 
 func (c *Controllers) GetReview(w http.ResponseWriter, r *http.Request) {
-	reviewID := uuid.Must(uuid.Parse(chi.URLParam(r, "reviewID")))
+	reviewID := uuid.Must(uuid.Parse(chi.URLParam(r, "review_id")))
 
 	review, err := c.store.GetReview(reviewID)
 
@@ -74,7 +74,7 @@ func (c *Controllers) CreateReview(w http.ResponseWriter, r *http.Request) {
 func (c *Controllers) ModifyReview(w http.ResponseWriter, r *http.Request) {
 	var reviewPayload models.Review
 
-	reviewID := uuid.Must(uuid.Parse(chi.URLParam(r, "reviewID")))
+	reviewID := uuid.Must(uuid.Parse(chi.URLParam(r, "review_id")))
 
 	errDecode := json.NewDecoder(r.Body).Decode(&reviewPayload)
 	if errDecode != nil {
@@ -95,7 +95,7 @@ func (c *Controllers) ModifyReview(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Controllers) DeleteReview(w http.ResponseWriter, r *http.Request) {
-	reviewID := uuid.Must(uuid.Parse(chi.URLParam(r, "reviewID")))
+	reviewID := uuid.Must(uuid.Parse(chi.URLParam(r, "review_id")))
 
 	err := c.store.DeleteReview(reviewID)
 
