@@ -14,6 +14,7 @@ import (
 	"go_server/internal/server"
 	goServerGormStore "go_server/internal/store/gorm"
 	"go_server/test/mocks/auth"
+	"go_server/test/mocks/consts"
 	testUtils "go_server/test/utils"
 	"net/http"
 	"net/http/httptest"
@@ -122,7 +123,9 @@ func TestUserIndustries(t *testing.T) {
 		user1 := models.User{}
 		db.Create(&user1)
 
-		user2 := models.User{}
+		auth0ID := consts.LoggedInAuth0Id
+
+		user2 := models.User{ Auth0ID: &auth0ID }
 		db.Create(&user2)
 
 		name1 := "Name1"
@@ -226,6 +229,37 @@ func TestUserIndustries(t *testing.T) {
 
 		errDecode2 := decoder.Decode(&userIndustriesFound)
 		assert.Nil(t, errDecode2)
+
+		assert.Equal(t, 1, len(userIndustriesFound))
+
+		userIndustryResponse = userIndustriesFound[0]
+
+		assert.Equal(t, userIndustryResponse.UserIndustryID, userIndustry3.UserIndustryID)
+		assert.Equal(t, userIndustryResponse.UserID, userIndustry3.UserID)
+		assert.Equal(t, userIndustryResponse.IndustryID, userIndustry3.IndustryID)
+
+		// test request with "me" query
+		req, errRequest = http.NewRequestWithContext(
+			context,
+			http.MethodGet,
+			fmt.Sprint(testServer.URL, "/api/user-industries?user_id=me"),
+			nil,
+		)
+		assert.Nil(t, errRequest)
+
+		res, errResponse = http.DefaultClient.Do(req)
+
+		assert.Nil(t, errResponse)
+
+		defer res.Body.Close()
+
+		assert.Equal(t, http.StatusOK, res.StatusCode)
+		assert.Equal(t, "application/json; charset=utf-8", res.Header.Get("Content-Type"))
+
+		decoder = json.NewDecoder(res.Body)
+
+		errDecode3 := decoder.Decode(&userIndustriesFound)
+		assert.Nil(t, errDecode3)
 
 		assert.Equal(t, 1, len(userIndustriesFound))
 

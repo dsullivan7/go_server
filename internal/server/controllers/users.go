@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"go_server/internal/errors"
 	"go_server/internal/models"
-	"go_server/internal/server/utils"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -13,7 +12,7 @@ import (
 )
 
 func (c *Controllers) GetUser(w http.ResponseWriter, r *http.Request) {
-	userID := utils.GetURLParamUUID(r, "userID")
+	userID := c.utils.GetURLParamUUID(r, "userID")
 
 	user, err := c.store.GetUser(userID)
 
@@ -65,7 +64,7 @@ func (c *Controllers) CreateUser(w http.ResponseWriter, r *http.Request) {
 func (c *Controllers) ModifyUser(w http.ResponseWriter, r *http.Request) {
 	var userPayload models.User
 
-	userID := utils.GetURLParamUUID(r, "userID")
+	userID := c.utils.GetURLParamUUID(r, "userID")
 
 	errDecode := json.NewDecoder(r.Body).Decode(&userPayload)
 	if errDecode != nil {

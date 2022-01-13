@@ -40,16 +40,29 @@ func (s *ServerUtils) HandleError(w http.ResponseWriter, r *http.Request, err er
 	render.JSON(w, r, logJSON)
 }
 
-func GetURLParamUUID(r *http.Request, param string) uuid.UUID {
+func (s *ServerUtils) GetURLParamUUID(r *http.Request, param string) uuid.UUID {
 	paramValue := chi.URLParam(r, param)
 
-	var paramUUID uuid.UUID
-
 	if paramValue == "me" {
-		paramUUID = r.Context().Value(consts.UserModelKey).(models.User).UserID
-	} else {
-		paramUUID = uuid.Must(uuid.Parse(paramValue))
+		return r.Context().Value(consts.UserModelKey).(models.User).UserID
 	}
 
-	return paramUUID
+	return uuid.Must(uuid.Parse(paramValue))
+}
+
+func (s *ServerUtils) GetQueryParamUUID(r *http.Request, param string) uuid.UUID {
+	paramValue := r.URL.Query().Get(param)
+
+	// check if the query parameter is not specified
+	if paramValue == "" {
+		return uuid.Nil
+	}
+
+	// check if the query parameter refers to the requesting user
+	if paramValue == "me" {
+		return r.Context().Value(consts.UserModelKey).(models.User).UserID
+	}
+
+	// return the parameter as specified
+	return uuid.Must(uuid.Parse(paramValue))
 }
