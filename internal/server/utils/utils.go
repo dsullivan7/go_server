@@ -36,6 +36,7 @@ func (s *ServerUtils) HandleError(w http.ResponseWriter, r *http.Request, err er
 
 	logJSON := map[string]interface{}{
 		"message": err.GetMessage(),
+		"code": err.GetCode(),
 	}
 	render.JSON(w, r, logJSON)
 }
@@ -44,6 +45,11 @@ func (s *ServerUtils) GetURLParamUUID(r *http.Request, param string) uuid.UUID {
 	paramValue := chi.URLParam(r, param)
 
 	if paramValue == "me" {
+		println("r.Context().Value(consts.UserModelKey)")
+		println(r.Context().Value(consts.UserModelKey) == nil)
+		if (r.Context().Value(consts.UserModelKey) == nil) {
+			return uuid.Nil
+		}
 		return r.Context().Value(consts.UserModelKey).(models.User).UserID
 	}
 

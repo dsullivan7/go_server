@@ -4,6 +4,7 @@ type HTTPError interface {
 	GetHTTPStatus() int
 	GetMessage() string
 	GetError() error
+	GetCode() string
 }
 
 type RunTimeError struct {

@@ -14,6 +14,12 @@ import (
 func (c *Controllers) GetUser(w http.ResponseWriter, r *http.Request) {
 	userID := c.utils.GetURLParamUUID(r, "user_id")
 
+	if (userID == uuid.Nil) {
+		c.utils.HandleError(w, r, errors.HTTPNonExistentError{})
+
+		return
+	}
+
 	user, err := c.store.GetUser(userID)
 
 	if err != nil {

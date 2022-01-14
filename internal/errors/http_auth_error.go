@@ -7,6 +7,7 @@ import (
 type HTTPAuthError struct {
 	HTTPStatus int
 	Message    string
+	Code    string
 	Err        error
 }
 
@@ -24,6 +25,14 @@ func (err HTTPAuthError) GetMessage() string {
 	}
 
 	return err.Message
+}
+
+func (err HTTPAuthError) GetCode() string {
+	if err.Code == "" {
+		return "auth_error"
+	}
+
+	return err.Code
 }
 
 func (err HTTPAuthError) GetError() error {

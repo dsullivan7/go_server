@@ -29,7 +29,9 @@ func Run() {
 		log.Fatal(configErr)
 	}
 
-	zapLogger, errZap := zap.NewProduction()
+	zapConfig := zap.NewProductionConfig()
+	zapConfig.OutputPaths = []string{"stdout"}
+	zapLogger, errZap := zapConfig.Build(zap.AddCallerSkip(2))
 
 	if errZap != nil {
 		log.Fatal(errZap)

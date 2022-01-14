@@ -7,6 +7,7 @@ import (
 type HTTPServerError struct {
 	HTTPStatus int
 	Message    string
+	Code    string
 	Err        error
 }
 
@@ -24,6 +25,14 @@ func (err HTTPServerError) GetMessage() string {
 	}
 
 	return err.Message
+}
+
+func (err HTTPServerError) GetCode() string {
+	if err.Code == "" {
+		return "service_error"
+	}
+
+	return err.Code
 }
 
 func (err HTTPServerError) GetError() error {

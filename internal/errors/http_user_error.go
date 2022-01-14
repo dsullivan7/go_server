@@ -7,6 +7,7 @@ import (
 type HTTPUserError struct {
 	HTTPStatus int
 	Message    string
+	Code    	 string
 	Err        error
 }
 
@@ -24,6 +25,14 @@ func (err HTTPUserError) GetMessage() string {
 	}
 
 	return err.Message
+}
+
+func (err HTTPUserError) GetCode() string {
+	if err.Code == "" {
+		return "bad_request"
+	}
+
+	return err.Code
 }
 
 func (err HTTPUserError) GetError() error {
