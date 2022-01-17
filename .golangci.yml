@@ -38,3 +38,6 @@ issues:
     - path: test/integration
       linters:
         - paralleltest
+    - path: test/mocks
+      linters:
+        - wrapcheck

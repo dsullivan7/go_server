@@ -2,20 +2,25 @@ package store
 
 import (
 	"go_server/internal/models"
-	"go_server/internal/store"
+
+	"github.com/stretchr/testify/mock"
 
 	"github.com/google/uuid"
 )
 
-type MockStore struct{}
+type MockStore struct {
+	mock.Mock
+}
 
-func NewMockStore() store.Store {
+func NewMockStore() *MockStore {
 	return &MockStore{}
 }
 
 // User.
 func (mockStore *MockStore) GetUser(userID uuid.UUID) (*models.User, error) {
-	return &models.User{}, nil
+	args := mockStore.Called(userID)
+
+	return args.Get(0).(*models.User), args.Error(1)
 }
 
 func (mockStore *MockStore) ListUsers(query map[string]interface{}) ([]models.User, error) {
