@@ -39,7 +39,10 @@ func (s *ChiServer) Init() http.Handler {
 		r.Use(middlewares.Auth())
 		r.Use(middlewares.User())
 
-		r.Get("/api/users/{user_id}", controllers.GetUser)
+		r.Group(func(rUser chi.Router) {
+			rUser.Use(middlewares.URLParam("user_id"))
+			rUser.Get("/api/users/{user_id}", controllers.GetUser)
+		})
 		r.Get("/api/users", controllers.ListUsers)
 		r.Post("/api/users", controllers.CreateUser)
 		r.Delete("/api/users/{user_id}", controllers.DeleteUser)

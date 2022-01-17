@@ -59,7 +59,7 @@ func TestUsers(t *testing.T) {
 
 	router := chi.NewRouter()
 
-	authMock := auth.NewAuth()
+	authMock := auth.NewMockAuth()
 
 	browser := rod.New()
 

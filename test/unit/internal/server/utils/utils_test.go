@@ -1,6 +1,7 @@
 package utils_test
 
 import (
+  "bytes"
   "context"
 	"fmt"
   "net/http"
@@ -18,9 +19,7 @@ import (
   "github.com/google/uuid"
 )
 
-type ctxKey struct {
-  name string
-}
+const domain = "https://sunburst.app"
 
 func TestUtils(t *testing.T) {
   t.Parallel()
@@ -32,7 +31,7 @@ func TestUtils(t *testing.T) {
 
   t.Run("GetPathParamUUID", func(t *testing.T) {
     uuid := uuid.New()
-    req := httptest.NewRequest(http.MethodGet, "https://google.com", nil)
+    req := httptest.NewRequest(http.MethodGet, domain, nil)
     rctx := chi.NewRouteContext()
     rctx.URLParams.Add("testParam", uuid.String())
     newContext := context.WithValue(req.Context(), chi.RouteCtxKey, rctx)
@@ -45,7 +44,7 @@ func TestUtils(t *testing.T) {
   t.Run("GetPathParamUUID me", func(t *testing.T) {
     uuid := uuid.New()
     user := models.User{ UserID: uuid }
-    req := httptest.NewRequest(http.MethodGet, "https://google.com", nil)
+    req := httptest.NewRequest(http.MethodGet, domain, nil)
     newContext := context.WithValue(req.Context(), consts.UserModelKey, user)
     req = req.WithContext(newContext)
     rctx := chi.NewRouteContext()
@@ -59,7 +58,7 @@ func TestUtils(t *testing.T) {
 
   t.Run("GetQueryParamUUID", func(t *testing.T) {
     uuid := uuid.New()
-    req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("https://google.com?testParam=%s", uuid), nil)
+    req := httptest.NewRequest(http.MethodGet, fmt.Sprint(domain, "?testParam=", uuid), nil)
     uuidFound := utils.GetQueryParamUUID(req, "testParam")
 
     assert.Equal(t, uuid, uuidFound)
@@ -68,7 +67,7 @@ func TestUtils(t *testing.T) {
   t.Run("GetQueryParamUUID me", func(t *testing.T) {
     uuid := uuid.New()
     user := models.User{ UserID: uuid }
-    req := httptest.NewRequest(http.MethodGet, "https://google.com?testParam=me", nil)
+    req := httptest.NewRequest(http.MethodGet, fmt.Sprint(domain, "?testParam=me"), nil)
     newContext := context.WithValue(req.Context(), consts.UserModelKey, user)
     req = req.WithContext(newContext)
 
@@ -78,10 +77,28 @@ func TestUtils(t *testing.T) {
   })
 
   t.Run("GetQueryParamUUID undefined", func(t *testing.T) {
-    req := httptest.NewRequest(http.MethodGet, "https://google.com", nil)
+    req := httptest.NewRequest(http.MethodGet, domain, nil)
 
     uuidFound := utils.GetQueryParamUUID(req, "testParam")
 
     assert.Equal(t, uuid.Nil, uuidFound)
+  })
+
+  t.Run("GetBodyParamUUID", func(t *testing.T) {
+    uuid := uuid.New()
+    jsonStr := []byte(fmt.Sprintf(`{
+      "testParam":"%s",
+      "last_name":"LastName"
+    }`, uuid))
+
+    req, errRequest := http.NewRequest(
+      http.MethodPost,
+      domain,
+      bytes.NewBuffer(jsonStr),
+    )
+
+    uuidFound := utils.GetBodyParamUUID(req, "testParam")
+
+    assert.Equal(t, uuid, uuidFound)
   })
 }

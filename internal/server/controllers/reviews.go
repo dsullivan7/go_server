@@ -49,7 +49,7 @@ func (c *Controllers) ListReviews(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, reviews)
 }
 
-func (c *Controllers) CreateReview(w http.ResponseWriter, r *http.Request) {
+func (c *Controllers) CreateReview(w http.ResponseWriter, r *http.Request) {	
 	var reviewPayload models.Review
 
 	errDecode := json.NewDecoder(r.Body).Decode(&reviewPayload)

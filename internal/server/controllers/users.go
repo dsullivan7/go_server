@@ -12,13 +12,7 @@ import (
 )
 
 func (c *Controllers) GetUser(w http.ResponseWriter, r *http.Request) {
-	userID := c.utils.GetPathParamUUID(r, "user_id")
-
-	if (userID == uuid.Nil) {
-		c.utils.HandleError(w, r, errors.HTTPNonExistentError{})
-
-		return
-	}
+	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "user_id")))
 
 	user, err := c.store.GetUser(userID)
 
@@ -70,7 +64,7 @@ func (c *Controllers) CreateUser(w http.ResponseWriter, r *http.Request) {
 func (c *Controllers) ModifyUser(w http.ResponseWriter, r *http.Request) {
 	var userPayload models.User
 
-	userID := c.utils.GetPathParamUUID(r, "user_id")
+	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "user_id")))
 
 	errDecode := json.NewDecoder(r.Body).Decode(&userPayload)
 	if errDecode != nil {
