@@ -27,9 +27,9 @@ func (c *Controllers) GetUserIndustry(w http.ResponseWriter, r *http.Request) {
 
 func (c *Controllers) ListUserIndustries(w http.ResponseWriter, r *http.Request) {
 	query := map[string]interface{}{}
-	userID := c.utils.GetQueryParamUUID(r, "user_id")
+	userID := r.URL.Query().Get("user_id")
 
-	if userID != uuid.Nil {
+	if userID != "" {
 		query["user_id"] = userID
 	}
 

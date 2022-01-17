@@ -39,7 +39,10 @@ func (gormStore *Store) CreateUserIndustry(userIndustryPayload models.UserIndust
 	return &userIndustry, nil
 }
 
-func (gormStore *Store) ModifyUserIndustry(userIndustryID uuid.UUID, userIndustryPayload models.UserIndustry) (*models.UserIndustry, error) {
+func (gormStore *Store) ModifyUserIndustry(
+	userIndustryID uuid.UUID,
+	userIndustryPayload models.UserIndustry,
+) (*models.UserIndustry, error) {
 	var userIndustryFound models.UserIndustry
 
 	errFind := gormStore.database.Where("user_industry_id = ?", userIndustryID).First(&userIndustryFound).Error

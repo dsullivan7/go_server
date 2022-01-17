@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"go_server/internal/errors"
 	"go_server/internal/models"
+	"go_server/internal/server/consts"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -12,7 +13,21 @@ import (
 )
 
 func (c *Controllers) GetUser(w http.ResponseWriter, r *http.Request) {
-	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "user_id")))
+	userIDString := chi.URLParam(r, "user_id")
+
+	var userID uuid.UUID
+
+	if userIDString == "me" {
+		if r.Context().Value(consts.UserModelKey) == nil {
+			c.utils.HandleError(w, r, errors.HTTPNonExistentError{})
+
+			return
+		}
+
+		userID = r.Context().Value(consts.UserModelKey).(models.User).UserID
+	} else {
+		userID = uuid.Must(uuid.Parse(userIDString))
+	}
 
 	user, err := c.store.GetUser(userID)
 
@@ -64,7 +79,21 @@ func (c *Controllers) CreateUser(w http.ResponseWriter, r *http.Request) {
 func (c *Controllers) ModifyUser(w http.ResponseWriter, r *http.Request) {
 	var userPayload models.User
 
-	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "user_id")))
+	userIDString := chi.URLParam(r, "user_id")
+
+	var userID uuid.UUID
+
+	if userIDString == "me" {
+		if r.Context().Value(consts.UserModelKey) == nil {
+			c.utils.HandleError(w, r, errors.HTTPNonExistentError{})
+
+			return
+		}
+
+		userID = r.Context().Value(consts.UserModelKey).(models.User).UserID
+	} else {
+		userID = uuid.Must(uuid.Parse(userIDString))
+	}
 
 	errDecode := json.NewDecoder(r.Body).Decode(&userPayload)
 	if errDecode != nil {
@@ -85,7 +114,21 @@ func (c *Controllers) ModifyUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Controllers) DeleteUser(w http.ResponseWriter, r *http.Request) {
-	userID := uuid.Must(uuid.Parse(chi.URLParam(r, "user_id")))
+	userIDString := chi.URLParam(r, "user_id")
+
+	var userID uuid.UUID
+
+	if userIDString == "me" {
+		if r.Context().Value(consts.UserModelKey) == nil {
+			c.utils.HandleError(w, r, errors.HTTPNonExistentError{})
+
+			return
+		}
+
+		userID = r.Context().Value(consts.UserModelKey).(models.User).UserID
+	} else {
+		userID = uuid.Must(uuid.Parse(userIDString))
+	}
 
 	err := c.store.DeleteUser(userID)
 

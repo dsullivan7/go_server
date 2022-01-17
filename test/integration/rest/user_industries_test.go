@@ -84,7 +84,7 @@ func TestUserIndustries(t *testing.T) {
 		industry := models.Industry{Name: &name}
 		db.Create(&industry)
 
-		userIndustry := models.UserIndustry{ UserID: user.UserID, IndustryID: industry.IndustryID }
+		userIndustry := models.UserIndustry{UserID: user.UserID, IndustryID: industry.IndustryID}
 
 		db.Create(&userIndustry)
 
@@ -125,7 +125,7 @@ func TestUserIndustries(t *testing.T) {
 
 		auth0ID := consts.LoggedInAuth0Id
 
-		user2 := models.User{ Auth0ID: &auth0ID }
+		user2 := models.User{Auth0ID: &auth0ID}
 		db.Create(&user2)
 
 		name1 := "Name1"
@@ -136,9 +136,9 @@ func TestUserIndustries(t *testing.T) {
 		industry2 := models.Industry{Name: &name2}
 		db.Create(&industry2)
 
-		userIndustry1 := models.UserIndustry{ UserID: user1.UserID, IndustryID: industry1.IndustryID }
-		userIndustry2 := models.UserIndustry{ UserID: user1.UserID, IndustryID: industry2.IndustryID }
-		userIndustry3 := models.UserIndustry{ UserID: user2.UserID, IndustryID: industry2.IndustryID }
+		userIndustry1 := models.UserIndustry{UserID: user1.UserID, IndustryID: industry1.IndustryID}
+		userIndustry2 := models.UserIndustry{UserID: user1.UserID, IndustryID: industry2.IndustryID}
+		userIndustry3 := models.UserIndustry{UserID: user2.UserID, IndustryID: industry2.IndustryID}
 
 		db.Create(&userIndustry1)
 		db.Create(&userIndustry2)
@@ -330,7 +330,7 @@ func TestUserIndustries(t *testing.T) {
 		industry := models.Industry{Name: &name}
 		db.Create(&industry)
 
-		userIndustry := models.UserIndustry{ UserID: user.UserID, IndustryID: industry.IndustryID }
+		userIndustry := models.UserIndustry{UserID: user.UserID, IndustryID: industry.IndustryID}
 
 		db.Create(&userIndustry)
 
@@ -384,7 +384,7 @@ func TestUserIndustries(t *testing.T) {
 		industry := models.Industry{Name: &name}
 		db.Create(&industry)
 
-		userIndustry := models.UserIndustry{ UserID: user.UserID, IndustryID: industry.IndustryID }
+		userIndustry := models.UserIndustry{UserID: user.UserID, IndustryID: industry.IndustryID}
 
 		db.Create(&userIndustry)
 

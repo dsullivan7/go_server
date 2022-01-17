@@ -5,9 +5,10 @@ import (
 	"net/http"
 )
 
-type HTTPNonExistentError struct {}
+type HTTPNonExistentError struct{}
 
 const message = "this record does not exist"
+
 var errNonExistent = errors.New(message)
 
 func (err HTTPNonExistentError) GetHTTPStatus() int {

@@ -22,6 +22,8 @@ import (
 	"github.com/go-chi/chi"
 )
 
+const callerSkip = 2
+
 func Run() {
 	config, configErr := config.NewConfig()
 
@@ -31,7 +33,7 @@ func Run() {
 
 	zapConfig := zap.NewProductionConfig()
 	zapConfig.OutputPaths = []string{"stdout"}
-	zapLogger, errZap := zapConfig.Build(zap.AddCallerSkip(2))
+	zapLogger, errZap := zapConfig.Build(zap.AddCallerSkip(callerSkip))
 
 	if errZap != nil {
 		log.Fatal(errZap)

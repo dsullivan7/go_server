@@ -7,7 +7,7 @@ import (
 type HTTPServerError struct {
 	HTTPStatus int
 	Message    string
-	Code    string
+	Code       string
 	Err        error
 }
 

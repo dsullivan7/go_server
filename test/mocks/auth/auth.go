@@ -6,8 +6,8 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 
-	"go_server/test/mocks/consts"
 	"go_server/internal/auth"
+	"go_server/test/mocks/consts"
 )
 
 type MockAuth struct{}
