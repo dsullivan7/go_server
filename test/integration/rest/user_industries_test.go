@@ -237,37 +237,6 @@ func TestUserIndustries(t *testing.T) {
 		assert.Equal(t, userIndustryResponse.UserIndustryID, userIndustry3.UserIndustryID)
 		assert.Equal(t, userIndustryResponse.UserID, userIndustry3.UserID)
 		assert.Equal(t, userIndustryResponse.IndustryID, userIndustry3.IndustryID)
-
-		// test request with "me" query
-		req, errRequest = http.NewRequestWithContext(
-			context,
-			http.MethodGet,
-			fmt.Sprint(testServer.URL, "/api/user-industries?user_id=me"),
-			nil,
-		)
-		assert.Nil(t, errRequest)
-
-		res, errResponse = http.DefaultClient.Do(req)
-
-		assert.Nil(t, errResponse)
-
-		defer res.Body.Close()
-
-		assert.Equal(t, http.StatusOK, res.StatusCode)
-		assert.Equal(t, "application/json; charset=utf-8", res.Header.Get("Content-Type"))
-
-		decoder = json.NewDecoder(res.Body)
-
-		errDecode3 := decoder.Decode(&userIndustriesFound)
-		assert.Nil(t, errDecode3)
-
-		assert.Equal(t, 1, len(userIndustriesFound))
-
-		userIndustryResponse = userIndustriesFound[0]
-
-		assert.Equal(t, userIndustryResponse.UserIndustryID, userIndustry3.UserIndustryID)
-		assert.Equal(t, userIndustryResponse.UserID, userIndustry3.UserID)
-		assert.Equal(t, userIndustryResponse.IndustryID, userIndustry3.IndustryID)
 	})
 
 	t.Run("Test Create", func(t *testing.T) {
