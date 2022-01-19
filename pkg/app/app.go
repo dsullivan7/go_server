@@ -8,6 +8,7 @@ import (
 	goServerRodCrawler "go_server/internal/crawler/rod"
 	"go_server/internal/db"
 	goServerZapLogger "go_server/internal/logger/zap"
+	goServerPlaid "go_server/internal/plaid"
 	"go_server/internal/server"
 	"go_server/internal/store/gorm"
 	"log"
@@ -18,6 +19,8 @@ import (
 	"github.com/go-rod/rod/lib/launcher/flags"
 
 	"go.uber.org/zap"
+
+	"github.com/plaid/plaid-go/plaid"
 
 	"github.com/go-chi/chi"
 )
@@ -70,11 +73,19 @@ func Run() {
 	captcha := twocaptcha.NewTwoCaptcha(captchaKey, logger)
 	crawler := goServerRodCrawler.NewCrawler(browser, captcha)
 
+	// initialize plaid
+	plaidConfig := plaid.NewConfiguration()
+	plaidConfig.AddDefaultHeader("PLAID-CLIENT-ID", config.PlaidClientID)
+	plaidConfig.AddDefaultHeader("PLAID-SECRET", config.PlaidSecret)
+	plaidConfig.UseEnvironment(plaid.Sandbox)
+	plaidClientInstance := plaid.NewAPIClient(plaidConfig)
+	plaidClient := goServerPlaid.NewPlaidClient(plaidClientInstance)
+
 	auth := auth0.NewAuth(config.Auth0Domain, config.Auth0Audience, logger)
 	auth.Init()
 
 	router := chi.NewRouter()
-	handler := server.NewChiServer(config, router, store, crawler, auth, logger)
+	handler := server.NewChiServer(config, router, store, crawler, plaidClient, auth, logger)
 
 	httpServer := http.Server{
 		Addr:    fmt.Sprintf(":%s", config.Port),

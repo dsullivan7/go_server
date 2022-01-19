@@ -22,6 +22,9 @@ type Config struct {
 	Auth0Domain   string
 	Auth0Audience string
 
+	PlaidClientID   string
+	PlaidSecret string
+
 	AllowedOrigins []string
 	RouterMaxAge   int
 }
@@ -42,6 +45,8 @@ func NewConfig() (*Config, error) {
 		DBName:         os.Getenv("DB_NAME"),
 		DBSSL:          dbSSL,
 		TwoCaptchaKey:  os.Getenv("TWO_CAPTCHA_KEY"),
+		PlaidClientID:  os.Getenv("PLAID_CLIENT_ID"),
+		PlaidSecret:  os.Getenv("PLAID_SECRET"),
 		Auth0Domain:    os.Getenv("AUTH0_DOMAIN"),
 		Auth0Audience:  os.Getenv("AUTH0_AUDIENCE"),
 		AllowedOrigins: strings.Split(os.Getenv("ALLOWED_ORIGINS"), ","),

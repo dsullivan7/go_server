@@ -5,72 +5,24 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"go_server/internal/captcha/twocaptcha"
-	"go_server/internal/config"
-	goServerRodCrawler "go_server/internal/crawler/rod"
-	"go_server/internal/db"
-	goServerZapLogger "go_server/internal/logger/zap"
 	"go_server/internal/models"
-	"go_server/internal/server"
-	goServerGormStore "go_server/internal/store/gorm"
-	"go_server/test/mocks/auth"
 	testUtils "go_server/test/utils"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
-	"github.com/go-chi/chi"
-	"github.com/go-rod/rod"
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
 func TestReviews(t *testing.T) {
-	config, configError := config.NewConfig()
-	assert.Nil(t, configError)
+	setupUtils := testUtils.NewSetupUtility()
 
-	zapLogger, errZap := zap.NewProduction()
-	assert.Nil(t, errZap)
-
-	logger := goServerZapLogger.NewLogger(zapLogger)
-
-	connection, errConnection := db.NewSQLConnection(
-		config.DBHost,
-		config.DBName,
-		config.DBPort,
-		config.DBUser,
-		config.DBPassword,
-		config.DBSSL,
-	)
-	assert.Nil(t, errConnection)
-
-	db, errDatabase := db.NewGormDB(connection)
-	assert.Nil(t, errDatabase)
-
-	dbUtility := testUtils.NewSQLDatabaseUtility(connection)
-
-	store := goServerGormStore.NewStore(db)
-
-	router := chi.NewRouter()
-
-	authMock := auth.NewMockAuth()
-
-	browser := rod.New()
-
-	captchaKey := "key"
-
-	captcha := twocaptcha.NewTwoCaptcha(captchaKey, logger)
-
-	crawler := goServerRodCrawler.NewCrawler(browser, captcha)
-
-	handler := server.NewChiServer(config, router, store, crawler, authMock, logger)
-
-	testServer := httptest.NewServer(handler.Init())
-
-	context := context.Background()
+	testServer, db, dbUtility, errIntSetup := setupUtils.SetupIntegration()
+	assert.Nil(t, errIntSetup)
 
 	defer testServer.Close()
+
+	context := context.Background()
 
 	t.Run("Test Get", func(t *testing.T) {
 		errTruncate := dbUtility.TruncateAll()

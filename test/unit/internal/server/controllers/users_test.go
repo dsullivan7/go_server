@@ -10,7 +10,9 @@ import (
 	"go_server/internal/models"
 	"go_server/internal/server/controllers"
 	"go_server/internal/server/utils"
+	"go_server/internal/server/consts"
 	"go_server/test/mocks/store"
+	"go_server/test/mocks/plaid"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -44,10 +46,12 @@ func TestUsers(tParent *testing.T) {
 
 	crawler := goServerRodCrawler.NewCrawler(browser, captcha)
 
+	plaidClient := plaid.NewMockPlaidClient()
+
 	ctx := context.Background()
 
 	utils := utils.NewServerUtils(logger)
-	controllers := controllers.NewControllers(config, store, crawler, utils, logger)
+	controllers := controllers.NewControllers(config, store, crawler, plaidClient, utils, logger)
 
 	tParent.Run("Test Get", func(t *testing.T) {
 		t.Parallel()
@@ -78,6 +82,55 @@ func TestUsers(tParent *testing.T) {
 		rctx.URLParams.Add("user_id", uuid.String())
 
 		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		res := httptest.NewRecorder()
+
+		handler := http.HandlerFunc(controllers.GetUser)
+		handler.ServeHTTP(res, req)
+
+		assert.Equal(t, http.StatusOK, res.Code)
+
+		decoder := json.NewDecoder(res.Body)
+
+		var userResponse models.User
+		errDecoder := decoder.Decode(&userResponse)
+		assert.Nil(t, errDecoder)
+
+		assert.Equal(t, userResponse.UserID, user.UserID)
+		assert.Equal(t, *userResponse.FirstName, *user.FirstName)
+		assert.Equal(t, *userResponse.LastName, *user.LastName)
+		assert.Equal(t, *userResponse.Auth0ID, *user.Auth0ID)
+	})
+
+	tParent.Run("Test Get Me", func(t *testing.T) {
+		t.Parallel()
+
+		firstName := "firstName"
+		lastName := "lastName"
+		auth0ID := "auth0ID"
+
+		user := models.User{
+      UserID: uuid.New(),
+			FirstName: &firstName,
+			LastName:  &lastName,
+			Auth0ID:   &auth0ID,
+		}
+
+		store.On("GetUser", user.UserID).Return(&user, nil)
+
+		req, errRequest := http.NewRequestWithContext(
+			ctx,
+			http.MethodGet,
+			"/api/users/",
+			nil,
+		)
+		assert.Nil(t, errRequest)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("user_id", "me")
+
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+    req = req.WithContext(context.WithValue(req.Context(), consts.UserModelKey, user))
 
 		res := httptest.NewRecorder()
 

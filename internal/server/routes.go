@@ -63,6 +63,8 @@ func (s *ChiServer) Init() http.Handler {
 		r.Delete("/api/user-industries/{user_industry_id}", controllers.DeleteUserIndustry)
 		r.Put("/api/user-industries/{user_industry_id}", controllers.ModifyUserIndustry)
 
+		r.Post("/api/plaid/token", controllers.CreatePlaidToken)
+
 		r.Get("/api/snap", controllers.GetSnap)
 
 		handler := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))

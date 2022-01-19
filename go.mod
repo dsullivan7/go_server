@@ -13,6 +13,7 @@ require (
 	github.com/google/uuid v1.2.0
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/lib/pq v1.3.0
+	github.com/plaid/plaid-go v1.10.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/stretchr/testify v1.5.1
 	github.com/urfave/negroni v1.0.0 // indirect

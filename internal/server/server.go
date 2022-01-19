@@ -6,6 +6,7 @@ import (
 	"go_server/internal/auth"
 	"go_server/internal/config"
 	"go_server/internal/crawler"
+	"go_server/internal/plaid"
 	"go_server/internal/logger"
 	"go_server/internal/server/controllers"
 	"go_server/internal/server/graph"
@@ -34,11 +35,12 @@ func NewChiServer(
 	router *chi.Mux,
 	store store.Store,
 	crawler crawler.Crawler,
+	plaidClient plaid.Client,
 	auth auth.Auth,
 	logger logger.Logger,
 ) Server {
 	utils := utils.NewServerUtils(logger)
-	controllers := controllers.NewControllers(config, store, crawler, utils, logger)
+	controllers := controllers.NewControllers(config, store, crawler, plaidClient, utils, logger)
 	resolver := graph.NewResolver(config, store, logger)
 	middlewares := middlewares.NewMiddlewares(config, store, auth, utils, logger)
 

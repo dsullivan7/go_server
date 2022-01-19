@@ -15,6 +15,7 @@ import (
 	goServerGormStore "go_server/internal/store/gorm"
 	"go_server/test/mocks/auth"
 	"go_server/test/mocks/consts"
+	"go_server/test/mocks/plaid"
 	testUtils "go_server/test/utils"
 	"net/http"
 	"net/http/httptest"
@@ -65,7 +66,9 @@ func TestUsers(t *testing.T) {
 
 	crawler := goServerRodCrawler.NewCrawler(browser, captcha)
 
-	handler := server.NewChiServer(config, router, store, crawler, authMock, logger)
+	plaidClient := plaid.NewMockPlaidClient()
+
+	handler := server.NewChiServer(config, router, store, crawler, plaidClient, authMock, logger)
 
 	testServer := httptest.NewServer(handler.Init())
 
