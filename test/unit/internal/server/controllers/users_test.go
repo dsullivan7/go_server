@@ -1,18 +1,11 @@
-package integration_test
+package controllers_test
 
 import (
 	"context"
 	"encoding/json"
-	"go_server/internal/captcha/twocaptcha"
-	"go_server/internal/config"
-	goServerRodCrawler "go_server/internal/crawler/rod"
-	goServerZapLogger "go_server/internal/logger/zap"
 	"go_server/internal/models"
-	"go_server/internal/server/controllers"
-	"go_server/internal/server/utils"
 	"go_server/internal/server/consts"
-	"go_server/test/mocks/store"
-	"go_server/test/mocks/plaid"
+	"go_server/test/unit/internal/server/controllers"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -20,38 +13,16 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/go-chi/chi"
-	"github.com/go-rod/rod"
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/zap"
 )
 
 func TestUsers(tParent *testing.T) {
 	tParent.Parallel()
 
-	config, configError := config.NewConfig()
-	assert.Nil(tParent, configError)
-
-	zapLogger, errZap := zap.NewProduction()
-	assert.Nil(tParent, errZap)
-
-	logger := goServerZapLogger.NewLogger(zapLogger)
-
-	store := store.NewMockStore()
-
-	browser := rod.New()
-
-	captchaKey := "key"
-
-	captcha := twocaptcha.NewTwoCaptcha(captchaKey, logger)
-
-	crawler := goServerRodCrawler.NewCrawler(browser, captcha)
-
-	plaidClient := plaid.NewMockPlaidClient()
+	controllers, mockStore, err := controllers.Setup()
+	assert.Nil(tParent, err)
 
 	ctx := context.Background()
-
-	utils := utils.NewServerUtils(logger)
-	controllers := controllers.NewControllers(config, store, crawler, plaidClient, utils, logger)
 
 	tParent.Run("Test Get", func(t *testing.T) {
 		t.Parallel()
@@ -68,7 +39,7 @@ func TestUsers(tParent *testing.T) {
 
 		uuid := uuid.New()
 
-		store.On("GetUser", uuid).Return(&user, nil)
+		mockStore.On("GetUser", uuid).Return(&user, nil)
 
 		req, errRequest := http.NewRequestWithContext(
 			ctx,
@@ -116,7 +87,7 @@ func TestUsers(tParent *testing.T) {
 			Auth0ID:   &auth0ID,
 		}
 
-		store.On("GetUser", user.UserID).Return(&user, nil)
+		mockStore.On("GetUser", user.UserID).Return(&user, nil)
 
 		req, errRequest := http.NewRequestWithContext(
 			ctx,

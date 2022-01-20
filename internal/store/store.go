@@ -25,9 +25,24 @@ type Store interface {
 	ModifyIndustry(industryID uuid.UUID, industryPayload models.Industry) (*models.Industry, error)
 	DeleteIndustry(industryID uuid.UUID) error
 
-	GetUserIndustry(userIndustryID uuid.UUID) (*models.UserIndustry, error)
-	ListUserIndustries(query map[string]interface{}) ([]models.UserIndustry, error)
-	CreateUserIndustry(userIndustryPayload models.UserIndustry) (*models.UserIndustry, error)
-	ModifyUserIndustry(userIndustryID uuid.UUID, userIndustryPayload models.UserIndustry) (*models.UserIndustry, error)
-	DeleteUserIndustry(userIndustryID uuid.UUID) error
+	GetBankAccount(portfolioID uuid.UUID) (*models.BankAccount, error)
+	ListBankAccounts(query map[string]interface{}) ([]models.BankAccount, error)
+	CreateBankAccount(portfolioPayload models.BankAccount) (*models.BankAccount, error)
+	ModifyBankAccount(portfolioID uuid.UUID, portfolioPayload models.BankAccount) (*models.BankAccount, error)
+	DeleteBankAccount(portfolioID uuid.UUID) error
+
+	GetPortfolio(portfolioID uuid.UUID) (*models.Portfolio, error)
+	ListPortfolios(query map[string]interface{}) ([]models.Portfolio, error)
+	CreatePortfolio(portfolioPayload models.Portfolio) (*models.Portfolio, error)
+	ModifyPortfolio(portfolioID uuid.UUID, portfolioPayload models.Portfolio) (*models.Portfolio, error)
+	DeletePortfolio(portfolioID uuid.UUID) error
+
+	GetPortfolioIndustry(portfolioIndustryID uuid.UUID) (*models.PortfolioIndustry, error)
+	ListPortfolioIndustries(query map[string]interface{}) ([]models.PortfolioIndustry, error)
+	CreatePortfolioIndustry(portfolioIndustryPayload models.PortfolioIndustry) (*models.PortfolioIndustry, error)
+	ModifyPortfolioIndustry(
+		portfolioIndustryID uuid.UUID,
+		portfolioIndustryPayload models.PortfolioIndustry,
+	) (*models.PortfolioIndustry, error)
+	DeletePortfolioIndustry(portfolioIndustryID uuid.UUID) error
 }

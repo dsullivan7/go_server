@@ -57,11 +57,23 @@ func (s *ChiServer) Init() http.Handler {
 		r.Delete("/api/industries/{industry_id}", controllers.DeleteIndustry)
 		r.Put("/api/industries/{industry_id}", controllers.ModifyIndustry)
 
-		r.Get("/api/user-industries/{user_industry_id}", controllers.GetUserIndustry)
-		r.Get("/api/user-industries", controllers.ListUserIndustries)
-		r.Post("/api/user-industries", controllers.CreateUserIndustry)
-		r.Delete("/api/user-industries/{user_industry_id}", controllers.DeleteUserIndustry)
-		r.Put("/api/user-industries/{user_industry_id}", controllers.ModifyUserIndustry)
+		r.Get("/api/bank-accounts/{bank_account_id}", controllers.GetBankAccount)
+		r.Get("/api/bank-accounts", controllers.ListBankAccounts)
+		r.Post("/api/bank-accounts", controllers.CreateBankAccount)
+		r.Delete("/api/bank-accounts/{bank_account_id}", controllers.DeleteBankAccount)
+		r.Put("/api/bank-accounts/{bank_account_id}", controllers.ModifyBankAccount)
+
+		r.Get("/api/portfolios/{portfolio_id}", controllers.GetPortfolio)
+		r.Get("/api/portfolios", controllers.ListPortfolios)
+		r.Post("/api/portfolios", controllers.CreatePortfolio)
+		r.Delete("/api/portfolios/{portfolio_id}", controllers.DeletePortfolio)
+		r.Put("/api/portfolios/{portfolio_id}", controllers.ModifyPortfolio)
+
+		r.Get("/api/portfolio-industries/{portfolio_industry_id}", controllers.GetPortfolioIndustry)
+		r.Get("/api/portfolio-industries", controllers.ListPortfolioIndustries)
+		r.Post("/api/portfolio-industries", controllers.CreatePortfolioIndustry)
+		r.Delete("/api/portfolio-industries/{portfolio_industry_id}", controllers.DeletePortfolioIndustry)
+		r.Put("/api/portfolio-industries/{portfolio_industry_id}", controllers.ModifyPortfolioIndustry)
 
 		r.Post("/api/plaid/token", controllers.CreatePlaidToken)
 
