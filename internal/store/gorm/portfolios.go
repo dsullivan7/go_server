@@ -48,8 +48,8 @@ func (gormStore *Store) ModifyPortfolio(portfolioID uuid.UUID, portfolioPayload 
 		return nil, errFind
 	}
 
-	if portfolioPayload.UserID != nil {
-		portfolioFound.UserID = portfolioPayload.UserID
+	if portfolioPayload.Risk != 0 {
+		portfolioFound.Risk = portfolioPayload.Risk
 	}
 
 	errUpdate := gormStore.database.Save(&portfolioFound).Error

@@ -27,15 +27,10 @@ func (c *Controllers) GetPortfolio(w http.ResponseWriter, r *http.Request) {
 
 func (c *Controllers) ListPortfolios(w http.ResponseWriter, r *http.Request) {
 	query := map[string]interface{}{}
-	fromUserID := r.URL.Query().Get("from_user_id")
-	toUserID := r.URL.Query().Get("to_user_id")
+	userID := r.URL.Query().Get("user_id")
 
-	if fromUserID != "" {
-		query["from_user_id"] = fromUserID
-	}
-
-	if toUserID != "" {
-		query["to_user_id"] = toUserID
+	if userID != "" {
+		query["user_id"] = userID
 	}
 
 	portfolios, err := c.store.ListPortfolios(query)
@@ -77,6 +72,7 @@ func (c *Controllers) ModifyPortfolio(w http.ResponseWriter, r *http.Request) {
 	portfolioID := uuid.Must(uuid.Parse(chi.URLParam(r, "portfolio_id")))
 
 	errDecode := json.NewDecoder(r.Body).Decode(&portfolioPayload)
+
 	if errDecode != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errDecode})
 
