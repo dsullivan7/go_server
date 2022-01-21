@@ -12,9 +12,9 @@ import (
 )
 
 func (c *Controllers) GetBankAccount(w http.ResponseWriter, r *http.Request) {
-	backAccountID := uuid.Must(uuid.Parse(chi.URLParam(r, "back_account_id")))
+	bankAccountID := uuid.Must(uuid.Parse(chi.URLParam(r, "bank_account_id")))
 
-	backAccount, err := c.store.GetBankAccount(backAccountID)
+	bankAccount, err := c.store.GetBankAccount(bankAccountID)
 
 	if err != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: err})
@@ -22,18 +22,18 @@ func (c *Controllers) GetBankAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.JSON(w, r, backAccount)
+	render.JSON(w, r, bankAccount)
 }
 
 func (c *Controllers) ListBankAccounts(w http.ResponseWriter, r *http.Request) {
 	query := map[string]interface{}{}
-	portfolioId := r.URL.Query().Get("user_id")
+	userID := r.URL.Query().Get("user_id")
 
-	if portfolioId != "" {
-		query["user_id"] = portfolioId
+	if userID != "" {
+		query["user_id"] = userID
 	}
 
-	backAccounts, err := c.store.ListBankAccounts(query)
+	bankAccounts, err := c.store.ListBankAccounts(query)
 
 	if err != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: err})
@@ -41,20 +41,37 @@ func (c *Controllers) ListBankAccounts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.JSON(w, r, backAccounts)
+	render.JSON(w, r, bankAccounts)
 }
 
 func (c *Controllers) CreateBankAccount(w http.ResponseWriter, r *http.Request) {
-	var backAccountPayload models.BankAccount
+	var bankAccountReq map[string]string
 
-	errDecode := json.NewDecoder(r.Body).Decode(&backAccountPayload)
+	errDecode := json.NewDecoder(r.Body).Decode(&bankAccountReq)
 	if errDecode != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errDecode})
 
 		return
 	}
 
-	backAccount, err := c.store.CreateBankAccount(backAccountPayload)
+	plaidAccessToken, plaidItemID, name, errPlaid := c.plaidClient.ExchangePublicToken(bankAccountReq["plaid_public_token"])
+
+	if errPlaid != nil {
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errPlaid})
+
+		return
+	}
+
+	userID := uuid.Must(uuid.Parse(bankAccountReq["user_id"]))
+
+	bankAccountPayload := models.BankAccount{
+		UserID: &userID,
+		Name: &name,
+		PlaidAccessToken: &plaidAccessToken,
+		PlaidItemID: &plaidItemID,
+	}
+
+	bankAccount, err := c.store.CreateBankAccount(bankAccountPayload)
 
 	if err != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: err})
@@ -63,22 +80,22 @@ func (c *Controllers) CreateBankAccount(w http.ResponseWriter, r *http.Request) 
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	render.JSON(w, r, backAccount)
+	render.JSON(w, r, bankAccount)
 }
 
 func (c *Controllers) ModifyBankAccount(w http.ResponseWriter, r *http.Request) {
-	var backAccountPayload models.BankAccount
+	var bankAccountPayload models.BankAccount
 
-	backAccountID := uuid.Must(uuid.Parse(chi.URLParam(r, "back_account_id")))
+	bankAccountID := uuid.Must(uuid.Parse(chi.URLParam(r, "bank_account_id")))
 
-	errDecode := json.NewDecoder(r.Body).Decode(&backAccountPayload)
+	errDecode := json.NewDecoder(r.Body).Decode(&bankAccountPayload)
 	if errDecode != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errDecode})
 
 		return
 	}
 
-	backAccount, err := c.store.ModifyBankAccount(backAccountID, backAccountPayload)
+	bankAccount, err := c.store.ModifyBankAccount(bankAccountID, bankAccountPayload)
 
 	if err != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: err})
@@ -86,13 +103,13 @@ func (c *Controllers) ModifyBankAccount(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	render.JSON(w, r, backAccount)
+	render.JSON(w, r, bankAccount)
 }
 
 func (c *Controllers) DeleteBankAccount(w http.ResponseWriter, r *http.Request) {
-	backAccountID := uuid.Must(uuid.Parse(chi.URLParam(r, "back_account_id")))
+	bankAccountID := uuid.Must(uuid.Parse(chi.URLParam(r, "bank_account_id")))
 
-	err := c.store.DeleteBankAccount(backAccountID)
+	err := c.store.DeleteBankAccount(bankAccountID)
 
 	if err != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: err})
