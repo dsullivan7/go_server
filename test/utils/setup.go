@@ -15,7 +15,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-rod/rod"
 	"go.uber.org/zap"
-  "gorm.io/gorm"
+	"gorm.io/gorm"
 )
 
 type SetupUtility struct {
@@ -26,60 +26,60 @@ func NewSetupUtility() *SetupUtility {
 }
 
 func (setupUtility *SetupUtility) SetupIntegration() (*httptest.Server, *gorm.DB, DatabaseUtility, error) {
-  config, configError := config.NewConfig()
+	config, configError := config.NewConfig()
 
-  if (configError != nil) {
-    return nil, nil, nil, configError
-  }
+	if configError != nil {
+		return nil, nil, nil, configError
+	}
 
-  zapLogger, errZap := zap.NewProduction()
+	zapLogger, errZap := zap.NewProduction()
 
-  if (errZap != nil) {
-    return nil, nil, nil, errZap
-  }
+	if errZap != nil {
+		return nil, nil, nil, errZap
+	}
 
-  logger := goServerZapLogger.NewLogger(zapLogger)
+	logger := goServerZapLogger.NewLogger(zapLogger)
 
-  connection, errConnection := db.NewSQLConnection(
-    config.DBHost,
-    config.DBName,
-    config.DBPort,
-    config.DBUser,
-    config.DBPassword,
-    config.DBSSL,
-  )
+	connection, errConnection := db.NewSQLConnection(
+		config.DBHost,
+		config.DBName,
+		config.DBPort,
+		config.DBUser,
+		config.DBPassword,
+		config.DBSSL,
+	)
 
-  if (errConnection != nil) {
-    return nil, nil, nil, errConnection
-  }
+	if errConnection != nil {
+		return nil, nil, nil, errConnection
+	}
 
-  db, errDatabase := db.NewGormDB(connection)
+	db, errDatabase := db.NewGormDB(connection)
 
-  if (errDatabase != nil) {
-    return nil, nil, nil, errDatabase
-  }
+	if errDatabase != nil {
+		return nil, nil, nil, errDatabase
+	}
 
-  dbUtility := NewSQLDatabaseUtility(connection)
+	dbUtility := NewSQLDatabaseUtility(connection)
 
-  store := goServerGormStore.NewStore(db)
+	store := goServerGormStore.NewStore(db)
 
-  router := chi.NewRouter()
+	router := chi.NewRouter()
 
-  authMock := auth.NewMockAuth()
+	authMock := auth.NewMockAuth()
 
-  browser := rod.New()
+	browser := rod.New()
 
-  captchaKey := "key"
+	captchaKey := "key"
 
-  captcha := twocaptcha.NewTwoCaptcha(captchaKey, logger)
+	captcha := twocaptcha.NewTwoCaptcha(captchaKey, logger)
 
-  crawler := goServerRodCrawler.NewCrawler(browser, captcha)
+	crawler := goServerRodCrawler.NewCrawler(browser, captcha)
 
-  plaidClient := plaid.NewMockPlaidClient()
+	plaidClient := plaid.NewMockPlaidClient()
 
-  handler := server.NewChiServer(config, router, store, crawler, plaidClient, authMock, logger)
+	handler := server.NewChiServer(config, router, store, crawler, plaidClient, authMock, logger)
 
-  testServer := httptest.NewServer(handler.Init())
+	testServer := httptest.NewServer(handler.Init())
 
-  return testServer, db, dbUtility, nil
+	return testServer, db, dbUtility, nil
 }

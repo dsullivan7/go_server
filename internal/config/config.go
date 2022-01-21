@@ -22,8 +22,9 @@ type Config struct {
 	Auth0Domain   string
 	Auth0Audience string
 
-	PlaidClientID   string
-	PlaidSecret string
+	PlaidClientID    string
+	PlaidSecret      string
+	PlaidRedirectURI string
 
 	AllowedOrigins []string
 	RouterMaxAge   int
@@ -37,20 +38,21 @@ func NewConfig() (*Config, error) {
 	}
 
 	config := &Config{
-		Port:           os.Getenv("PORT"),
-		DBUser:         os.Getenv("DB_USER"),
-		DBPassword:     os.Getenv("DB_PASSWORD"),
-		DBPort:         os.Getenv("DB_PORT"),
-		DBHost:         os.Getenv("DB_HOST"),
-		DBName:         os.Getenv("DB_NAME"),
-		DBSSL:          dbSSL,
-		TwoCaptchaKey:  os.Getenv("TWO_CAPTCHA_KEY"),
-		PlaidClientID:  os.Getenv("PLAID_CLIENT_ID"),
-		PlaidSecret:  os.Getenv("PLAID_SECRET"),
-		Auth0Domain:    os.Getenv("AUTH0_DOMAIN"),
-		Auth0Audience:  os.Getenv("AUTH0_AUDIENCE"),
-		AllowedOrigins: strings.Split(os.Getenv("ALLOWED_ORIGINS"), ","),
-		RouterMaxAge:   300,
+		Port:             os.Getenv("PORT"),
+		DBUser:           os.Getenv("DB_USER"),
+		DBPassword:       os.Getenv("DB_PASSWORD"),
+		DBPort:           os.Getenv("DB_PORT"),
+		DBHost:           os.Getenv("DB_HOST"),
+		DBName:           os.Getenv("DB_NAME"),
+		DBSSL:            dbSSL,
+		TwoCaptchaKey:    os.Getenv("TWO_CAPTCHA_KEY"),
+		PlaidClientID:    os.Getenv("PLAID_CLIENT_ID"),
+		PlaidSecret:      os.Getenv("PLAID_SECRET"),
+		PlaidRedirectURI: os.Getenv("PLAID_REDIRECT_URI"),
+		Auth0Domain:      os.Getenv("AUTH0_DOMAIN"),
+		Auth0Audience:    os.Getenv("AUTH0_AUDIENCE"),
+		AllowedOrigins:   strings.Split(os.Getenv("ALLOWED_ORIGINS"), ","),
+		RouterMaxAge:     300,
 	}
 
 	return config, nil

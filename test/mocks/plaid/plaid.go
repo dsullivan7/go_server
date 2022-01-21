@@ -17,3 +17,9 @@ func (mockStore *MockPlaidClient) CreatePlaidToken(userID string) (string, error
 
 	return args.String(0), args.Error(1)
 }
+
+func (mockStore *MockPlaidClient) ExchangePublicToken(publicToken string) (string, string, string, error) {
+	args := mockStore.Called(publicToken)
+
+	return args.String(0), args.String(1), args.String(2), args.Error(3)
+}

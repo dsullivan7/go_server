@@ -24,7 +24,10 @@ func (mockStore *MockStore) CreateIndustry(industryPayload models.Industry) (*mo
 	return args.Get(0).(*models.Industry), args.Error(1)
 }
 
-func (mockStore *MockStore) ModifyIndustry(industryID uuid.UUID, industryPayload models.Industry) (*models.Industry, error) {
+func (mockStore *MockStore) ModifyIndustry(
+	industryID uuid.UUID,
+	industryPayload models.Industry,
+) (*models.Industry, error) {
 	args := mockStore.Called(industryID, industryPayload)
 
 	return args.Get(0).(*models.Industry), args.Error(1)

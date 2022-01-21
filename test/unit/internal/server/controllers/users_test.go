@@ -81,7 +81,7 @@ func TestUsers(tParent *testing.T) {
 		auth0ID := "auth0ID"
 
 		user := models.User{
-      UserID: uuid.New(),
+			UserID:    uuid.New(),
 			FirstName: &firstName,
 			LastName:  &lastName,
 			Auth0ID:   &auth0ID,
@@ -101,7 +101,7 @@ func TestUsers(tParent *testing.T) {
 		rctx.URLParams.Add("user_id", "me")
 
 		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
-    req = req.WithContext(context.WithValue(req.Context(), consts.UserModelKey, user))
+		req = req.WithContext(context.WithValue(req.Context(), consts.UserModelKey, user))
 
 		res := httptest.NewRecorder()
 

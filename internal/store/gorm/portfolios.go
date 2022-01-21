@@ -39,7 +39,10 @@ func (gormStore *Store) CreatePortfolio(portfolioPayload models.Portfolio) (*mod
 	return &portfolio, nil
 }
 
-func (gormStore *Store) ModifyPortfolio(portfolioID uuid.UUID, portfolioPayload models.Portfolio) (*models.Portfolio, error) {
+func (gormStore *Store) ModifyPortfolio(
+	portfolioID uuid.UUID,
+	portfolioPayload models.Portfolio,
+) (*models.Portfolio, error) {
 	var portfolioFound models.Portfolio
 
 	errFind := gormStore.database.Where("portfolio_id = ?", portfolioID).First(&portfolioFound).Error

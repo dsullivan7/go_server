@@ -31,6 +31,15 @@ issues:
     - path: internal/store/
       linters:
         - dupl
+    - path: internal/server/routes.go
+      linters:
+        - funlen
+    - path: pkg/app/app.go
+      linters:
+        - funlen
+    - path: internal/server/controllers/
+      linters:
+        - dupl
     - path: _test\.go
       linters:
         - funlen
@@ -38,6 +47,11 @@ issues:
     - path: test/integration
       linters:
         - paralleltest
+    - path: test/mocks
+      linters:
+        - mnd
+        - gomnd
+        - dupl
     - path: test
       linters:
         - wrapcheck

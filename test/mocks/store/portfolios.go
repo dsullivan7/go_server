@@ -24,7 +24,10 @@ func (mockStore *MockStore) CreatePortfolio(portfolioPayload models.Portfolio) (
 	return args.Get(0).(*models.Portfolio), args.Error(1)
 }
 
-func (mockStore *MockStore) ModifyPortfolio(portfolioID uuid.UUID, portfolioPayload models.Portfolio) (*models.Portfolio, error) {
+func (mockStore *MockStore) ModifyPortfolio(
+	portfolioID uuid.UUID,
+	portfolioPayload models.Portfolio,
+) (*models.Portfolio, error) {
 	args := mockStore.Called(portfolioID, portfolioPayload)
 
 	return args.Get(0).(*models.Portfolio), args.Error(1)

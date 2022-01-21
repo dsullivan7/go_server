@@ -28,7 +28,9 @@ func (gormStore *Store) ListPortfolioIndustries(query map[string]interface{}) ([
 	return portfolioIndustries, nil
 }
 
-func (gormStore *Store) CreatePortfolioIndustry(portfolioIndustryPayload models.PortfolioIndustry) (*models.PortfolioIndustry, error) {
+func (gormStore *Store) CreatePortfolioIndustry(
+	portfolioIndustryPayload models.PortfolioIndustry,
+) (*models.PortfolioIndustry, error) {
 	portfolioIndustry := portfolioIndustryPayload
 
 	err := gormStore.database.Create(&portfolioIndustry).Error
@@ -45,7 +47,10 @@ func (gormStore *Store) ModifyPortfolioIndustry(
 ) (*models.PortfolioIndustry, error) {
 	var portfolioIndustryFound models.PortfolioIndustry
 
-	errFind := gormStore.database.Where("portfolio_industry_id = ?", portfolioIndustryID).First(&portfolioIndustryFound).Error
+	errFind := gormStore.database.Where(
+		"portfolio_industry_id = ?",
+		portfolioIndustryID,
+	).First(&portfolioIndustryFound).Error
 
 	if errFind != nil {
 		return nil, errFind

@@ -54,7 +54,8 @@ func (c *Controllers) CreateBankAccount(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	plaidAccessToken, plaidItemID, name, errPlaid := c.plaidClient.ExchangePublicToken(bankAccountReq["plaid_public_token"])
+	plaidAccessToken, plaidItemID, name, errPlaid :=
+		c.plaidClient.ExchangePublicToken(bankAccountReq["plaid_public_token"])
 
 	if errPlaid != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errPlaid})
@@ -65,10 +66,10 @@ func (c *Controllers) CreateBankAccount(w http.ResponseWriter, r *http.Request) 
 	userID := uuid.Must(uuid.Parse(bankAccountReq["user_id"]))
 
 	bankAccountPayload := models.BankAccount{
-		UserID: &userID,
-		Name: &name,
+		UserID:           &userID,
+		Name:             &name,
 		PlaidAccessToken: &plaidAccessToken,
-		PlaidItemID: &plaidItemID,
+		PlaidItemID:      &plaidItemID,
 	}
 
 	bankAccount, err := c.store.CreateBankAccount(bankAccountPayload)

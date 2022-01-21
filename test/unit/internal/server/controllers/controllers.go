@@ -7,24 +7,24 @@ import (
 	goServerZapLogger "go_server/internal/logger/zap"
 	"go_server/internal/server/controllers"
 	"go_server/internal/server/utils"
-	"go_server/test/mocks/store"
 	"go_server/test/mocks/plaid"
+	"go_server/test/mocks/store"
 
 	"github.com/go-rod/rod"
 	"go.uber.org/zap"
 )
 
 func Setup() (*controllers.Controllers, *store.MockStore, error) {
-  config, errConfig := config.NewConfig()
+	config, errConfig := config.NewConfig()
 
-	if (errConfig != nil) {
-    return nil, nil, errConfig
-  }
+	if errConfig != nil {
+		return nil, nil, errConfig
+	}
 
 	zapLogger, errZap := zap.NewProduction()
-  if errZap != nil {
-    return nil, nil, errZap
-  }
+	if errZap != nil {
+		return nil, nil, errZap
+	}
 
 	logger := goServerZapLogger.NewLogger(zapLogger)
 
@@ -42,5 +42,6 @@ func Setup() (*controllers.Controllers, *store.MockStore, error) {
 
 	utils := utils.NewServerUtils(logger)
 	controllers := controllers.NewControllers(config, store, crawler, plaidClient, utils, logger)
-  return controllers, store, nil
+
+	return controllers, store, nil
 }

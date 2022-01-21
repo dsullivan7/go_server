@@ -79,7 +79,7 @@ func Run() {
 	plaidConfig.AddDefaultHeader("PLAID-SECRET", config.PlaidSecret)
 	plaidConfig.UseEnvironment(plaid.Sandbox)
 	plaidClientInstance := plaid.NewAPIClient(plaidConfig)
-	plaidClient := goServerPlaid.NewPlaidClient(plaidClientInstance)
+	plaidClient := goServerPlaid.NewPlaidClient(plaidClientInstance, config.PlaidRedirectURI)
 
 	auth := auth0.NewAuth(config.Auth0Domain, config.Auth0Audience, logger)
 	auth.Init()

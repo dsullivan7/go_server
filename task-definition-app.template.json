@@ -72,6 +72,18 @@
         {
           "name": "TWO_CAPTCHA_KEY",
           "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/TWO_CAPTCHA_KEY"
+        },
+        {
+          "name": "PLAID_REDIRECT_URI",
+          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/PLAID_REDIRECT_URI"
+        },
+        {
+          "name": "PLAID_CLIENT_ID",
+          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/PLAID_CLIENT_ID"
+        },
+        {
+          "name": "PLAID_SECRET",
+          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/tchr_voice/PLAID_SECRET"
         }
       ]
     }

@@ -18,13 +18,18 @@ func (mockStore *MockStore) ListPortfolioIndustries(query map[string]interface{}
 	return args.Get(0).([]models.PortfolioIndustry), args.Error(1)
 }
 
-func (mockStore *MockStore) CreatePortfolioIndustry(portfolioIndustryPayload models.PortfolioIndustry) (*models.PortfolioIndustry, error) {
+func (mockStore *MockStore) CreatePortfolioIndustry(
+	portfolioIndustryPayload models.PortfolioIndustry,
+) (*models.PortfolioIndustry, error) {
 	args := mockStore.Called(portfolioIndustryPayload)
 
 	return args.Get(0).(*models.PortfolioIndustry), args.Error(1)
 }
 
-func (mockStore *MockStore) ModifyPortfolioIndustry(portfolioIndustryID uuid.UUID, portfolioIndustryPayload models.PortfolioIndustry) (*models.PortfolioIndustry, error) {
+func (mockStore *MockStore) ModifyPortfolioIndustry(
+	portfolioIndustryID uuid.UUID,
+	portfolioIndustryPayload models.PortfolioIndustry,
+) (*models.PortfolioIndustry, error) {
 	args := mockStore.Called(portfolioIndustryID, portfolioIndustryPayload)
 
 	return args.Get(0).(*models.PortfolioIndustry), args.Error(1)

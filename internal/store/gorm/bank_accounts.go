@@ -39,7 +39,10 @@ func (gormStore *Store) CreateBankAccount(bankAccountPayload models.BankAccount)
 	return &bankAccount, nil
 }
 
-func (gormStore *Store) ModifyBankAccount(bankAccountID uuid.UUID, bankAccountPayload models.BankAccount) (*models.BankAccount, error) {
+func (gormStore *Store) ModifyBankAccount(
+	bankAccountID uuid.UUID,
+	bankAccountPayload models.BankAccount,
+) (*models.BankAccount, error) {
 	var bankAccountFound models.BankAccount
 
 	errFind := gormStore.database.Where("bank_account_id = ?", bankAccountID).First(&bankAccountFound).Error

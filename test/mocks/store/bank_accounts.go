@@ -6,32 +6,35 @@ import (
 	"github.com/google/uuid"
 )
 
-func (mockStore *MockStore) GetPortfolio(portfolioID uuid.UUID) (*models.Portfolio, error) {
-	args := mockStore.Called(portfolioID)
+func (mockStore *MockStore) GetBankAccount(bankAccountID uuid.UUID) (*models.BankAccount, error) {
+	args := mockStore.Called(bankAccountID)
 
-	return args.Get(0).(*models.Portfolio), args.Error(1)
+	return args.Get(0).(*models.BankAccount), args.Error(1)
 }
 
-func (mockStore *MockStore) ListPortfolios(query map[string]interface{}) ([]models.Portfolio, error) {
+func (mockStore *MockStore) ListBankAccounts(query map[string]interface{}) ([]models.BankAccount, error) {
 	args := mockStore.Called(query)
 
-	return args.Get(0).([]models.Portfolio), args.Error(1)
+	return args.Get(0).([]models.BankAccount), args.Error(1)
 }
 
-func (mockStore *MockStore) CreatePortfolio(portfolioPayload models.Portfolio) (*models.Portfolio, error) {
-	args := mockStore.Called(portfolioPayload)
+func (mockStore *MockStore) CreateBankAccount(bankAccountPayload models.BankAccount) (*models.BankAccount, error) {
+	args := mockStore.Called(bankAccountPayload)
 
-	return args.Get(0).(*models.Portfolio), args.Error(1)
+	return args.Get(0).(*models.BankAccount), args.Error(1)
 }
 
-func (mockStore *MockStore) ModifyPortfolio(portfolioID uuid.UUID, portfolioPayload models.Portfolio) (*models.Portfolio, error) {
-	args := mockStore.Called(portfolioID, portfolioPayload)
+func (mockStore *MockStore) ModifyBankAccount(
+	bankAccountID uuid.UUID,
+	bankAccountPayload models.BankAccount,
+) (*models.BankAccount, error) {
+	args := mockStore.Called(bankAccountID, bankAccountPayload)
 
-	return args.Get(0).(*models.Portfolio), args.Error(1)
+	return args.Get(0).(*models.BankAccount), args.Error(1)
 }
 
-func (mockStore *MockStore) DeletePortfolio(portfolioID uuid.UUID) error {
-	args := mockStore.Called(portfolioID)
+func (mockStore *MockStore) DeleteBankAccount(bankAccountID uuid.UUID) error {
+	args := mockStore.Called(bankAccountID)
 
 	return args.Error(0)
 }
