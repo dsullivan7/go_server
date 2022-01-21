@@ -172,7 +172,7 @@ func TestPortfolioIndustries(t *testing.T) {
 		req, errRequest = http.NewRequestWithContext(
 			context,
 			http.MethodGet,
-			fmt.Sprint(testServer.URL, "/api/portfolio-industries?user_id=", user2.UserID),
+			fmt.Sprint(testServer.URL, "/api/portfolio-industries?portfolio_id=", portfolio2.PortfolioID),
 			nil,
 		)
 		assert.Nil(t, errRequest)
