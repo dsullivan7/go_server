@@ -1,6 +1,6 @@
 {
   "family": "pongo-app",
-  "executionRoleArn": "arn:aws:iam::408204130528:role/pongo-ecs-exec-role",
+  "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/pongo-ecs-exec-role",
   "networkMode": "awsvpc",
   "requiresCompatibilities": [
     "FARGATE"
@@ -10,7 +10,7 @@
   "containerDefinitions": [
     {
       "name": "pongo-app",
-      "image": "408204130528.dkr.ecr.us-east-2.amazonaws.com/pongo-app:latest",
+      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-2.amazonaws.com/pongo-app:latest",
       "essential": true,
       "cpu": 10,
       "memory": 512,
@@ -31,59 +31,59 @@
       "secrets": [
         {
           "name": "ALLOWED_ORIGINS",
-          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/pongo/ALLOWED_ORIGINS"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/ALLOWED_ORIGINS"
         },
         {
           "name": "AUTH0_DOMAIN",
-          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/pongo/AUTH0_DOMAIN"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/AUTH0_DOMAIN"
         },
         {
           "name": "AUTH0_AUDIENCE",
-          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/pongo/AUTH0_AUDIENCE"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/AUTH0_AUDIENCE"
         },
         {
           "name": "PORT",
-          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/pongo/PORT"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/PORT"
         },
         {
           "name": "DB_USER",
-          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/pongo/DB_USER"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/DB_USER"
         },
         {
           "name": "DB_PASSWORD",
-          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/pongo/DB_PASSWORD"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/DB_PASSWORD"
         },
         {
           "name": "DB_HOST",
-          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/pongo/DB_HOST"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/DB_HOST"
         },
         {
           "name": "DB_PORT",
-          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/pongo/DB_PORT"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/DB_PORT"
         },
         {
           "name": "DB_SSL",
-          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/pongo/DB_SSL"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/DB_SSL"
         },
         {
           "name": "DB_NAME",
-          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/pongo/DB_NAME"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/DB_NAME"
         },
         {
           "name": "TWO_CAPTCHA_KEY",
-          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/pongo/TWO_CAPTCHA_KEY"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/TWO_CAPTCHA_KEY"
         },
         {
           "name": "PLAID_REDIRECT_URI",
-          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/pongo/PLAID_REDIRECT_URI"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/PLAID_REDIRECT_URI"
         },
         {
           "name": "PLAID_CLIENT_ID",
-          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/pongo/PLAID_CLIENT_ID"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/PLAID_CLIENT_ID"
         },
         {
           "name": "PLAID_SECRET",
-          "valueFrom": "arn:aws:ssm:us-east-2:408204130528:parameter/dev/pongo/PLAID_SECRET"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/PLAID_SECRET"
         }
       ]
     }
