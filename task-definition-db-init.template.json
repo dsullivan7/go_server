@@ -10,7 +10,7 @@
   "containerDefinitions": [
     {
       "name": "pongo-db-init",
-      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-2.amazonaws.com/pongo-db-init:${CIRCLE_SHA1}",
+      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-2.amazonaws.com/pongo-db-init-57c8178:${CIRCLE_SHA1}",
       "essential": true,
       "cpu": 10,
       "memory": 512,

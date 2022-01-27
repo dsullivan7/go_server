@@ -10,7 +10,7 @@
   "containerDefinitions": [
     {
       "name": "pongo-app",
-      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-2.amazonaws.com/pongo-app:latest",
+      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-2.amazonaws.com/pongo-app-72db723:latest",
       "essential": true,
       "cpu": 10,
       "memory": 512,
