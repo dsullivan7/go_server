@@ -1,6 +1,6 @@
 {
-  "family": "tchr-voice-migrate",
-  "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/tchr_voice_ecs_execution_role",
+  "family": "pongo-migrate",
+  "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/pongo_ecs_execution_role",
   "networkMode": "awsvpc",
   "requiresCompatibilities": [
     "FARGATE"
@@ -9,15 +9,15 @@
   "memory": "1024",
   "containerDefinitions": [
     {
-      "name": "tchr-voice-migrate",
-      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-2.amazonaws.com/tchr-voice-migrate:${CIRCLE_SHA1}",
+      "name": "pongo-migrate",
+      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-2.amazonaws.com/pongo-migrate:${CIRCLE_SHA1}",
       "essential": true,
       "cpu": 10,
       "memory": 512,
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/tchr-voice/migrate",
+          "awslogs-group": "/pongo/migrate",
           "awslogs-region": "us-east-2",
           "awslogs-stream-prefix": "migrate"
         }
@@ -25,27 +25,27 @@
       "secrets": [
         {
           "name": "DB_USER",
-          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/tchr_voice/DB_USER"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/DB_USER"
         },
         {
           "name": "DB_PASSWORD",
-          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/tchr_voice/DB_PASSWORD"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/DB_PASSWORD"
         },
         {
           "name": "DB_HOST",
-          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/tchr_voice/DB_HOST"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/DB_HOST"
         },
         {
           "name": "DB_PORT",
-          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/tchr_voice/DB_PORT"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/DB_PORT"
         },
         {
           "name": "DB_SSL_MODE",
-          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/tchr_voice/DB_SSL_MODE"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/DB_SSL_MODE"
         },
         {
           "name": "DB_NAME",
-          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/tchr_voice/DB_NAME"
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/DB_NAME"
         }
       ]
     }

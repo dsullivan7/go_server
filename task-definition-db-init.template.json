@@ -1,5 +1,5 @@
 {
-  "family": "tchr-voice-db-init",
+  "family": "pongo-db-init",
   "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/tchr_voice_ecs_execution_role",
   "networkMode": "awsvpc",
   "requiresCompatibilities": [
@@ -9,15 +9,15 @@
   "memory": "1024",
   "containerDefinitions": [
     {
-      "name": "tchr-voice-db-init",
-      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-2.amazonaws.com/tchr-voice-db-init:${CIRCLE_SHA1}",
+      "name": "pongo-db-init",
+      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-2.amazonaws.com/pongo-db-init:${CIRCLE_SHA1}",
       "essential": true,
       "cpu": 10,
       "memory": 512,
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/tchr-voice/db-init",
+          "awslogs-group": "/pongo/db-init",
           "awslogs-region": "us-east-2",
           "awslogs-stream-prefix": "db-init"
         }
