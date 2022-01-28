@@ -15,6 +15,10 @@ db-stop:
 db-start:
 	docker-compose -f docker-compose.yml up -d postgres
 
+.PHONY: db-remove
+db-remove:
+	docker-compose -f docker-compose.yml rm -s -v postgres && docker volume rm go_server_dbdata_12.7
+
 .PHONY: db-create
 db-create:
 	docker-compose run --rm postgres-util sh -c "createdb -h \$${DB_HOST} -p \$${DB_PORT} -U \$${DB_USER} \$${DB_NAME}"
