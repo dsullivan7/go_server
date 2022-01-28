@@ -132,10 +132,7 @@ jobs:
       - envsubst:
           input: task-definition-app.template.json
           output: task-definition.json
-      - aws-ecs/update-task-definition-from-json:
-          task-definition-json: task-definition.json
       - aws-ecs/update-service:
-          skip-task-definition-registration: true
           cluster-name: 'pongo-ecs-cluster-1520594'
           family: 'pongo-app'
           service-name: 'pongo-service-app'
