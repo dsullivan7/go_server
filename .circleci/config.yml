@@ -94,21 +94,21 @@ jobs:
           aws-region: AWS_REGION
       - aws-assume-role:
           role: 'dev-admin'
-      # - aws-ecr/build-and-push-image:
-      #     checkout: false
-      #     repo: pongo-db-init-57c8178
-      #     tag: ${CIRCLE_SHA1}
-      #     dockerfile: Dockerfile.db-init
-      # - envsubst:
-      #     input: task-definition-db-init.template.json
-      #     output: task-definition.json
-      # - aws-ecs/update-task-definition-from-json:
-      #     task-definition-json: task-definition.json
-      # - aws-ecs/run-task:
-      #     cluster: 'pongo-ecs-cluster-1520594'
-      #     task-definition: 'pongo-db-init'
-      #     subnet-ids: 'subnet-075e79ab6b9ead172,subnet-0548e2af7ea21ed1a'
-      #     security-group-ids: 'sg-0fc108c880310be04'
+      - aws-ecr/build-and-push-image:
+          checkout: false
+          repo: pongo-db-init-57c8178
+          tag: ${CIRCLE_SHA1}
+          dockerfile: Dockerfile.db-init
+      - envsubst:
+          input: task-definition-db-init.template.json
+          output: task-definition.json
+      - aws-ecs/update-task-definition-from-json:
+          task-definition-json: task-definition.json
+      - aws-ecs/run-task:
+          cluster: 'pongo-ecs-cluster-1520594'
+          task-definition: 'pongo-db-init'
+          subnet-ids: 'subnet-075e79ab6b9ead172,subnet-0548e2af7ea21ed1a'
+          security-group-ids: 'sg-0fc108c880310be04'
       - aws-ecr/build-and-push-image:
           checkout: false
           repo: pongo-migrate-990bd9f
@@ -124,21 +124,21 @@ jobs:
           task-definition: 'pongo-migrate'
           subnet-ids: 'subnet-075e79ab6b9ead172,subnet-0548e2af7ea21ed1a'
           security-group-ids: 'sg-0fc108c880310be04'
-      # - aws-ecr/build-and-push-image:
-      #     checkout: false
-      #     repo: pongo-app-72db723
-      #     tag: ${CIRCLE_SHA1}
-      #     dockerfile: Dockerfile.app
-      # - envsubst:
-      #     input: task-definition-app.template.json
-      #     output: task-definition.json
-      # - aws-ecs/update-task-definition-from-json:
-      #     task-definition-json: task-definition.json
-      # - aws-ecs/update-service:
-      #     cluster-name: 'pongo-ecs-cluster-1520594'
-      #     family: 'pongo-app'
-      #     service-name: 'pongo-service-app'
-      #     container-image-name-updates: 'container=pongo-app,tag=${CIRCLE_SHA1}'
+      - aws-ecr/build-and-push-image:
+          checkout: false
+          repo: pongo-app-72db723
+          tag: ${CIRCLE_SHA1}
+          dockerfile: Dockerfile.app
+      - envsubst:
+          input: task-definition-app.template.json
+          output: task-definition.json
+      - aws-ecs/update-task-definition-from-json:
+          task-definition-json: task-definition.json
+      - aws-ecs/update-service:
+          cluster-name: 'pongo-ecs-cluster-1520594'
+          family: 'pongo-app'
+          service-name: 'pongo-service-app'
+          container-image-name-updates: 'container=pongo-app,tag=${CIRCLE_SHA1}'
 
 workflows:
   pipeline:
