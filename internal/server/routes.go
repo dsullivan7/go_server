@@ -7,6 +7,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/render"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
 )
@@ -20,7 +21,7 @@ func (s *ChiServer) Init() http.Handler {
 	router.Use(middleware.RequestID)
 	router.Use(middleware.RealIP)
 	router.Use(middleware.Recoverer)
-	router.Use(middlewares.ContentType("application/json; charset=utf-8"))
+	router.Use(render.SetContentType(render.ContentTypeJSON))
 	router.Use(middlewares.Logger())
 	router.Use(middlewares.HandlePanic())
 

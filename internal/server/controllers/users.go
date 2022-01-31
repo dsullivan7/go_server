@@ -72,7 +72,7 @@ func (c *Controllers) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, user)
 }
 

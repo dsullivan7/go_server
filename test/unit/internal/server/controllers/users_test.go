@@ -1,6 +1,7 @@
 package controllers_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"go_server/internal/models"
@@ -200,52 +201,62 @@ func TestUsers(tParent *testing.T) {
 		assert.Equal(t, *userResponse.Auth0ID, *user2.Auth0ID)
 	})
 
-	// tParent.Run("Test Create", func(t *testing.T) {
-	// 	t.Parallel()
-	//
-	// 	jsonStr := []byte(`{
-	// 		"first_name":"FirstName",
-	// 		"last_name":"LastName"
-	// 	}`)
-	//
-	// 	req, errRequest := http.NewRequestWithContext(
-	// 		context,
-	// 		http.MethodPost,
-	// 		fmt.Sprint(testServer.URL, "/api/users"),
-	// 		bytes.NewBuffer(jsonStr),
-	// 	)
-	// 	assert.Nil(t, errRequest)
-	//
-	// 	res, errResponse := http.DefaultClient.Do(req)
-	//
-	// 	assert.Nil(t, errResponse)
-	//
-	// 	defer res.Body.Close()
-	//
-	// 	assert.Equal(t, http.StatusCreated, res.StatusCode)
-	// 	assert.Equal(t, "application/json; charset=utf-8", res.Header.Get("Content-Type"))
-	//
-	// 	decoder := json.NewDecoder(res.Body)
-	//
-	// 	var userResponse models.User
-	// 	errDecoder := decoder.Decode(&userResponse)
-	// 	assert.Nil(t, errDecoder)
-	//
-	// 	assert.NotNil(t, userResponse.UserID)
-	// 	assert.Equal(t, "FirstName", *userResponse.FirstName)
-	// 	assert.Equal(t, "LastName", *userResponse.LastName)
-	// 	// assert.Equal(t, *userResponse.Auth0ID, "auth0|loggedInUser")
-	//
-	// 	var userFound models.User
-	// 	errFound := db.Where("user_id = ?", userResponse.UserID).First(&userFound).Error
-	//
-	// 	assert.Nil(t, errFound)
-	//
-	// 	assert.Equal(t, "FirstName", *userFound.FirstName)
-	// 	assert.Equal(t, "LastName", *userFound.LastName)
-	// 	// assert.Equal(t, *userFound.Auth0ID, "auth0|loggedInUser")
-	// })
-	//
+	tParent.Run("Test Create", func(t *testing.T) {
+		t.Parallel()
+
+		jsonStr := []byte(`{
+			"first_name":"firstName",
+			"last_name":"lastName",
+			"auth0_id":"auth0Id"
+		}`)
+
+		firstName := "firstName"
+		lastName := "lastName"
+		auth0Id := "auth0Id"
+
+		userPayload := models.User{
+			FirstName: &firstName,
+			LastName:  &lastName,
+			Auth0ID:   &auth0Id,
+		}
+
+		userCreated := models.User{
+			UserID:    uuid.New(),
+			FirstName: &firstName,
+			LastName:  &lastName,
+			Auth0ID:   &auth0Id,
+		}
+
+		mockStore.On("CreateUser", userPayload).Return(&userCreated, nil)
+
+		req := httptest.NewRequest(
+			http.MethodPost,
+			"/api/users",
+			bytes.NewBuffer(jsonStr),
+		)
+
+		w := httptest.NewRecorder()
+
+		controllers.CreateUser(w, req)
+
+		res := w.Result()
+		defer res.Body.Close()
+
+		assert.Equal(t, http.StatusCreated, res.StatusCode)
+		assert.Equal(t, "application/json; charset=utf-8", res.Header.Get("Content-Type"))
+
+		decoder := json.NewDecoder(res.Body)
+
+		var userResponse models.User
+		errDecoder := decoder.Decode(&userResponse)
+		assert.Nil(t, errDecoder)
+
+		assert.NotNil(t, userResponse.UserID)
+		assert.Equal(t, "firstName", *userResponse.FirstName)
+		assert.Equal(t, "lastName", *userResponse.LastName)
+		assert.Equal(t, "auth0Id", *userResponse.Auth0ID)
+	})
+
 	// tParent.Run("Test Modify", func(t *testing.T) {
 	// 	t.Parallel()
 	//
