@@ -1,6 +1,7 @@
 package controllers_test
 
 import (
+	"fmt"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -204,15 +205,20 @@ func TestUsers(tParent *testing.T) {
 	tParent.Run("Test Create", func(t *testing.T) {
 		t.Parallel()
 
-		jsonStr := []byte(`{
-			"first_name":"firstName",
-			"last_name":"lastName",
-			"auth0_id":"auth0Id"
-		}`)
-
 		firstName := "firstName"
 		lastName := "lastName"
 		auth0Id := "auth0Id"
+
+		jsonStr := []byte(fmt.Sprintf(
+			`{
+				"first_name":"%s",
+				"last_name":"%s",
+				"auth0_id":"%s"
+			}`,
+			firstName,
+			lastName,
+			auth0Id,
+		))
 
 		userPayload := models.User{
 			FirstName: &firstName,
@@ -252,67 +258,77 @@ func TestUsers(tParent *testing.T) {
 		assert.Nil(t, errDecoder)
 
 		assert.NotNil(t, userResponse.UserID)
-		assert.Equal(t, "firstName", *userResponse.FirstName)
-		assert.Equal(t, "lastName", *userResponse.LastName)
-		assert.Equal(t, "auth0Id", *userResponse.Auth0ID)
+		assert.Equal(t, firstName, *userResponse.FirstName)
+		assert.Equal(t, lastName, *userResponse.LastName)
+		assert.Equal(t, auth0Id, *userResponse.Auth0ID)
 	})
 
-	// tParent.Run("Test Modify", func(t *testing.T) {
-	// 	t.Parallel()
-	//
-	// 	firstName := "FirstName"
-	// 	lastName := "LastName"
-	// 	auth0ID := "Auth0ID"
-	// 	user := models.User{
-	// 		FirstName: &firstName,
-	// 		LastName:  &lastName,
-	// 		Auth0ID:   &auth0ID,
-	// 	}
-	//
-	// 	db.Create(&user)
-	//
-	// 	jsonStr := []byte(`{
-	// 		"first_name":"FirstNameDifferent",
-	// 		"last_name": "LastNameDifferent",
-	// 		"auth0_id": "Auth0IDDifferent"
-	// 	}`)
-	//
-	// 	req, errRequest := http.NewRequestWithContext(
-	// 		context,
-	// 		http.MethodPut,
-	// 		fmt.Sprint(testServer.URL, "/api/users/", user.UserID),
-	// 		bytes.NewBuffer(jsonStr),
-	// 	)
-	// 	assert.Nil(t, errRequest)
-	//
-	// 	res, errResponse := http.DefaultClient.Do(req)
-	//
-	// 	assert.Nil(t, errResponse)
-	//
-	// 	defer res.Body.Close()
-	//
-	// 	assert.Equal(t, http.StatusOK, res.StatusCode)
-	// 	assert.Equal(t, "application/json; charset=utf-8", res.Header.Get("Content-Type"))
-	//
-	// 	decoder := json.NewDecoder(res.Body)
-	//
-	// 	var userResponse models.User
-	// 	errDecoder := decoder.Decode(&userResponse)
-	// 	assert.Nil(t, errDecoder)
-	//
-	// 	assert.Equal(t, "FirstNameDifferent", *userResponse.FirstName)
-	// 	assert.Equal(t, "LastNameDifferent", *userResponse.LastName)
-	// 	assert.Equal(t, "Auth0IDDifferent", *userResponse.Auth0ID)
-	//
-	// 	var userFound models.User
-	// 	errFound := db.Where("user_id = ?", user.UserID).First(&userFound).Error
-	//
-	// 	assert.Nil(t, errFound)
-	//
-	// 	assert.Equal(t, "FirstNameDifferent", *userFound.FirstName)
-	// 	assert.Equal(t, "LastNameDifferent", *userFound.LastName)
-	// 	assert.Equal(t, "Auth0IDDifferent", *userFound.Auth0ID)
-	// })
+	tParent.Run("Test Modify", func(t *testing.T) {
+		t.Parallel()
+
+		userID := uuid.New()
+
+		firstNameNew := "firstNameNew"
+		lastNameNew := "lastNameNew"
+		auth0IdNew := "auth0IdNew"
+
+		jsonStr := []byte(fmt.Sprintf(
+			`{
+				"first_name":"%s",
+				"last_name":"%s",
+				"auth0_id":"%s"
+			}`,
+			firstNameNew,
+			lastNameNew,
+			auth0IdNew,
+		))
+
+		userPayload := models.User{
+			FirstName: &firstNameNew,
+			LastName:  &lastNameNew,
+			Auth0ID:   &auth0IdNew,
+		}
+
+		userModified := models.User{
+			UserID:    userID,
+			FirstName: &firstNameNew,
+			LastName:  &lastNameNew,
+			Auth0ID:   &auth0IdNew,
+		}
+
+		mockStore.On("ModifyUser", userID, userPayload).Return(&userModified, nil)
+
+		req := httptest.NewRequest(
+			http.MethodPut,
+			"/api/users/",
+			bytes.NewBuffer(jsonStr),
+		)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("user_id", userID.String())
+
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		w := httptest.NewRecorder()
+
+		controllers.ModifyUser(w, req)
+
+		res := w.Result()
+		defer res.Body.Close()
+
+		assert.Equal(t, http.StatusOK, res.StatusCode)
+		assert.Equal(t, "application/json; charset=utf-8", res.Header.Get("Content-Type"))
+
+		decoder := json.NewDecoder(res.Body)
+
+		var userResponse models.User
+		errDecoder := decoder.Decode(&userResponse)
+		assert.Nil(t, errDecoder)
+
+		assert.Equal(t, firstNameNew, *userResponse.FirstName)
+		assert.Equal(t, lastNameNew, *userResponse.LastName)
+		assert.Equal(t, auth0IdNew, *userResponse.Auth0ID)
+	})
 	//
 	// tParent.Run("Test Delete", func(t *testing.T) {
 	// 	t.Parallel()
