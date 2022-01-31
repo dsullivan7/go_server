@@ -300,7 +300,7 @@ func TestUsers(tParent *testing.T) {
 
 		req := httptest.NewRequest(
 			http.MethodPut,
-			"/api/users/",
+			"/api/users",
 			bytes.NewBuffer(jsonStr),
 		)
 
@@ -329,34 +329,32 @@ func TestUsers(tParent *testing.T) {
 		assert.Equal(t, lastNameNew, *userResponse.LastName)
 		assert.Equal(t, auth0IdNew, *userResponse.Auth0ID)
 	})
-	//
-	// tParent.Run("Test Delete", func(t *testing.T) {
-	// 	t.Parallel()
-	//
-	// 	firstName := "firstName"
-	// 	user := models.User{FirstName: &firstName}
-	//
-	// 	db.Create(&user)
-	//
-	// 	req, errRequest := http.NewRequestWithContext(
-	// 		context,
-	// 		http.MethodDelete,
-	// 		fmt.Sprint(testServer.URL, "/api/users/", user.UserID),
-	// 		nil,
-	// 	)
-	// 	assert.Nil(t, errRequest)
-	//
-	// 	res, errResponse := http.DefaultClient.Do(req)
-	//
-	// 	assert.Nil(t, errResponse)
-	//
-	// 	defer res.Body.Close()
-	//
-	// 	assert.Equal(t, http.StatusNoContent, res.StatusCode)
-	//
-	// 	var userFound models.User
-	// 	errFound := db.Where("user_id = ?", user.UserID).First(&userFound).Error
-	//
-	// 	assert.Equal(t, errFound, gorm.ErrRecordNotFound)
-	// })
+
+	tParent.Run("Test Delete", func(t *testing.T) {
+		t.Parallel()
+
+		userID := uuid.New()
+
+		mockStore.On("DeleteUser", userID).Return(nil)
+
+		req := httptest.NewRequest(
+			http.MethodDelete,
+			"/api/users",
+			nil,
+		)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("user_id", userID.String())
+
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		w := httptest.NewRecorder()
+
+		controllers.DeleteUser(w, req)
+
+		res := w.Result()
+		defer res.Body.Close()
+
+		assert.Equal(t, http.StatusNoContent, res.StatusCode)
+	})
 }
