@@ -7,7 +7,7 @@ import (
 	"go_server/internal/config"
 	"go_server/internal/crawler"
 	"go_server/internal/logger"
-	"go_server/internal/plaid"
+	"go_server/internal/bank"
 	"go_server/internal/server/controllers"
 	"go_server/internal/server/graph"
 	"go_server/internal/server/middlewares"
@@ -31,23 +31,23 @@ type ChiServer struct {
 }
 
 func NewChiServer(
-	config *config.Config,
+	cfg *config.Config,
 	router *chi.Mux,
-	store store.Store,
-	crawler crawler.Crawler,
-	plaidClient plaid.Client,
-	auth auth.Auth,
-	logger logger.Logger,
+	str store.Store,
+	crwlr crawler.Crawler,
+	bnk bank.Bank,
+	ath auth.Auth,
+	lggr logger.Logger,
 ) Server {
-	utils := utils.NewServerUtils(logger)
-	controllers := controllers.NewControllers(config, store, crawler, plaidClient, utils, logger)
-	resolver := graph.NewResolver(config, store, logger)
-	middlewares := middlewares.NewMiddlewares(config, store, auth, utils, logger)
+	utils := utils.NewServerUtils(lggr)
+	controllers := controllers.NewControllers(cfg, str, crwlr, bnk, utils, lggr)
+	resolver := graph.NewResolver(cfg, str, lggr)
+	middlewares := middlewares.NewMiddlewares(cfg, str, ath, utils, lggr)
 
 	return &ChiServer{
 		router:      router,
-		config:      config,
-		logger:      logger,
+		config:      cfg,
+		logger:      lggr,
 		controllers: controllers,
 		resolver:    resolver,
 		middlewares: middlewares,

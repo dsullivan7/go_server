@@ -9,7 +9,7 @@ import (
 	"go_server/internal/server"
 	goServerGormStore "go_server/internal/store/gorm"
 	"go_server/test/mocks/auth"
-	"go_server/test/mocks/plaid"
+	"go_server/test/mocks/bank"
 	"net/http/httptest"
 
 	"github.com/go-chi/chi"
@@ -75,9 +75,9 @@ func (setupUtility *SetupUtility) SetupIntegration() (*httptest.Server, *gorm.DB
 
 	crawler := goServerRodCrawler.NewCrawler(browser, captcha)
 
-	plaidClient := plaid.NewMockPlaidClient()
+	bankMock := bank.NewMockBank()
 
-	handler := server.NewChiServer(config, router, store, crawler, plaidClient, authMock, logger)
+	handler := server.NewChiServer(config, router, store, crawler, bankMock, authMock, logger)
 
 	testServer := httptest.NewServer(handler.Init())
 

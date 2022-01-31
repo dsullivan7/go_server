@@ -5,29 +5,26 @@ import (
 	"fmt"
 
 	"github.com/plaid/plaid-go/plaid"
+	"go_server/internal/bank"
 )
 
-type Client interface {
-	CreatePlaidToken(userID string) (string, error)
-	ExchangePublicToken(publicToken string) (string, string, string, error)
-}
-
-type Implementation struct {
-	plaidClient *plaid.APIClient
+type Client struct {
+	client *plaid.APIClient
 	redirectURI string
 }
 
-func NewPlaidClient(
-	plaidClient *plaid.APIClient,
+func NewClient(
+	client *plaid.APIClient,
 	redirectURI string,
-) Client {
-	return &Implementation{
-		plaidClient: plaidClient,
+) bank.Bank {
+	return &Client{
+		client: client,
 		redirectURI: redirectURI,
 	}
 }
 
-func (pc *Implementation) CreatePlaidToken(userID string) (string, error) {
+// creates a plaid token to use in link.
+func (pc *Client) CreateToken(userID string) (string, error) {
 	ctx := context.Background()
 
 	request := plaid.NewLinkTokenCreateRequest(
@@ -39,7 +36,7 @@ func (pc *Implementation) CreatePlaidToken(userID string) (string, error) {
 	request.SetRedirectUri(pc.redirectURI)
 	request.SetProducts([]plaid.Products{plaid.PRODUCTS_AUTH})
 
-	resp, _, err := pc.plaidClient.PlaidApi.LinkTokenCreate(ctx).LinkTokenCreateRequest(*request).Execute()
+	resp, _, err := pc.client.PlaidApi.LinkTokenCreate(ctx).LinkTokenCreateRequest(*request).Execute()
 
 	if err != nil {
 		plaidErr, _ := plaid.ToPlaidError(err)
@@ -50,34 +47,41 @@ func (pc *Implementation) CreatePlaidToken(userID string) (string, error) {
 	return resp.GetLinkToken(), nil
 }
 
-func (pc *Implementation) ExchangePublicToken(publicToken string) (string, string, string, error) {
+// exchanges the plaid token for an access token.
+func (pc *Client) GetAccessToken(publicToken string) (string, error) {
 	ctx := context.Background()
 
 	exchangePublicTokenReq := plaid.NewItemPublicTokenExchangeRequest(publicToken)
-	exchangePublicTokenResp, _, errAccessToken := pc.plaidClient.PlaidApi.ItemPublicTokenExchange(ctx).
+	exchangePublicTokenResp, _, errAccessToken := pc.client.PlaidApi.ItemPublicTokenExchange(ctx).
 		ItemPublicTokenExchangeRequest(*exchangePublicTokenReq).
 		Execute()
 
 	if errAccessToken != nil {
 		plaidErr, _ := plaid.ToPlaidError(errAccessToken)
 
-		return "", "", "", fmt.Errorf("plaid error %w: %s", errAccessToken, plaidErr.ErrorMessage)
+		return "", fmt.Errorf("plaid error %w: %s", errAccessToken, plaidErr.ErrorMessage)
 	}
 
 	accessToken := exchangePublicTokenResp.GetAccessToken()
-	itemID := exchangePublicTokenResp.GetItemId()
 
-	accountsGetResp, _, errAccount := pc.plaidClient.PlaidApi.AccountsGet(ctx).
+	return accessToken, nil
+}
+
+// uses the access token to retrieve the account information.
+func (pc *Client) GetAccount(accessToken string) (string, error) {
+	ctx := context.Background()
+
+	accountsGetResp, _, errAccount := pc.client.PlaidApi.AccountsGet(ctx).
 		AccountsGetRequest(*plaid.NewAccountsGetRequest(accessToken)).
 		Execute()
 
 	if errAccount != nil {
 		plaidErr, _ := plaid.ToPlaidError(errAccount)
 
-		return "", "", "", fmt.Errorf("plaid error %w: %s", errAccount, plaidErr.ErrorMessage)
+		return "", fmt.Errorf("plaid error %w: %s", errAccount, plaidErr.ErrorMessage)
 	}
 
-	institutionGetResp, _, errInstitution := pc.plaidClient.PlaidApi.InstitutionsGetById(ctx).
+	institutionGetResp, _, errInstitution := pc.client.PlaidApi.InstitutionsGetById(ctx).
 		InstitutionsGetByIdRequest(
 			*plaid.NewInstitutionsGetByIdRequest(*accountsGetResp.Item.InstitutionId.Get(),
 				[]plaid.CountryCode{plaid.COUNTRYCODE_US},
@@ -87,8 +91,8 @@ func (pc *Implementation) ExchangePublicToken(publicToken string) (string, strin
 	if errInstitution != nil {
 		plaidErr, _ := plaid.ToPlaidError(errInstitution)
 
-		return "", "", "", fmt.Errorf("plaid error %w: %s", errInstitution, plaidErr.ErrorMessage)
+		return "", fmt.Errorf("plaid error %w: %s", errInstitution, plaidErr.ErrorMessage)
 	}
 
-	return accessToken, itemID, institutionGetResp.Institution.Name, nil
+	return institutionGetResp.Institution.Name, nil
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/go-chi/render"
 )
 
-func (c *Controllers) CreatePlaidToken(w http.ResponseWriter, r *http.Request) {
+func (c *Controllers) CreateBankToken(w http.ResponseWriter, r *http.Request) {
 	var tokenPayload map[string]string
 
 	errDecode := json.NewDecoder(r.Body).Decode(&tokenPayload)
@@ -20,7 +20,7 @@ func (c *Controllers) CreatePlaidToken(w http.ResponseWriter, r *http.Request) {
 
 	userID := tokenPayload["user_id"]
 
-	plaidToken, err := c.plaidClient.CreatePlaidToken(userID)
+	token, err := c.bank.CreateToken(userID)
 
 	if err != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: err})
@@ -29,5 +29,5 @@ func (c *Controllers) CreatePlaidToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	render.JSON(w, r, render.M{"plaid_token": plaidToken})
+	render.JSON(w, r, render.M{"value": token})
 }
