@@ -7,9 +7,9 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 
 	"github.com/go-chi/chi"
-	"github.com/go-chi/render"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
+	"github.com/go-chi/render"
 )
 
 func (s *ChiServer) Init() http.Handler {

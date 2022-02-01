@@ -3,12 +3,12 @@ package app
 import (
 	"fmt"
 	"go_server/internal/auth/auth0"
+	goServerPlaid "go_server/internal/bank/plaid"
 	"go_server/internal/captcha/twocaptcha"
 	"go_server/internal/config"
 	goServerRodCrawler "go_server/internal/crawler/rod"
 	"go_server/internal/db"
 	goServerZapLogger "go_server/internal/logger/zap"
-	goServerPlaid "go_server/internal/plaid"
 	"go_server/internal/server"
 	"go_server/internal/store/gorm"
 	"log"
@@ -79,13 +79,13 @@ func Run() {
 	plaidConfig.AddDefaultHeader("PLAID-SECRET", config.PlaidSecret)
 	plaidConfig.UseEnvironment(plaid.Sandbox)
 	plaidClientInstance := plaid.NewAPIClient(plaidConfig)
-	plaidClient := goServerPlaid.NewPlaidClient(plaidClientInstance, config.PlaidRedirectURI)
+	bank := goServerPlaid.NewClient(plaidClientInstance, config.PlaidRedirectURI)
 
 	auth := auth0.NewAuth(config.Auth0Domain, config.Auth0Audience, logger)
 	auth.Init()
 
 	router := chi.NewRouter()
-	handler := server.NewChiServer(config, router, store, crawler, plaidClient, auth, logger)
+	handler := server.NewChiServer(config, router, store, crawler, bank, auth, logger)
 
 	httpServer := http.Server{
 		Addr:    fmt.Sprintf(":%s", config.Port),

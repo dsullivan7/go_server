@@ -4,10 +4,10 @@ import (
 	"net/http"
 
 	"go_server/internal/auth"
+	"go_server/internal/bank"
 	"go_server/internal/config"
 	"go_server/internal/crawler"
 	"go_server/internal/logger"
-	"go_server/internal/bank"
 	"go_server/internal/server/controllers"
 	"go_server/internal/server/graph"
 	"go_server/internal/server/middlewares"

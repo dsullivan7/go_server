@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/plaid/plaid-go/plaid"
 	"go_server/internal/bank"
+
+	"github.com/plaid/plaid-go/plaid"
 )
 
 type Client struct {
-	client *plaid.APIClient
+	client      *plaid.APIClient
 	redirectURI string
 }
 
@@ -18,7 +19,7 @@ func NewClient(
 	redirectURI string,
 ) bank.Bank {
 	return &Client{
-		client: client,
+		client:      client,
 		redirectURI: redirectURI,
 	}
 }
