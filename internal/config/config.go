@@ -26,6 +26,10 @@ type Config struct {
 	PlaidSecret      string
 	PlaidRedirectURI string
 
+	AlpacaAPIKey    string
+	AlpacaAPISecret string
+	AlpacaAPIURL    string
+
 	AllowedOrigins []string
 	RouterMaxAge   int
 }
@@ -49,6 +53,9 @@ func NewConfig() (*Config, error) {
 		PlaidClientID:    os.Getenv("PLAID_CLIENT_ID"),
 		PlaidSecret:      os.Getenv("PLAID_SECRET"),
 		PlaidRedirectURI: os.Getenv("PLAID_REDIRECT_URI"),
+		AlpacaAPIKey:     os.Getenv("ALPACA_API_KEY"),
+		AlpacaAPISecret:  os.Getenv("ALPACA_API_SECRET"),
+		AlpacaAPIURL:     os.Getenv("ALPACA_API_URL"),
 		Auth0Domain:      os.Getenv("AUTH0_DOMAIN"),
 		Auth0Audience:    os.Getenv("AUTH0_AUDIENCE"),
 		AllowedOrigins:   strings.Split(os.Getenv("ALLOWED_ORIGINS"), ","),

@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"go_server/internal/auth/auth0"
 	goServerPlaid "go_server/internal/bank/plaid"
+	goServerAlpaca "go_server/internal/broker/alpaca"
 	"go_server/internal/captcha/twocaptcha"
 	"go_server/internal/config"
 	goServerRodCrawler "go_server/internal/crawler/rod"
 	"go_server/internal/db"
+	goServerHTTP "go_server/internal/http"
 	goServerZapLogger "go_server/internal/logger/zap"
 	"go_server/internal/server"
 	"go_server/internal/store/gorm"
@@ -65,6 +67,9 @@ func Run() {
 
 	store := gorm.NewStore(db)
 
+	// initialize http client
+	httpClient := goServerHTTP.NewClient()
+
 	// initialize 2captcha
 	captchaKey := config.TwoCaptchaKey
 	path, _ := launcher.LookPath()
@@ -81,11 +86,14 @@ func Run() {
 	plaidClientInstance := plaid.NewAPIClient(plaidConfig)
 	bank := goServerPlaid.NewClient(plaidClientInstance, config.PlaidRedirectURI)
 
+	// initialize alpaca
+	broker := goServerAlpaca.NewBroker(config.AlpacaAPIKey, config.AlpacaAPISecret, config.AlpacaAPIURL, httpClient)
+
 	auth := auth0.NewAuth(config.Auth0Domain, config.Auth0Audience, logger)
 	auth.Init()
 
 	router := chi.NewRouter()
-	handler := server.NewChiServer(config, router, store, crawler, bank, auth, logger)
+	handler := server.NewChiServer(config, router, store, crawler, bank, broker, auth, logger)
 
 	httpServer := http.Server{
 		Addr:    fmt.Sprintf(":%s", config.Port),

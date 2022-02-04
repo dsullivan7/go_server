@@ -8,6 +8,7 @@ import (
 	"go_server/internal/server"
 	"go_server/test/mocks/auth"
 	"go_server/test/mocks/bank"
+	"go_server/test/mocks/broker"
 	"go_server/test/mocks/store"
 	"testing"
 
@@ -42,11 +43,13 @@ func TestServer(tParent *testing.T) {
 
 	bnk := bank.NewMockBank()
 
+	brkr := broker.NewMockBroker()
+
 	rtr := chi.NewRouter()
 
 	ath := auth.NewMockAuth()
 
-	handler := server.NewChiServer(config, rtr, str, crawler, bnk, ath, logger)
+	handler := server.NewChiServer(config, rtr, str, crawler, bnk, brkr, ath, logger)
 
 	handler.Init()
 

@@ -12,20 +12,20 @@ func NewMockBank() *MockBank {
 	return &MockBank{}
 }
 
-func (mockStore *MockBank) CreateToken(userID string) (string, error) {
-	args := mockStore.Called(userID)
+func (mockBank *MockBank) CreateToken(userID string) (string, error) {
+	args := mockBank.Called(userID)
 
 	return args.String(0), args.Error(1)
 }
 
-func (mockStore *MockBank) GetAccessToken(publicToken string) (string, error) {
-	args := mockStore.Called(publicToken)
+func (mockBank *MockBank) GetAccessToken(publicToken string) (string, error) {
+	args := mockBank.Called(publicToken)
 
 	return args.String(0), args.Error(1)
 }
 
-func (mockStore *MockBank) GetAccount(accessToken string) (string, error) {
-	args := mockStore.Called(accessToken)
+func (mockBank *MockBank) GetAccount(accessToken string) (string, error) {
+	args := mockBank.Called(accessToken)
 
 	return args.String(0), args.Error(1)
 }

@@ -8,6 +8,7 @@ import (
 	"go_server/internal/server/controllers"
 	"go_server/internal/server/utils"
 	"go_server/test/mocks/bank"
+	"go_server/test/mocks/broker"
 	"go_server/test/mocks/store"
 
 	"github.com/go-rod/rod"
@@ -40,8 +41,11 @@ func Setup() (*controllers.Controllers, *store.MockStore, error) {
 
 	bnk := bank.NewMockBank()
 
+	brkr := broker.NewMockBroker()
+
 	utils := utils.NewServerUtils(logger)
-	controllers := controllers.NewControllers(config, store, crawler, bnk, utils, logger)
+
+	controllers := controllers.NewControllers(config, store, crawler, bnk, brkr, utils, logger)
 
 	return controllers, store, nil
 }

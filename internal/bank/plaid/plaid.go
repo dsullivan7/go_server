@@ -24,7 +24,7 @@ func NewClient(
 	}
 }
 
-// creates a plaid token to use in link.
+// CreateToken creates a plaid token to use in link.
 func (pc *Client) CreateToken(userID string) (string, error) {
 	ctx := context.Background()
 
@@ -48,7 +48,7 @@ func (pc *Client) CreateToken(userID string) (string, error) {
 	return resp.GetLinkToken(), nil
 }
 
-// exchanges the plaid token for an access token.
+// GetAccessToken exchanges the plaid token for an access token.
 func (pc *Client) GetAccessToken(publicToken string) (string, error) {
 	ctx := context.Background()
 
@@ -68,7 +68,7 @@ func (pc *Client) GetAccessToken(publicToken string) (string, error) {
 	return accessToken, nil
 }
 
-// uses the access token to retrieve the account information.
+// GetAccount uses the access token to retrieve the account information.
 func (pc *Client) GetAccount(accessToken string) (string, error) {
 	ctx := context.Background()
 

@@ -10,6 +10,7 @@ import (
 	goServerGormStore "go_server/internal/store/gorm"
 	"go_server/test/mocks/auth"
 	"go_server/test/mocks/bank"
+	"go_server/test/mocks/broker"
 	"net/http/httptest"
 
 	"github.com/go-chi/chi"
@@ -77,7 +78,9 @@ func (setupUtility *SetupUtility) SetupIntegration() (*httptest.Server, *gorm.DB
 
 	bankMock := bank.NewMockBank()
 
-	handler := server.NewChiServer(config, router, store, crawler, bankMock, authMock, logger)
+	brokerMock := broker.NewMockBroker()
+
+	handler := server.NewChiServer(config, router, store, crawler, bankMock, brokerMock, authMock, logger)
 
 	testServer := httptest.NewServer(handler.Init())
 

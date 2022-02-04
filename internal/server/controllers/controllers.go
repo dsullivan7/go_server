@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"go_server/internal/bank"
+	"go_server/internal/broker"
 	"go_server/internal/config"
 	"go_server/internal/crawler"
 	"go_server/internal/logger"
@@ -14,6 +15,7 @@ type Controllers struct {
 	store   store.Store
 	crawler crawler.Crawler
 	bank    bank.Bank
+	broker  broker.Broker
 	utils   *utils.ServerUtils
 	logger  logger.Logger
 }
@@ -23,6 +25,7 @@ func NewControllers(
 	str store.Store,
 	crwlr crawler.Crawler,
 	bnk bank.Bank,
+	brkr broker.Broker,
 	utls *utils.ServerUtils,
 	lggr logger.Logger,
 ) *Controllers {
@@ -31,6 +34,7 @@ func NewControllers(
 		config:  cfg,
 		crawler: crwlr,
 		bank:    bnk,
+		broker:  brkr,
 		logger:  lggr,
 		utils:   utls,
 	}
