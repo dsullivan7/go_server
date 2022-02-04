@@ -1,8 +1,11 @@
 package zap_test
 
 import (
+	"bytes"
 	"go_server/internal/broker/alpaca"
 	mockHTTP "go_server/test/mocks/http"
+  "encoding/json"
+  "io/ioutil"
 	"net/http"
 	"testing"
 
@@ -22,7 +25,23 @@ func TestAlpacaCreateAccount(t *testing.T) {
 		mockHTTPClient,
 	)
 
-	mockHTTPClient.On("Do", mock.Anything).Return(&http.Response{StatusCode: 200}, nil)
+  body := map[string]interface{}{
+		"account": map[string]string{
+      "id": "test",
+    },
+	}
+
+	jsonBytes, errMarshal := json.Marshal(body)
+
+  assert.Nil(t, errMarshal)
+
+	mockHTTPClient.On("Do", mock.Anything).Return(
+    &http.Response{
+      StatusCode: 200,
+      Body: ioutil.NopCloser(bytes.NewBufferString(string(jsonBytes))),
+    },
+    nil,
+  )
 
 	accountNumber, errAcc := alpacaClient.CreateAccount(
 		"emailAddress",
@@ -30,7 +49,7 @@ func TestAlpacaCreateAccount(t *testing.T) {
 	)
 
 	assert.Nil(t, errAcc)
-	assert.NotEqual(t, accountNumber, "")
+	assert.Equal(t, accountNumber, "test")
 
 	mockHTTPClient.AssertExpectations(t)
 }
