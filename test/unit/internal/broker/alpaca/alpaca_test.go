@@ -44,8 +44,18 @@ func TestAlpacaCreateAccount(t *testing.T) {
   )
 
 	accountNumber, errAcc := alpacaClient.CreateAccount(
+		"givenName",
+		"familyName",
+		"dateOfBirth",
+		"taxID",
 		"emailAddress",
 		"phoneNumber",
+		"streetAddress",
+		"city",
+		"state",
+		"postalCode",
+		"fundingSource",
+		"ipAddress",
 	)
 
 	assert.Nil(t, errAcc)
