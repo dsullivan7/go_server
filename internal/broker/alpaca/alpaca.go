@@ -149,6 +149,7 @@ func (brkr *Broker) CreateAccount(
 	return alpacaResponse["id"].(string), nil
 }
 
+// DeleteAccount deactivates an active account.
 func (brkr *Broker) DeleteAccount(accountID string) (error) {
 	context := context.Background()
 
@@ -192,4 +193,64 @@ func (brkr *Broker) DeleteAccount(accountID string) (error) {
 	}
 
 	return nil
+}
+
+// CreateOrder creates an order for an account.
+func (brkr *Broker) CreateOrder(accountID string, symbol string, quantity float32, side string) (string, error) {
+	context := context.Background()
+
+	body := map[string]interface{}{
+		"symbol": symbol,
+		"quantity":  quantity,
+		"side":  side,
+		"type": "market",
+		"time_in_force": "day",
+	}
+
+	jsonBytes, errMarshal := json.Marshal(body)
+
+	if errMarshal != nil {
+		return "", fmt.Errorf("failed to construct the request body: %w", errMarshal)
+	}
+
+	req, errReq := http.NewRequestWithContext(
+		context,
+		http.MethodPost,
+		fmt.Sprint(brkr.alpacaAPIURL, "/v1/trading/accounts/", accountID, "/orders"),
+		bytes.NewReader(jsonBytes),
+	)
+
+	if errReq != nil {
+		return "", fmt.Errorf("failed to create the request: %w", errReq)
+	}
+
+	authHeader := base64.StdEncoding.EncodeToString([]byte(fmt.Sprint(brkr.alpacaAPIKey, ":", brkr.alpacaAPISecret)))
+
+	req.Header = http.Header{
+		"Authorization": []string{fmt.Sprint("Basic ", authHeader)},
+	}
+
+	res, errRes := brkr.httpClient.Do(req)
+
+	if errRes != nil {
+		return "", fmt.Errorf("failed to get the response: %w", errRes)
+	}
+
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	var alpacaResponse map[string]interface{}
+
+	errDecode := decoder.Decode(&alpacaResponse)
+
+	if errDecode != nil {
+		return "", fmt.Errorf("failed to decode the response: %w", errDecode)
+	}
+
+	if (res.StatusCode != 200) {
+		return "", fmt.Errorf("%w: %s", AlpacaAPIError, alpacaResponse["message"])
+	}
+
+	return alpacaResponse["id"].(string), nil
 }
