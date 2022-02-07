@@ -43,3 +43,27 @@ func (mockBroker *MockBroker) CreateAccount(
 
 	return args.String(0), args.Error(1)
 }
+
+func (mockBroker *MockBroker) DeleteAccount(
+	accountID string,
+) (error) {
+	args := mockBroker.Called(accountID)
+
+	return args.Error(0)
+}
+
+func (mockBroker *MockBroker) DeleteAccount(
+	accountID string,
+	symbol string,
+	quantity float32,
+	side string,
+) (string, error) {
+	args := mockBroker.Called(
+		accountID,
+		symbol,
+		quantity,
+		side,
+	)
+
+	return args.String(0), args.Error(1)
+}

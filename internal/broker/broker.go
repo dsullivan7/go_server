@@ -16,4 +16,10 @@ type Broker interface {
 		ipAddress string,
 	) (string, error)
 	DeleteAccount(accountID string) (error)
+	CreateOrder(
+		accountID string,
+		symbol string,
+		quantity float32,
+		side string,
+	) (string, error)
 }
