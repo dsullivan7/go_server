@@ -87,7 +87,7 @@ func (c *Controllers) CreateBankAccount(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, bankAccount)
 }
 
@@ -125,5 +125,5 @@ func (c *Controllers) DeleteBankAccount(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	render.NoContent(w, r)
 }

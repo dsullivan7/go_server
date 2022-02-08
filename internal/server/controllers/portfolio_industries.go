@@ -62,7 +62,7 @@ func (c *Controllers) CreatePortfolioIndustry(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, portfolioIndustry)
 }
 
@@ -100,5 +100,5 @@ func (c *Controllers) DeletePortfolioIndustry(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	render.NoContent(w, r)
 }

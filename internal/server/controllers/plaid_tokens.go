@@ -28,6 +28,6 @@ func (c *Controllers) CreatePlaidToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, render.M{"value": token})
 }

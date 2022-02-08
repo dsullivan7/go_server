@@ -67,7 +67,7 @@ func (c *Controllers) CreateReview(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, review)
 }
 
@@ -105,5 +105,5 @@ func (c *Controllers) DeleteReview(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	render.NoContent(w, r)
 }
