@@ -159,6 +159,60 @@ func TestPortfolioList(t *testing.T) {
 	mockStore.AssertExpectations(t)
 }
 
+func TestPortfolioListQueryParams(t *testing.T) {
+	t.Parallel()
+
+	controllers, mockStore, err := controllers.Setup()
+	assert.Nil(t, err)
+
+	portfolioID := uuid.New()
+	userID := uuid.New()
+
+	portfolio := models.Portfolio{
+		PortfolioID: portfolioID,
+		UserID:   &userID,
+		Risk:   3,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	mockStore.On("ListPortfolios", map[string]interface{}{ "user_id": userID.String() }).Return([]models.Portfolio{portfolio}, nil)
+
+	req := httptest.NewRequest(
+		http.MethodGet,
+		fmt.Sprint("/api/users?user_id=", userID),
+		nil,
+	)
+
+	w := httptest.NewRecorder()
+
+	controllers.ListPortfolios(w, req)
+
+	res := w.Result()
+	defer res.Body.Close()
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+	assert.Equal(t, "application/json; charset=utf-8", res.Header.Get("Content-Type"))
+
+	decoder := json.NewDecoder(res.Body)
+
+	var portfoliosFound []models.Portfolio
+	errDecoder := decoder.Decode(&portfoliosFound)
+	assert.Nil(t, errDecoder)
+
+	assert.Equal(t, 1, len(portfoliosFound))
+
+	portfolioResponse := portfoliosFound[0]
+
+	assert.Equal(t, portfolioResponse.PortfolioID, portfolio.PortfolioID)
+	assert.Equal(t, portfolioResponse.UserID, portfolio.UserID)
+	assert.Equal(t, portfolioResponse.Risk, portfolio.Risk)
+	assert.WithinDuration(t, portfolioResponse.CreatedAt, portfolio.CreatedAt, 0)
+	assert.WithinDuration(t, portfolioResponse.UpdatedAt, portfolio.UpdatedAt, 0)
+
+	mockStore.AssertExpectations(t)
+}
+
 func TestPortfolioCreate(t *testing.T) {
 	t.Parallel()
 
