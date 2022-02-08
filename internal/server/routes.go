@@ -82,7 +82,7 @@ func (s *ChiServer) Init() http.Handler {
 		r.Delete("/api/portfolio-industries/{portfolio_industry_id}", controllers.DeletePortfolioIndustry)
 		r.Put("/api/portfolio-industries/{portfolio_industry_id}", controllers.ModifyPortfolioIndustry)
 
-		r.Post("/api/bank-tokens", controllers.CreateBankToken)
+		r.Post("/api/plaid/token", controllers.CreatePlaidToken)
 
 		r.Get("/api/snap", controllers.GetSnap)
 

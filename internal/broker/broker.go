@@ -15,11 +15,21 @@ type Broker interface {
 		fundingSource string,
 		ipAddress string,
 	) (string, error)
-	DeleteAccount(accountID string) (error)
+	DeleteAccount(accountID string) error
 	CreateOrder(
 		accountID string,
 		symbol string,
 		quantity float32,
 		side string,
+	) (string, error)
+	CreateTransfer(
+		accountID string,
+		relationshipID string,
+		amount float32,
+		direction string,
+	) (string, error)
+	CreateACHRelationship(
+		accountID string,
+		processorToken string,
 	) (string, error)
 }

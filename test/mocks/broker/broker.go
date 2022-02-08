@@ -46,13 +46,13 @@ func (mockBroker *MockBroker) CreateAccount(
 
 func (mockBroker *MockBroker) DeleteAccount(
 	accountID string,
-) (error) {
+) error {
 	args := mockBroker.Called(accountID)
 
 	return args.Error(0)
 }
 
-func (mockBroker *MockBroker) DeleteAccount(
+func (mockBroker *MockBroker) CreateOrder(
 	accountID string,
 	symbol string,
 	quantity float32,
@@ -63,6 +63,34 @@ func (mockBroker *MockBroker) DeleteAccount(
 		symbol,
 		quantity,
 		side,
+	)
+
+	return args.String(0), args.Error(1)
+}
+
+func (mockBroker *MockBroker) CreateTransfer(
+	accountID string,
+	relationshipID string,
+	amount float32,
+	direction string,
+) (string, error) {
+	args := mockBroker.Called(
+		accountID,
+		relationshipID,
+		amount,
+		direction,
+	)
+
+	return args.String(0), args.Error(1)
+}
+
+func (mockBroker *MockBroker) CreateACHRelationship(
+	accountID string,
+	processorToken string,
+) (string, error) {
+	args := mockBroker.Called(
+		accountID,
+		processorToken,
 	)
 
 	return args.String(0), args.Error(1)

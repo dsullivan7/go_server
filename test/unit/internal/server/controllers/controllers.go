@@ -7,7 +7,7 @@ import (
 	goServerZapLogger "go_server/internal/logger/zap"
 	"go_server/internal/server/controllers"
 	"go_server/internal/server/utils"
-	"go_server/test/mocks/bank"
+	"go_server/test/mocks/plaid"
 	"go_server/test/mocks/broker"
 	"go_server/test/mocks/store"
 
@@ -39,13 +39,13 @@ func Setup() (*controllers.Controllers, *store.MockStore, error) {
 
 	crawler := goServerRodCrawler.NewCrawler(browser, captcha)
 
-	bnk := bank.NewMockBank()
+	plaidClient := plaid.NewMockPlaid()
 
 	brkr := broker.NewMockBroker()
 
 	utils := utils.NewServerUtils(logger)
 
-	controllers := controllers.NewControllers(config, store, crawler, bnk, brkr, utils, logger)
+	controllers := controllers.NewControllers(config, store, crawler, plaidClient, brkr, utils, logger)
 
 	return controllers, store, nil
 }

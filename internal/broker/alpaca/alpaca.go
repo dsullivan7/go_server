@@ -1,19 +1,19 @@
 package alpaca
 
 import (
-	"time"
-	"errors"
 	"bytes"
-	"encoding/base64"
 	"context"
+	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"go_server/internal/broker"
 	goServerHTTP "go_server/internal/http"
 	"net/http"
+	"time"
 )
 
-var AlpacaAPIError = errors.New("alpaca api error")
+var ErrAlpacaAPI = errors.New("alpaca api error")
 
 type Broker struct {
 	alpacaAPIKey    string
@@ -40,7 +40,7 @@ func (brkr *Broker) sendRequest(
 	path string,
 	method string,
 	body map[string]interface{},
-) (map[string]interface{}, error){
+) (map[string]interface{}, error) {
 	context := context.Background()
 
 	jsonBytes, errMarshal := json.Marshal(body)
@@ -84,11 +84,10 @@ func (brkr *Broker) sendRequest(
 		return nil, fmt.Errorf("failed to decode the response: %w", errDecode)
 	}
 
-	if (
-		res.StatusCode != http.StatusOK ||
-		res.StatusCode != http.StatusCreated ||
-		res.StatusCode != http.StatusNoContent) {
-		return nil, fmt.Errorf("%w: %s", AlpacaAPIError, alpacaResponse["message"])
+	if res.StatusCode != http.StatusOK &&
+		res.StatusCode != http.StatusCreated &&
+		res.StatusCode != http.StatusNoContent {
+		return nil, fmt.Errorf("%w: %s", ErrAlpacaAPI, alpacaResponse["message"])
 	}
 
 	return alpacaResponse, nil
@@ -109,77 +108,76 @@ func (brkr *Broker) CreateAccount(
 	fundingSource string,
 	ipAddress string,
 ) (string, error) {
-
 	body := map[string]interface{}{
 		"contact": map[string]interface{}{
-			"email_address": emailAddress,
-			"phone_number":  phoneNumber,
-			"street_address":  []string{streetAddress},
-			"city": city,
-			"state": state,
-			"postal_code": postalCode,
-			"country": "USA",
+			"email_address":  emailAddress,
+			"phone_number":   phoneNumber,
+			"street_address": []string{streetAddress},
+			"city":           city,
+			"state":          state,
+			"postal_code":    postalCode,
+			"country":        "USA",
 		},
 		"identity": map[string]interface{}{
-			"given_name": givenName,
-			"family_name": familyName,
-			"date_of_birth": dateOfBirth,
+			"given_name":               givenName,
+			"family_name":              familyName,
+			"date_of_birth":            dateOfBirth,
 			"country_of_tax_residency": "USA",
-			"tax_id": taxID,
-			"tax_id_type": "USA_SSN",
+			"tax_id":                   taxID,
+			"tax_id_type":              "USA_SSN",
 			"country_of_tax_residence": "USA",
-			"funding_source": []string{fundingSource},
+			"funding_source":           []string{fundingSource},
 		},
-		"disclosures":  map[string]interface{}{
-			"is_control_person": false,
+		"disclosures": map[string]interface{}{
+			"is_control_person":               false,
 			"is_affiliated_exchange_or_finra": false,
-			"is_politically_exposed": false,
-			"immediate_family_exposed": false,
+			"is_politically_exposed":          false,
+			"immediate_family_exposed":        false,
 		},
 		"agreements": []interface{}{
-	    map[string]string{
-	      "agreement": "margin_agreement",
-	      "signed_at": time.Now().Format(time.RFC3339),
-	      "ip_address": ipAddress,
-	      "revision": "16.2021.05",
-	    },
-	    map[string]string{
-	      "agreement": "account_agreement",
-	      "signed_at": time.Now().Format(time.RFC3339),
-	      "ip_address": ipAddress,
-	      "revision": "16.2021.05",
-	    },
-	    map[string]string{
-	      "agreement": "customer_agreement",
-	      "signed_at": time.Now().Format(time.RFC3339),
-	      "ip_address": ipAddress,
-	      "revision": "16.2021.05",
-	    },
-	  },
+			map[string]string{
+				"agreement":  "margin_agreement",
+				"signed_at":  time.Now().Format(time.RFC3339),
+				"ip_address": ipAddress,
+				"revision":   "16.2021.05",
+			},
+			map[string]string{
+				"agreement":  "account_agreement",
+				"signed_at":  time.Now().Format(time.RFC3339),
+				"ip_address": ipAddress,
+				"revision":   "16.2021.05",
+			},
+			map[string]string{
+				"agreement":  "customer_agreement",
+				"signed_at":  time.Now().Format(time.RFC3339),
+				"ip_address": ipAddress,
+				"revision":   "16.2021.05",
+			},
+		},
 	}
 
 	alpacaResponse, errAlpaca := brkr.sendRequest(
+		"/v1/accounts",
 		http.MethodPost,
-		"/v1/accounts/",
 		body,
 	)
 
-	if (errAlpaca != nil) {
+	if errAlpaca != nil {
 		return "", errAlpaca
 	}
 
-	return alpacaResponse["id"].(string), nil
+	return alpacaResponse["account"].(map[string]interface{})["id"].(string), nil
 }
 
 // DeleteAccount deactivates an active account.
-func (brkr *Broker) DeleteAccount(accountID string) (error) {
+func (brkr *Broker) DeleteAccount(accountID string) error {
 	_, errAlpaca := brkr.sendRequest(
-		http.MethodDelete,
 		fmt.Sprint("/v1/accounts/", accountID),
+		http.MethodDelete,
 		nil,
 	)
 
-	if (errAlpaca != nil) {
+	if errAlpaca != nil {
 		return errAlpaca
 	}
 
@@ -189,20 +187,70 @@ func (brkr *Broker) DeleteAccount(accountID string) (error) {
 // CreateOrder creates an order for an account.
 func (brkr *Broker) CreateOrder(accountID string, symbol string, quantity float32, side string) (string, error) {
 	body := map[string]interface{}{
-		"symbol": symbol,
-		"qty":  quantity,
-		"side":  side,
-		"type": "market",
+		"symbol":        symbol,
+		"qty":           quantity,
+		"side":          side,
+		"type":          "market",
 		"time_in_force": "day",
 	}
 
 	alpacaResponse, errAlpaca := brkr.sendRequest(
+		fmt.Sprint("/v1/trading/accounts/", accountID, "/orders"),
 		http.MethodPost,
-		"/v1/accounts/",
 		body,
 	)
 
-	if (errAlpaca != nil) {
+	if errAlpaca != nil {
+		return "", errAlpaca
+	}
+
+	return alpacaResponse["id"].(string), nil
+}
+
+// CreateTransfer creates a transfer for an account.
+func (brkr *Broker) CreateTransfer(
+	accountID string,
+	relationshipID string,
+	amount float32,
+	direction string,
+) (string, error) {
+	body := map[string]interface{}{
+		"transfer_type":          "ach",
+		"relationship_id":        relationshipID,
+		"amount":                 amount,
+		"direction":              direction,
+		"additional_information": "/fixtures/status=APPROVED/fixtures/",
+	}
+
+	alpacaResponse, errAlpaca := brkr.sendRequest(
+		fmt.Sprint("/v1/accounts/", accountID, "/transfers"),
+		http.MethodPost,
+		body,
+	)
+
+	if errAlpaca != nil {
+		return "", errAlpaca
+	}
+
+	return alpacaResponse["id"].(string), nil
+}
+
+// CreateACHRelationship creates an ach relastionship for an account.
+func (brkr *Broker) CreateACHRelationship(
+	accountID string,
+	processorToken string,
+) (string, error) {
+	body := map[string]interface{}{
+		"processor_token": processorToken,
+	}
+
+	alpacaResponse, errAlpaca := brkr.sendRequest(
+		fmt.Sprint("/v1/accounts/", accountID, "/ach_relationships"),
+		http.MethodPost,
+		body,
+	)
+
+	if errAlpaca != nil {
 		return "", errAlpaca
 	}
 

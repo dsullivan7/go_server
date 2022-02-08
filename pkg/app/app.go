@@ -3,7 +3,6 @@ package app
 import (
 	"fmt"
 	"go_server/internal/auth/auth0"
-	goServerPlaid "go_server/internal/bank/plaid"
 	goServerAlpaca "go_server/internal/broker/alpaca"
 	"go_server/internal/captcha/twocaptcha"
 	"go_server/internal/config"
@@ -11,6 +10,7 @@ import (
 	"go_server/internal/db"
 	goServerHTTP "go_server/internal/http"
 	goServerZapLogger "go_server/internal/logger/zap"
+	goServerPlaid "go_server/internal/plaid"
 	"go_server/internal/server"
 	"go_server/internal/store/gorm"
 	"log"
@@ -83,8 +83,8 @@ func Run() {
 	plaidConfig.AddDefaultHeader("PLAID-CLIENT-ID", config.PlaidClientID)
 	plaidConfig.AddDefaultHeader("PLAID-SECRET", config.PlaidSecret)
 	plaidConfig.UseEnvironment(plaid.Sandbox)
-	plaidClientInstance := plaid.NewAPIClient(plaidConfig)
-	bank := goServerPlaid.NewClient(plaidClientInstance, config.PlaidRedirectURI)
+	plaidAPIClient := plaid.NewAPIClient(plaidConfig)
+	plaidClient := goServerPlaid.NewClient(plaidAPIClient, config.PlaidRedirectURI)
 
 	// initialize alpaca
 	broker := goServerAlpaca.NewBroker(config.AlpacaAPIKey, config.AlpacaAPISecret, config.AlpacaAPIURL, httpClient)
@@ -93,7 +93,7 @@ func Run() {
 	auth.Init()
 
 	router := chi.NewRouter()
-	handler := server.NewChiServer(config, router, store, crawler, bank, broker, auth, logger)
+	handler := server.NewChiServer(config, router, store, crawler, plaidClient, broker, auth, logger)
 
 	httpServer := http.Server{
 		Addr:    fmt.Sprintf(":%s", config.Port),

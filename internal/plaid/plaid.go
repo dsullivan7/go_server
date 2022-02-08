@@ -4,10 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	"go_server/internal/bank"
-
 	"github.com/plaid/plaid-go/plaid"
 )
+
+type IClient interface {
+	CreateToken(userID string) (string, error)
+	CreateProcessorToken(accessToken string, accountID string, accessor string) (string, error)
+	GetAccessToken(publicToken string) (string, error)
+	GetAccount(accessToken string) (string, string, error)
+}
 
 type Client struct {
 	client      *plaid.APIClient
@@ -17,7 +22,7 @@ type Client struct {
 func NewClient(
 	client *plaid.APIClient,
 	redirectURI string,
-) bank.Bank {
+) IClient {
 	return &Client{
 		client:      client,
 		redirectURI: redirectURI,
@@ -69,7 +74,7 @@ func (pc *Client) GetAccessToken(publicToken string) (string, error) {
 }
 
 // GetAccount uses the access token to retrieve the account information.
-func (pc *Client) GetAccount(accessToken string) (string, error) {
+func (pc *Client) GetAccount(accessToken string) (string, string, error) {
 	ctx := context.Background()
 
 	accountsGetResp, _, errAccount := pc.client.PlaidApi.AccountsGet(ctx).
@@ -79,7 +84,7 @@ func (pc *Client) GetAccount(accessToken string) (string, error) {
 	if errAccount != nil {
 		plaidErr, _ := plaid.ToPlaidError(errAccount)
 
-		return "", fmt.Errorf("plaid error %w: %s", errAccount, plaidErr.ErrorMessage)
+		return "", "", fmt.Errorf("plaid error %w: %s", errAccount, plaidErr.ErrorMessage)
 	}
 
 	institutionGetResp, _, errInstitution := pc.client.PlaidApi.InstitutionsGetById(ctx).
@@ -92,8 +97,31 @@ func (pc *Client) GetAccount(accessToken string) (string, error) {
 	if errInstitution != nil {
 		plaidErr, _ := plaid.ToPlaidError(errInstitution)
 
-		return "", fmt.Errorf("plaid error %w: %s", errInstitution, plaidErr.ErrorMessage)
+		return "", "", fmt.Errorf("plaid error %w: %s", errInstitution, plaidErr.ErrorMessage)
 	}
 
-	return institutionGetResp.Institution.Name, nil
+	institution := institutionGetResp.GetInstitution()
+
+	return accountsGetResp.GetAccounts()[0].GetAccountId(), institution.GetName(), nil
+}
+
+// CreateToken creates a plaid token to use in link.
+func (pc *Client) CreateProcessorToken(accessToken string, accountID string, processor string) (string, error) {
+	ctx := context.Background()
+
+	request := plaid.NewProcessorTokenCreateRequest(
+		accessToken,
+		accountID,
+		processor,
+	)
+
+	resp, _, err := pc.client.PlaidApi.ProcessorTokenCreate(ctx).ProcessorTokenCreateRequest(*request).Execute()
+
+	if err != nil {
+		plaidErr, _ := plaid.ToPlaidError(err)
+
+		return "", fmt.Errorf("plaid error %w: %s", err, plaidErr.ErrorMessage)
+	}
+
+	return resp.GetProcessorToken(), nil
 }

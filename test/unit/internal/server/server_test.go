@@ -7,7 +7,7 @@ import (
 	goServerZapLogger "go_server/internal/logger/zap"
 	"go_server/internal/server"
 	"go_server/test/mocks/auth"
-	"go_server/test/mocks/bank"
+	"go_server/test/mocks/plaid"
 	"go_server/test/mocks/broker"
 	"go_server/test/mocks/store"
 	"testing"
@@ -41,7 +41,7 @@ func TestServer(tParent *testing.T) {
 
 	crawler := goServerRodCrawler.NewCrawler(browser, captcha)
 
-	bnk := bank.NewMockBank()
+	plaidClientMock := plaid.NewMockPlaid()
 
 	brkr := broker.NewMockBroker()
 
@@ -49,7 +49,7 @@ func TestServer(tParent *testing.T) {
 
 	ath := auth.NewMockAuth()
 
-	handler := server.NewChiServer(config, rtr, str, crawler, bnk, brkr, ath, logger)
+	handler := server.NewChiServer(config, rtr, str, crawler, plaidClientMock, brkr, ath, logger)
 
 	handler.Init()
 
