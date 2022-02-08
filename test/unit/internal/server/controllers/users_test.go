@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGet(t *testing.T) {
+func TestUserGet(t *testing.T) {
 	t.Parallel()
 
 	controllers, mockStore, err := controllers.Setup()
@@ -72,7 +72,7 @@ func TestGet(t *testing.T) {
 	mockStore.AssertExpectations(t)
 }
 
-func TestGetMe(t *testing.T) {
+func TestUserGetMe(t *testing.T) {
 	t.Parallel()
 
 	controllers, mockStore, err := controllers.Setup()
@@ -126,7 +126,7 @@ func TestGetMe(t *testing.T) {
 	mockStore.AssertExpectations(t)
 }
 
-func TestList(t *testing.T) {
+func TestUserList(t *testing.T) {
 	t.Parallel()
 
 	controllers, mockStore, err := controllers.Setup()
@@ -211,7 +211,7 @@ func TestList(t *testing.T) {
 	mockStore.AssertExpectations(t)
 }
 
-func TestCreate(t *testing.T) {
+func TestUserCreate(t *testing.T) {
 	t.Parallel()
 
 	controllers, mockStore, err := controllers.Setup()
@@ -277,7 +277,7 @@ func TestCreate(t *testing.T) {
 	mockStore.AssertExpectations(t)
 }
 
-func TestModif(t *testing.T) {
+func TestUserModify(t *testing.T) {
 	t.Parallel()
 
 	controllers, mockStore, err := controllers.Setup()
@@ -349,7 +349,7 @@ func TestModif(t *testing.T) {
 	mockStore.AssertExpectations(t)
 }
 
-func TestDelete(t *testing.T) {
+func TestUserDelete(t *testing.T) {
 	t.Parallel()
 
 	controllers, mockStore, err := controllers.Setup()
