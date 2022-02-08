@@ -31,6 +31,15 @@ type Store interface {
 	ModifyBankAccount(portfolioID uuid.UUID, portfolioPayload models.BankAccount) (*models.BankAccount, error)
 	DeleteBankAccount(portfolioID uuid.UUID) error
 
+	GetBrokerageAccount(brokerageAccountID uuid.UUID) (*models.BrokerageAccount, error)
+	ListBrokerageAccounts(query map[string]interface{}) ([]models.BrokerageAccount, error)
+	CreateBrokerageAccount(brokerageAccountPayload models.BrokerageAccount) (*models.BrokerageAccount, error)
+	ModifyBrokerageAccount(
+		brokerageAccountID uuid.UUID,
+		brokerageAccountPayload models.BrokerageAccount,
+	) (*models.BrokerageAccount, error)
+	DeleteBrokerageAccount(brokerageAccountID uuid.UUID) error
+
 	GetPortfolio(portfolioID uuid.UUID) (*models.Portfolio, error)
 	ListPortfolios(query map[string]interface{}) ([]models.Portfolio, error)
 	CreatePortfolio(portfolioPayload models.Portfolio) (*models.Portfolio, error)
