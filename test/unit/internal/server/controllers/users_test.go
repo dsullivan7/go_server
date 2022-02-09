@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"go_server/internal/models"
 	"go_server/internal/server/consts"
-	"go_server/test/unit/internal/server/controllers"
+	"go_server/test/utils"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -21,7 +21,7 @@ import (
 func TestUserGet(t *testing.T) {
 	t.Parallel()
 
-	controllers, mockStore, err := controllers.Setup()
+	testServer, err := utils.NewTestServer()
 	assert.Nil(t, err)
 
 	firstName := "firstName"
@@ -36,7 +36,7 @@ func TestUserGet(t *testing.T) {
 
 	uuid := uuid.New()
 
-	mockStore.On("GetUser", uuid).Return(&user, nil)
+	testServer.Store.On("GetUser", uuid).Return(&user, nil)
 
 	req := httptest.NewRequest(
 		http.MethodGet,
@@ -50,7 +50,7 @@ func TestUserGet(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	controllers.GetUser(w, req)
+	testServer.Server.GetControllers().GetUser(w, req)
 
 	res := w.Result()
 	defer res.Body.Close()
@@ -69,13 +69,13 @@ func TestUserGet(t *testing.T) {
 	assert.Equal(t, *userResponse.LastName, *user.LastName)
 	assert.Equal(t, *userResponse.Auth0ID, *user.Auth0ID)
 
-	mockStore.AssertExpectations(t)
+	testServer.Store.AssertExpectations(t)
 }
 
 func TestUserGetMe(t *testing.T) {
 	t.Parallel()
 
-	controllers, mockStore, err := controllers.Setup()
+	testServer, err := utils.NewTestServer()
 	assert.Nil(t, err)
 
 	firstName := "firstName"
@@ -89,7 +89,7 @@ func TestUserGetMe(t *testing.T) {
 		Auth0ID:   &auth0ID,
 	}
 
-	mockStore.On("GetUser", user.UserID).Return(&user, nil)
+	testServer.Store.On("GetUser", user.UserID).Return(&user, nil)
 
 	req := httptest.NewRequest(
 		http.MethodGet,
@@ -104,7 +104,7 @@ func TestUserGetMe(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	controllers.GetUser(w, req)
+	testServer.Server.GetControllers().GetUser(w, req)
 
 	res := w.Result()
 	defer res.Body.Close()
@@ -123,13 +123,13 @@ func TestUserGetMe(t *testing.T) {
 	assert.Equal(t, *userResponse.LastName, *user.LastName)
 	assert.Equal(t, *userResponse.Auth0ID, *user.Auth0ID)
 
-	mockStore.AssertExpectations(t)
+	testServer.Store.AssertExpectations(t)
 }
 
 func TestUserList(t *testing.T) {
 	t.Parallel()
 
-	controllers, mockStore, err := controllers.Setup()
+	testServer, err := utils.NewTestServer()
 	assert.Nil(t, err)
 
 	firstName1 := "firstName1"
@@ -154,7 +154,7 @@ func TestUserList(t *testing.T) {
 		Auth0ID:   &auth0Id2,
 	}
 
-	mockStore.On("ListUsers", map[string]interface{}{}).Return([]models.User{user1, user2}, nil)
+	testServer.Store.On("ListUsers", map[string]interface{}{}).Return([]models.User{user1, user2}, nil)
 
 	req := httptest.NewRequest(
 		http.MethodGet,
@@ -164,7 +164,7 @@ func TestUserList(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	controllers.ListUsers(w, req)
+	testServer.Server.GetControllers().ListUsers(w, req)
 
 	res := w.Result()
 	defer res.Body.Close()
@@ -208,13 +208,13 @@ func TestUserList(t *testing.T) {
 	assert.Equal(t, *userResponse.LastName, *user2.LastName)
 	assert.Equal(t, *userResponse.Auth0ID, *user2.Auth0ID)
 
-	mockStore.AssertExpectations(t)
+	testServer.Store.AssertExpectations(t)
 }
 
 func TestUserCreate(t *testing.T) {
 	t.Parallel()
 
-	controllers, mockStore, err := controllers.Setup()
+	testServer, err := utils.NewTestServer()
 	assert.Nil(t, err)
 
 	firstName := "firstName"
@@ -245,7 +245,7 @@ func TestUserCreate(t *testing.T) {
 		Auth0ID:   &auth0Id,
 	}
 
-	mockStore.On("CreateUser", userPayload).Return(&userCreated, nil)
+	testServer.Store.On("CreateUser", userPayload).Return(&userCreated, nil)
 
 	req := httptest.NewRequest(
 		http.MethodPost,
@@ -255,7 +255,7 @@ func TestUserCreate(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	controllers.CreateUser(w, req)
+	testServer.Server.GetControllers().CreateUser(w, req)
 
 	res := w.Result()
 	defer res.Body.Close()
@@ -274,13 +274,13 @@ func TestUserCreate(t *testing.T) {
 	assert.Equal(t, lastName, *userResponse.LastName)
 	assert.Equal(t, auth0Id, *userResponse.Auth0ID)
 
-	mockStore.AssertExpectations(t)
+	testServer.Store.AssertExpectations(t)
 }
 
 func TestUserModify(t *testing.T) {
 	t.Parallel()
 
-	controllers, mockStore, err := controllers.Setup()
+	testServer, err := utils.NewTestServer()
 	assert.Nil(t, err)
 
 	userID := uuid.New()
@@ -313,7 +313,7 @@ func TestUserModify(t *testing.T) {
 		Auth0ID:   &auth0IdNew,
 	}
 
-	mockStore.On("ModifyUser", userID, userPayload).Return(&userModified, nil)
+	testServer.Store.On("ModifyUser", userID, userPayload).Return(&userModified, nil)
 
 	req := httptest.NewRequest(
 		http.MethodPut,
@@ -328,7 +328,7 @@ func TestUserModify(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	controllers.ModifyUser(w, req)
+	testServer.Server.GetControllers().ModifyUser(w, req)
 
 	res := w.Result()
 	defer res.Body.Close()
@@ -346,18 +346,18 @@ func TestUserModify(t *testing.T) {
 	assert.Equal(t, lastNameNew, *userResponse.LastName)
 	assert.Equal(t, auth0IdNew, *userResponse.Auth0ID)
 
-	mockStore.AssertExpectations(t)
+	testServer.Store.AssertExpectations(t)
 }
 
 func TestUserDelete(t *testing.T) {
 	t.Parallel()
 
-	controllers, mockStore, err := controllers.Setup()
+	testServer, err := utils.NewTestServer()
 	assert.Nil(t, err)
 
 	userID := uuid.New()
 
-	mockStore.On("DeleteUser", userID).Return(nil)
+	testServer.Store.On("DeleteUser", userID).Return(nil)
 
 	req := httptest.NewRequest(
 		http.MethodDelete,
@@ -372,12 +372,12 @@ func TestUserDelete(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	controllers.DeleteUser(w, req)
+	testServer.Server.GetControllers().DeleteUser(w, req)
 
 	res := w.Result()
 	defer res.Body.Close()
 
 	assert.Equal(t, http.StatusNoContent, res.StatusCode)
 
-	mockStore.AssertExpectations(t)
+	testServer.Store.AssertExpectations(t)
 }

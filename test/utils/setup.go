@@ -4,69 +4,62 @@ import (
 	"go_server/internal/captcha/twocaptcha"
 	"go_server/internal/config"
 	goServerRodCrawler "go_server/internal/crawler/rod"
-	"go_server/internal/db"
 	goServerZapLogger "go_server/internal/logger/zap"
 	"go_server/internal/server"
-	goServerGormStore "go_server/internal/store/gorm"
-	"go_server/test/mocks/auth"
-	"go_server/test/mocks/plaid"
-	"go_server/test/mocks/broker"
-	"net/http/httptest"
+	"go_server/internal/server/graph"
+	"go_server/internal/logger"
+	"go_server/internal/auth"
+	mockPlaid "go_server/test/mocks/plaid"
+	mockBroker "go_server/test/mocks/broker"
+	mockStore "go_server/test/mocks/store"
+	mockAuth "go_server/test/mocks/auth"
 
 	"github.com/go-chi/chi"
 	"github.com/go-rod/rod"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 )
 
-type SetupUtility struct {
+type TestServer struct {
+	Server	server.Server
+	Router	*chi.Mux
+	Config      *config.Config
+	Resolver    *graph.Resolver
+	Logger      logger.Logger
+	Store	*mockStore.MockStore
+	Auth      	auth.Auth
+	PlaidClient      	*mockPlaid.MockPlaid
+	Broker      	*mockBroker.MockBroker
 }
 
-func NewSetupUtility() *SetupUtility {
-	return &SetupUtility{}
-}
+func NewTestServer() (*TestServer, error) {
+	testServer := TestServer{}
 
-func (setupUtility *SetupUtility) SetupIntegration() (*httptest.Server, *gorm.DB, DatabaseUtility, error) {
 	config, configError := config.NewConfig()
 
 	if configError != nil {
-		return nil, nil, nil, configError
+		return nil, configError
 	}
+
+	testServer.Config = config
 
 	zapLogger, errZap := zap.NewProduction()
 
 	if errZap != nil {
-		return nil, nil, nil, errZap
+		return nil, errZap
 	}
 
 	logger := goServerZapLogger.NewLogger(zapLogger)
 
-	connection, errConnection := db.NewSQLConnection(
-		config.DBHost,
-		config.DBName,
-		config.DBPort,
-		config.DBUser,
-		config.DBPassword,
-		config.DBSSL,
-	)
+	testServer.Logger = logger
 
-	if errConnection != nil {
-		return nil, nil, nil, errConnection
-	}
-
-	db, errDatabase := db.NewGormDB(connection)
-
-	if errDatabase != nil {
-		return nil, nil, nil, errDatabase
-	}
-
-	dbUtility := NewSQLDatabaseUtility(connection)
-
-	store := goServerGormStore.NewStore(db)
+	str := mockStore.NewMockStore()
+	testServer.Store = str
 
 	router := chi.NewRouter()
+	testServer.Router = router
 
-	authMock := auth.NewMockAuth()
+	ath := mockAuth.NewMockAuth()
+	testServer.Auth = ath
 
 	browser := rod.New()
 
@@ -76,13 +69,16 @@ func (setupUtility *SetupUtility) SetupIntegration() (*httptest.Server, *gorm.DB
 
 	crawler := goServerRodCrawler.NewCrawler(browser, captcha)
 
-	plaidMock := plaid.NewMockPlaid()
+	pld := mockPlaid.NewMockPlaid()
+	testServer.PlaidClient = pld
 
-	brokerMock := broker.NewMockBroker()
+	brkr := mockBroker.NewMockBroker()
+	testServer.Broker = brkr
 
-	handler := server.NewChiServer(config, router, store, crawler, plaidMock, brokerMock, authMock, logger)
+	srvr := server.NewChiServer(config, router, str, crawler, pld, brkr, ath, logger)
+	srvr.Init()
 
-	testServer := httptest.NewServer(handler.Init())
+	testServer.Server = srvr
 
-	return testServer, db, dbUtility, nil
+	return &testServer, nil
 }

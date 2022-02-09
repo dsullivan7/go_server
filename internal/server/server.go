@@ -20,14 +20,16 @@ import (
 
 type Server interface {
 	Init() http.Handler
+	GetControllers() *controllers.Controllers
+	GetMiddlewares() *middlewares.Middlewares
 }
 
 type ChiServer struct {
+	controllers *controllers.Controllers
+	middlewares *middlewares.Middlewares
 	router      *chi.Mux
 	config      *config.Config
-	controllers *controllers.Controllers
 	resolver    *graph.Resolver
-	middlewares *middlewares.Middlewares
 	logger      logger.Logger
 }
 
@@ -47,11 +49,19 @@ func NewChiServer(
 	middlewares := middlewares.NewMiddlewares(cfg, str, ath, utils, lggr)
 
 	return &ChiServer{
+		controllers: controllers,
+		middlewares: middlewares,
 		router:      router,
 		config:      cfg,
 		logger:      lggr,
-		controllers: controllers,
 		resolver:    resolver,
-		middlewares: middlewares,
 	}
+}
+
+func (s *ChiServer) GetControllers() *controllers.Controllers {
+	return s.controllers
+}
+
+func (s *ChiServer) GetMiddlewares() *middlewares.Middlewares {
+	return s.middlewares
 }

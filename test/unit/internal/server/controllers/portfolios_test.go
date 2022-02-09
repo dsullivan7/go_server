@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"go_server/internal/models"
-	"go_server/test/unit/internal/server/controllers"
+	"go_server/test/utils"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -21,7 +21,7 @@ import (
 func TestPortfolioGet(t *testing.T) {
 	t.Parallel()
 
-	controllers, mockStore, err := controllers.Setup()
+	testServer, err := utils.NewTestServer()
 	assert.Nil(t, err)
 
 	portfolioID := uuid.New()
@@ -35,7 +35,7 @@ func TestPortfolioGet(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}
 
-	mockStore.On("GetPortfolio", portfolioID).Return(&portfolio, nil)
+	testServer.Store.On("GetPortfolio", portfolioID).Return(&portfolio, nil)
 
 	req := httptest.NewRequest(
 		http.MethodGet,
@@ -49,7 +49,7 @@ func TestPortfolioGet(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	controllers.GetPortfolio(w, req)
+	testServer.Server.GetControllers().GetPortfolio(w, req)
 
 	res := w.Result()
 	defer res.Body.Close()
@@ -69,13 +69,13 @@ func TestPortfolioGet(t *testing.T) {
 	assert.WithinDuration(t, portfolioResponse.CreatedAt, portfolio.CreatedAt, 0)
 	assert.WithinDuration(t, portfolioResponse.UpdatedAt, portfolio.UpdatedAt, 0)
 
-	mockStore.AssertExpectations(t)
+	testServer.Store.AssertExpectations(t)
 }
 
 func TestPortfolioList(t *testing.T) {
 	t.Parallel()
 
-	controllers, mockStore, err := controllers.Setup()
+	testServer, err := utils.NewTestServer()
 	assert.Nil(t, err)
 
 	portfolioID1 := uuid.New()
@@ -100,17 +100,17 @@ func TestPortfolioList(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}
 
-	mockStore.On("ListPortfolios", map[string]interface{}{}).Return([]models.Portfolio{portfolio1, portfolio2}, nil)
+	testServer.Store.On("ListPortfolios", map[string]interface{}{}).Return([]models.Portfolio{portfolio1, portfolio2}, nil)
 
 	req := httptest.NewRequest(
 		http.MethodGet,
-		"/api/users",
+		"/api/portfolios",
 		nil,
 	)
 
 	w := httptest.NewRecorder()
 
-	controllers.ListPortfolios(w, req)
+	testServer.Server.GetControllers().ListPortfolios(w, req)
 
 	res := w.Result()
 	defer res.Body.Close()
@@ -156,13 +156,13 @@ func TestPortfolioList(t *testing.T) {
 	assert.WithinDuration(t, portfolioResponse.CreatedAt, portfolio2.CreatedAt, 0)
 	assert.WithinDuration(t, portfolioResponse.UpdatedAt, portfolio2.UpdatedAt, 0)
 
-	mockStore.AssertExpectations(t)
+	testServer.Store.AssertExpectations(t)
 }
 
 func TestPortfolioListQueryParams(t *testing.T) {
 	t.Parallel()
 
-	controllers, mockStore, err := controllers.Setup()
+	testServer, err := utils.NewTestServer()
 	assert.Nil(t, err)
 
 	portfolioID := uuid.New()
@@ -176,17 +176,17 @@ func TestPortfolioListQueryParams(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}
 
-	mockStore.On("ListPortfolios", map[string]interface{}{ "user_id": userID.String() }).Return([]models.Portfolio{portfolio}, nil)
+	testServer.Store.On("ListPortfolios", map[string]interface{}{ "user_id": userID.String() }).Return([]models.Portfolio{portfolio}, nil)
 
 	req := httptest.NewRequest(
 		http.MethodGet,
-		fmt.Sprint("/api/users?user_id=", userID),
+		fmt.Sprint("/api/portfolios?user_id=", userID),
 		nil,
 	)
 
 	w := httptest.NewRecorder()
 
-	controllers.ListPortfolios(w, req)
+	testServer.Server.GetControllers().ListPortfolios(w, req)
 
 	res := w.Result()
 	defer res.Body.Close()
@@ -210,13 +210,13 @@ func TestPortfolioListQueryParams(t *testing.T) {
 	assert.WithinDuration(t, portfolioResponse.CreatedAt, portfolio.CreatedAt, 0)
 	assert.WithinDuration(t, portfolioResponse.UpdatedAt, portfolio.UpdatedAt, 0)
 
-	mockStore.AssertExpectations(t)
+	testServer.Store.AssertExpectations(t)
 }
 
 func TestPortfolioCreate(t *testing.T) {
 	t.Parallel()
 
-	controllers, mockStore, err := controllers.Setup()
+	testServer, err := utils.NewTestServer()
 	assert.Nil(t, err)
 
 	userID := uuid.New()
@@ -244,7 +244,7 @@ func TestPortfolioCreate(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}
 
-	mockStore.On("CreatePortfolio", portfolioPayload).Return(&portfolioCreated, nil)
+	testServer.Store.On("CreatePortfolio", portfolioPayload).Return(&portfolioCreated, nil)
 
 	req := httptest.NewRequest(
 		http.MethodPost,
@@ -254,7 +254,7 @@ func TestPortfolioCreate(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	controllers.CreatePortfolio(w, req)
+	testServer.Server.GetControllers().CreatePortfolio(w, req)
 
 	res := w.Result()
 	defer res.Body.Close()
@@ -274,13 +274,13 @@ func TestPortfolioCreate(t *testing.T) {
 	assert.WithinDuration(t, portfolioResponse.CreatedAt, portfolioCreated.CreatedAt, 0)
 	assert.WithinDuration(t, portfolioResponse.UpdatedAt, portfolioCreated.UpdatedAt, 0)
 
-	mockStore.AssertExpectations(t)
+	testServer.Store.AssertExpectations(t)
 }
 
 func TestPortfolioModify(t *testing.T) {
 	t.Parallel()
 
-	controllers, mockStore, err := controllers.Setup()
+	testServer, err := utils.NewTestServer()
 	assert.Nil(t, err)
 
 	userID := uuid.New()
@@ -305,7 +305,7 @@ func TestPortfolioModify(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}
 
-	mockStore.On("ModifyPortfolio", portfolioModified.PortfolioID, portfolioPayload).Return(&portfolioModified, nil)
+	testServer.Store.On("ModifyPortfolio", portfolioModified.PortfolioID, portfolioPayload).Return(&portfolioModified, nil)
 
 	req := httptest.NewRequest(
 		http.MethodPut,
@@ -320,7 +320,7 @@ func TestPortfolioModify(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	controllers.ModifyPortfolio(w, req)
+	testServer.Server.GetControllers().ModifyPortfolio(w, req)
 
 	res := w.Result()
 	defer res.Body.Close()
@@ -340,18 +340,18 @@ func TestPortfolioModify(t *testing.T) {
 	assert.WithinDuration(t, portfolioResponse.CreatedAt, portfolioModified.CreatedAt, 0)
 	assert.WithinDuration(t, portfolioResponse.UpdatedAt, portfolioModified.UpdatedAt, 0)
 
-	mockStore.AssertExpectations(t)
+	testServer.Store.AssertExpectations(t)
 }
 
 func TestPortfolioDelete(t *testing.T) {
 	t.Parallel()
 
-	controllers, mockStore, err := controllers.Setup()
+	testServer, err := utils.NewTestServer()
 	assert.Nil(t, err)
 
 	portfolioID := uuid.New()
 
-	mockStore.On("DeletePortfolio", portfolioID).Return(nil)
+	testServer.Store.On("DeletePortfolio", portfolioID).Return(nil)
 
 	req := httptest.NewRequest(
 		http.MethodDelete,
@@ -366,12 +366,12 @@ func TestPortfolioDelete(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	controllers.DeletePortfolio(w, req)
+	testServer.Server.GetControllers().DeletePortfolio(w, req)
 
 	res := w.Result()
 	defer res.Body.Close()
 
 	assert.Equal(t, http.StatusNoContent, res.StatusCode)
 
-	mockStore.AssertExpectations(t)
+	testServer.Store.AssertExpectations(t)
 }
