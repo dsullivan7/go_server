@@ -57,18 +57,18 @@ func (c *Controllers) CreateBrokerageAccount(w http.ResponseWriter, r *http.Requ
 	}
 
   alpacaAccountID, errBroker := c.broker.CreateAccount(
-    brokerageAccountReq["givenName"].(string),
-  	brokerageAccountReq["familyName"].(string),
-  	brokerageAccountReq["dateOfBirth"].(string),
-  	brokerageAccountReq["taxID"].(string),
-  	brokerageAccountReq["emailAddress"].(string),
-  	brokerageAccountReq["phoneNumber"].(string),
-  	brokerageAccountReq["streetAddress"].(string),
+    brokerageAccountReq["first_name"].(string),
+  	brokerageAccountReq["last_name"].(string),
+  	brokerageAccountReq["date_of_birth"].(string),
+  	brokerageAccountReq["tax_id"].(string),
+  	brokerageAccountReq["email_address"].(string),
+  	brokerageAccountReq["phone_number"].(string),
+  	brokerageAccountReq["street_address"].(string),
   	brokerageAccountReq["city"].(string),
   	brokerageAccountReq["state"].(string),
-  	brokerageAccountReq["postalCode"].(string),
-  	brokerageAccountReq["fundingSource"].(string),
-  	brokerageAccountReq["ipAddress"].(string),
+  	brokerageAccountReq["postal_code"].(string),
+  	brokerageAccountReq["funding_source"].(string),
+  	r.RemoteAddr,
   )
 
   if errBroker != nil {
@@ -77,7 +77,7 @@ func (c *Controllers) CreateBrokerageAccount(w http.ResponseWriter, r *http.Requ
     return
   }
 
-  userID := uuid.Must(uuid.Parse(brokerageAccountReq["userID"].(string)))
+  userID := uuid.Must(uuid.Parse(brokerageAccountReq["user_id"].(string)))
 
   brokerageAccountPayload := models.BrokerageAccount{
     UserID: &userID,
