@@ -1,4 +1,4 @@
-package zap_test
+package alpaca_test
 
 import (
 	"bytes"
@@ -26,9 +26,7 @@ func TestAlpacaCreateAccount(t *testing.T) {
 	)
 
 	body := map[string]interface{}{
-		"account": map[string]string{
-			"id": "test",
-		},
+		"id": "test",
 	}
 
 	jsonBytes, errMarshal := json.Marshal(body)
@@ -43,7 +41,7 @@ func TestAlpacaCreateAccount(t *testing.T) {
 		nil,
 	)
 
-	accountNumber, errAcc := alpacaClient.CreateAccount(
+	alpacaAccountID, errAcc := alpacaClient.CreateAccount(
 		"givenName",
 		"familyName",
 		"dateOfBirth",
@@ -59,7 +57,7 @@ func TestAlpacaCreateAccount(t *testing.T) {
 	)
 
 	assert.Nil(t, errAcc)
-	assert.Equal(t, accountNumber, "test")
+	assert.Equal(t, alpacaAccountID, "test")
 
 	mockHTTPClient.AssertExpectations(t)
 }

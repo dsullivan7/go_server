@@ -166,7 +166,7 @@ func (brkr *Broker) CreateAccount(
 		return "", errAlpaca
 	}
 
-	return alpacaResponse["account"].(map[string]interface{})["id"].(string), nil
+	return alpacaResponse["id"].(string), nil
 }
 
 // DeleteAccount deactivates an active account.
