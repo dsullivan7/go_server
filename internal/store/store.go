@@ -25,11 +25,17 @@ type Store interface {
 	ModifyIndustry(industryID uuid.UUID, industryPayload models.Industry) (*models.Industry, error)
 	DeleteIndustry(industryID uuid.UUID) error
 
-	GetBankAccount(portfolioID uuid.UUID) (*models.BankAccount, error)
+	GetBankAccount(bankAccountID uuid.UUID) (*models.BankAccount, error)
 	ListBankAccounts(query map[string]interface{}) ([]models.BankAccount, error)
-	CreateBankAccount(portfolioPayload models.BankAccount) (*models.BankAccount, error)
-	ModifyBankAccount(portfolioID uuid.UUID, portfolioPayload models.BankAccount) (*models.BankAccount, error)
-	DeleteBankAccount(portfolioID uuid.UUID) error
+	CreateBankAccount(bankAccountPayload models.BankAccount) (*models.BankAccount, error)
+	ModifyBankAccount(bankAccountID uuid.UUID, bankAccountPayload models.BankAccount) (*models.BankAccount, error)
+	DeleteBankAccount(bankAccountID uuid.UUID) error
+
+	GetBankTransfer(bankTransferID uuid.UUID) (*models.BankTransfer, error)
+	ListBankTransfers(query map[string]interface{}) ([]models.BankTransfer, error)
+	CreateBankTransfer(bankTransferPayload models.BankTransfer) (*models.BankTransfer, error)
+	ModifyBankTransfer(bankTransferID uuid.UUID, bankTransferPayload models.BankTransfer) (*models.BankTransfer, error)
+	DeleteBankTransfer(bankTransferID uuid.UUID) error
 
 	GetBrokerageAccount(brokerageAccountID uuid.UUID) (*models.BrokerageAccount, error)
 	ListBrokerageAccounts(query map[string]interface{}) ([]models.BrokerageAccount, error)

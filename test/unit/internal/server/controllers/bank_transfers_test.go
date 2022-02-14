@@ -26,10 +26,14 @@ func TestBankTransferGet(t *testing.T) {
 
 	bankTransferID := uuid.New()
 	userID := uuid.New()
+	alpacaTransferID := "alpacaTransferID"
 
 	bankTransfer := models.BankTransfer{
 		BankTransferID: bankTransferID,
 		UserID:   &userID,
+		Amount: 123.45,
+		Status: "approved",
+		AlpacaTransferID: &alpacaTransferID,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -64,6 +68,9 @@ func TestBankTransferGet(t *testing.T) {
 
 	assert.Equal(t, bankTransferResponse.BankTransferID, bankTransfer.BankTransferID)
 	assert.Equal(t, bankTransferResponse.UserID, bankTransfer.UserID)
+	assert.Equal(t, *bankTransferResponse.AlpacaTransferID, *bankTransfer.AlpacaTransferID)
+	assert.Equal(t, bankTransferResponse.Status, bankTransfer.Status)
+	assert.Equal(t, bankTransferResponse.Amount, bankTransfer.Amount)
 	assert.WithinDuration(t, bankTransferResponse.CreatedAt, bankTransfer.CreatedAt, 0)
 	assert.WithinDuration(t, bankTransferResponse.UpdatedAt, bankTransfer.UpdatedAt, 0)
 
@@ -78,20 +85,28 @@ func TestBankTransferList(t *testing.T) {
 
 	bankTransferID1 := uuid.New()
 	userID1 := uuid.New()
+	alpacaTransferID1 := "alpacaTransferID1"
 
 	bankTransfer1 := models.BankTransfer{
 		BankTransferID: bankTransferID1,
 		UserID:   &userID1,
+		Amount: 123.45,
+		Status: "approved",
+		AlpacaTransferID: &alpacaTransferID1,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
 
 	bankTransferID2 := uuid.New()
 	userID2 := uuid.New()
+	alpacaTransferID2 := "alpacaTransferID2"
 
 	bankTransfer2 := models.BankTransfer{
 		BankTransferID: bankTransferID2,
 		UserID:   &userID2,
+		Amount: 456.78,
+		Status: "pending",
+		AlpacaTransferID: &alpacaTransferID2,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -134,6 +149,9 @@ func TestBankTransferList(t *testing.T) {
 
 	assert.Equal(t, bankTransferResponse.BankTransferID, bankTransfer1.BankTransferID)
 	assert.Equal(t, bankTransferResponse.UserID, bankTransfer1.UserID)
+	assert.Equal(t, *bankTransferResponse.AlpacaTransferID, *bankTransfer1.AlpacaTransferID)
+	assert.Equal(t, bankTransferResponse.Status, bankTransfer1.Status)
+	assert.Equal(t, bankTransferResponse.Amount, bankTransfer1.Amount)
 	assert.WithinDuration(t, bankTransferResponse.CreatedAt, bankTransfer1.CreatedAt, 0)
 	assert.WithinDuration(t, bankTransferResponse.UpdatedAt, bankTransfer1.UpdatedAt, 0)
 
@@ -147,6 +165,9 @@ func TestBankTransferList(t *testing.T) {
 
 	assert.Equal(t, bankTransferResponse.BankTransferID, bankTransfer2.BankTransferID)
 	assert.Equal(t, bankTransferResponse.UserID, bankTransfer2.UserID)
+	assert.Equal(t, *bankTransferResponse.AlpacaTransferID, *bankTransfer2.AlpacaTransferID)
+	assert.Equal(t, bankTransferResponse.Status, bankTransfer2.Status)
+	assert.Equal(t, bankTransferResponse.Amount, bankTransfer2.Amount)
 	assert.WithinDuration(t, bankTransferResponse.CreatedAt, bankTransfer2.CreatedAt, 0)
 	assert.WithinDuration(t, bankTransferResponse.UpdatedAt, bankTransfer2.UpdatedAt, 0)
 
@@ -161,10 +182,14 @@ func TestBankTransferListQueryParams(t *testing.T) {
 
 	bankTransferID := uuid.New()
 	userID := uuid.New()
+	alpacaTransferID := "alpacaTransferID"
 
 	bankTransfer := models.BankTransfer{
 		BankTransferID: bankTransferID,
 		UserID:   &userID,
+		Amount: 123.45,
+		Status: "approved",
+		AlpacaTransferID: &alpacaTransferID,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -199,6 +224,9 @@ func TestBankTransferListQueryParams(t *testing.T) {
 
 	assert.Equal(t, bankTransferResponse.BankTransferID, bankTransfer.BankTransferID)
 	assert.Equal(t, bankTransferResponse.UserID, bankTransfer.UserID)
+	assert.Equal(t, *bankTransferResponse.AlpacaTransferID, *bankTransfer.AlpacaTransferID)
+	assert.Equal(t, bankTransferResponse.Status, bankTransfer.Status)
+	assert.Equal(t, bankTransferResponse.Amount, bankTransfer.Amount)
 	assert.WithinDuration(t, bankTransferResponse.CreatedAt, bankTransfer.CreatedAt, 0)
 	assert.WithinDuration(t, bankTransferResponse.UpdatedAt, bankTransfer.UpdatedAt, 0)
 
@@ -212,6 +240,7 @@ func TestBankTransferCreate(t *testing.T) {
 	assert.Nil(t, err)
 
 	userID := uuid.New()
+	alpacaTransferID := "alpacaTransferID"
 
 	jsonStr := []byte(fmt.Sprintf(
 		`{
@@ -227,6 +256,9 @@ func TestBankTransferCreate(t *testing.T) {
 	bankTransferCreated := models.BankTransfer{
 		BankTransferID:    uuid.New(),
 		UserID:   &userID,
+		Amount: 123.45,
+		Status: "approved",
+		AlpacaTransferID: &alpacaTransferID,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -257,6 +289,9 @@ func TestBankTransferCreate(t *testing.T) {
 
 	assert.Equal(t, bankTransferResponse.BankTransferID, bankTransferCreated.BankTransferID)
 	assert.Equal(t, bankTransferResponse.UserID, bankTransferCreated.UserID)
+	assert.Equal(t, *bankTransferResponse.AlpacaTransferID, *bankTransferCreated.AlpacaTransferID)
+	assert.Equal(t, bankTransferResponse.Status, bankTransferCreated.Status)
+	assert.Equal(t, bankTransferResponse.Amount, bankTransferCreated.Amount)
 	assert.WithinDuration(t, bankTransferResponse.CreatedAt, bankTransferCreated.CreatedAt, 0)
 	assert.WithinDuration(t, bankTransferResponse.UpdatedAt, bankTransferCreated.UpdatedAt, 0)
 
@@ -270,6 +305,7 @@ func TestBankTransferModify(t *testing.T) {
 	assert.Nil(t, err)
 
 	userID := uuid.New()
+	alpacaTransferID := "alpacaTransferID"
 
 	jsonStr := []byte(`{}`)
 
@@ -278,6 +314,9 @@ func TestBankTransferModify(t *testing.T) {
 	bankTransferModified := models.BankTransfer{
 		BankTransferID:    uuid.New(),
 		UserID:   &userID,
+		Amount: 123.45,
+		Status: "approved",
+		AlpacaTransferID: &alpacaTransferID,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -313,6 +352,9 @@ func TestBankTransferModify(t *testing.T) {
 
 	assert.Equal(t, bankTransferResponse.BankTransferID, bankTransferModified.BankTransferID)
 	assert.Equal(t, bankTransferResponse.UserID, bankTransferModified.UserID)
+	assert.Equal(t, *bankTransferResponse.AlpacaTransferID, *bankTransferModified.AlpacaTransferID)
+	assert.Equal(t, bankTransferResponse.Status, bankTransferModified.Status)
+	assert.Equal(t, bankTransferResponse.Amount, bankTransferModified.Amount)
 	assert.WithinDuration(t, bankTransferResponse.CreatedAt, bankTransferModified.CreatedAt, 0)
 	assert.WithinDuration(t, bankTransferResponse.UpdatedAt, bankTransferModified.UpdatedAt, 0)
 
