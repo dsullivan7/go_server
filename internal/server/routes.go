@@ -64,6 +64,12 @@ func (s *ChiServer) Init() http.Handler {
 		r.Delete("/api/bank-accounts/{bank_account_id}", controllers.DeleteBankAccount)
 		r.Put("/api/bank-accounts/{bank_account_id}", controllers.ModifyBankAccount)
 
+		r.Get("/api/bank-transfers/{bank_transfer_id}", controllers.GetBankTransfer)
+		r.Get("/api/bank-transfers", controllers.ListBankTransfers)
+		r.Post("/api/bank-transfers", controllers.CreateBankTransfer)
+		r.Delete("/api/bank-transfers/{bank_transfer_id}", controllers.DeleteBankTransfer)
+		r.Put("/api/bank-transfers/{bank_transfer_id}", controllers.ModifyBankTransfer)
+
 		r.Get("/api/brokerage-accounts/{brokerage_account_id}", controllers.GetBrokerageAccount)
 		r.Get("/api/brokerage-accounts", controllers.ListBrokerageAccounts)
 		r.Post("/api/brokerage-accounts", controllers.CreateBrokerageAccount)
