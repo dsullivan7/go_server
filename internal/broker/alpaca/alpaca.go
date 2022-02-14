@@ -185,7 +185,7 @@ func (brkr *Broker) DeleteAccount(accountID string) error {
 }
 
 // CreateOrder creates an order for an account.
-func (brkr *Broker) CreateOrder(accountID string, symbol string, quantity float32, side string) (string, error) {
+func (brkr *Broker) CreateOrder(accountID string, symbol string, quantity float64, side string) (string, error) {
 	body := map[string]interface{}{
 		"symbol":        symbol,
 		"qty":           quantity,
@@ -211,7 +211,7 @@ func (brkr *Broker) CreateOrder(accountID string, symbol string, quantity float3
 func (brkr *Broker) CreateTransfer(
 	accountID string,
 	relationshipID string,
-	amount float32,
+	amount float64,
 	direction string,
 ) (string, error) {
 	body := map[string]interface{}{

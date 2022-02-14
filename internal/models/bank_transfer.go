@@ -9,7 +9,7 @@ import (
 type BankTransfer struct {
 	BankTransferID    uuid.UUID  `json:"bank_transfer_id" gorm:"primary_key;type:uuid;default:uuid_generate_v4()"`
 	UserID           *uuid.UUID `json:"user_id"`
-	Amount           float32 `json:"amount"`
+	Amount           float64 `json:"amount"`
 	Status           string `json:"status"`
 	AlpacaTransferID   *string    `json:"alpaca_transfer_id"`
 	CreatedAt        time.Time  `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`

@@ -55,7 +55,7 @@ func (mockBroker *MockBroker) DeleteAccount(
 func (mockBroker *MockBroker) CreateOrder(
 	accountID string,
 	symbol string,
-	quantity float32,
+	quantity float64,
 	side string,
 ) (string, error) {
 	args := mockBroker.Called(
@@ -71,7 +71,7 @@ func (mockBroker *MockBroker) CreateOrder(
 func (mockBroker *MockBroker) CreateTransfer(
 	accountID string,
 	relationshipID string,
-	amount float32,
+	amount float64,
 	direction string,
 ) (string, error) {
 	args := mockBroker.Called(

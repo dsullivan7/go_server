@@ -19,13 +19,13 @@ type Broker interface {
 	CreateOrder(
 		accountID string,
 		symbol string,
-		quantity float32,
+		quantity float64,
 		side string,
 	) (string, error)
 	CreateTransfer(
 		accountID string,
 		relationshipID string,
-		amount float32,
+		amount float64,
 		direction string,
 	) (string, error)
 	CreateACHRelationship(

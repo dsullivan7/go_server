@@ -241,28 +241,47 @@ func TestBankTransferCreate(t *testing.T) {
 
 	userID := uuid.New()
 	alpacaTransferID := "alpacaTransferID"
+	amount := 234.45
+
+	alpacaAccountID := "alpacaAccountID"
+	alpacaACHRelationshipID := "alpacaACHRelationshipID"
 
 	jsonStr := []byte(fmt.Sprintf(
 		`{
-				"user_id": "%s"
+				"user_id": "%s",
+				"alpaca_account_id": "%s",
+				"alpaca_ach_relationship_id": "%s",
+				"amount": %f
 			}`,
 		userID.String(),
+		alpacaTransferID,
+		alpacaACHRelationshipID,
+		amount,
 	))
 
 	bankTransferPayload := models.BankTransfer{
 		UserID:   &userID,
+		Amount: amount,
+		Status: "pending",
 	}
 
 	bankTransferCreated := models.BankTransfer{
 		BankTransferID:    uuid.New(),
 		UserID:   &userID,
-		Amount: 123.45,
-		Status: "approved",
+		Amount: amount,
+		Status: "pending",
 		AlpacaTransferID: &alpacaTransferID,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
 
+	testServer.Broker.On(
+		"CreateTransfer",
+		alpacaAccountID,
+		alpacaACHRelationshipID,
+		amount,
+		"INCOMING",
+	).Return(&alpacaTransferID, nil)
 	testServer.Store.On("CreateBankTransfer", bankTransferPayload).Return(&bankTransferCreated, nil)
 
 	req := httptest.NewRequest(
