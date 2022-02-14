@@ -254,7 +254,7 @@ func TestBankTransferCreate(t *testing.T) {
 				"amount": %f
 			}`,
 		userID.String(),
-		alpacaTransferID,
+		alpacaAccountID,
 		alpacaACHRelationshipID,
 		amount,
 	))
@@ -262,14 +262,15 @@ func TestBankTransferCreate(t *testing.T) {
 	bankTransferPayload := models.BankTransfer{
 		UserID:   &userID,
 		Amount: amount,
-		Status: "pending",
+		Status: "PENDING",
+		AlpacaTransferID: &alpacaTransferID,
 	}
 
 	bankTransferCreated := models.BankTransfer{
 		BankTransferID:    uuid.New(),
 		UserID:   &userID,
 		Amount: amount,
-		Status: "pending",
+		Status: "PENDING",
 		AlpacaTransferID: &alpacaTransferID,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
@@ -281,7 +282,8 @@ func TestBankTransferCreate(t *testing.T) {
 		alpacaACHRelationshipID,
 		amount,
 		"INCOMING",
-	).Return(&alpacaTransferID, nil)
+	).Return(alpacaTransferID, nil)
+
 	testServer.Store.On("CreateBankTransfer", bankTransferPayload).Return(&bankTransferCreated, nil)
 
 	req := httptest.NewRequest(

@@ -45,14 +45,36 @@ func (c *Controllers) ListBankTransfers(w http.ResponseWriter, r *http.Request) 
 }
 
 func (c *Controllers) CreateBankTransfer(w http.ResponseWriter, r *http.Request) {
-	var bankTransferPayload models.BankTransfer
+	var bankTransferReq map[string]interface{}
 
-	errDecode := json.NewDecoder(r.Body).Decode(&bankTransferPayload)
+	errDecode := json.NewDecoder(r.Body).Decode(&bankTransferReq)
 	if errDecode != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errDecode})
 
 		return
 	}
+
+	alpacaTransferID, errTransfer := c.broker.CreateTransfer(
+		bankTransferReq["alpaca_account_id"].(string),
+		bankTransferReq["alpaca_ach_relationship_id"].(string),
+		bankTransferReq["amount"].(float64),
+		"INCOMING",
+	)
+
+	if errTransfer != nil {
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errTransfer})
+
+		return
+	}
+
+	userID := uuid.Must(uuid.Parse(bankTransferReq["user_id"].(string)))
+
+  bankTransferPayload := models.BankTransfer{
+    UserID: &userID,
+    Amount: bankTransferReq["amount"].(float64),
+    Status: "PENDING",
+    AlpacaTransferID: &alpacaTransferID,
+  }
 
 	bankTransfer, err := c.store.CreateBankTransfer(bankTransferPayload)
 
