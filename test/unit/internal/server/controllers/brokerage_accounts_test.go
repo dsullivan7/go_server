@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"go_server/internal/models"
+	"go_server/internal/broker"
 	"go_server/test/utils"
 	"net/http"
 	"net/http/httptest"
@@ -93,6 +94,11 @@ func TestBrokerageAccountList(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}
 
+	alpacaAccount1 := broker.Account{
+		AccountID: alpacaAccountID1,
+		Cash: 234.56,
+	}
+
 	brokerageAccountID2 := uuid.New()
 	userID2 := uuid.New()
 
@@ -106,7 +112,14 @@ func TestBrokerageAccountList(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}
 
+	alpacaAccount2 := broker.Account{
+		AccountID: alpacaAccountID2,
+		Cash: 456.56,
+	}
+
 	testServer.Store.On("ListBrokerageAccounts", map[string]interface{}{}).Return([]models.BrokerageAccount{brokerageAccount1, brokerageAccount2}, nil)
+	testServer.Broker.On("GetAccount", alpacaAccountID1).Return(&alpacaAccount1, nil)
+	testServer.Broker.On("GetAccount", alpacaAccountID2).Return(&alpacaAccount2, nil)
 
 	req := httptest.NewRequest(
 		http.MethodGet,
@@ -184,7 +197,13 @@ func TestBrokerageAccountListQueryParams(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}
 
+	alpacaAccount := broker.Account{
+		AccountID: alpacaAccountID,
+		Cash: 234.56,
+	}
+
 	testServer.Store.On("ListBrokerageAccounts", map[string]interface{}{ "user_id": userID.String() }).Return([]models.BrokerageAccount{brokerageAccount}, nil)
+	testServer.Broker.On("GetAccount", alpacaAccountID).Return(&alpacaAccount, nil)
 
 	req := httptest.NewRequest(
 		http.MethodGet,

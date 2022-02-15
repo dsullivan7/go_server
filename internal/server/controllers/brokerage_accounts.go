@@ -43,7 +43,41 @@ func (c *Controllers) ListBrokerageAccounts(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	render.JSON(w, r, brokerageAccounts)
+  var brokerageAccountRes []map[string]interface{}
+
+  for _, brokerageAccount := range brokerageAccounts {
+    var brkrgAccntRes map[string]interface{}
+
+    brkrgAccntJson, errDecode := json.Marshal(brokerageAccount)
+
+    if (errDecode != nil) {
+      c.utils.HandleError(w, r, errors.HTTPServerError{Err: errDecode})
+
+      return
+    }
+
+    errEncode := json.Unmarshal(brkrgAccntJson, &brkrgAccntRes)
+
+    if (errEncode != nil) {
+      c.utils.HandleError(w, r, errors.HTTPServerError{Err: errEncode})
+
+      return
+    }
+
+    brokerRes, brokerErr := c.broker.GetAccount(*brokerageAccount.AlpacaAccountID)
+
+    if (brokerErr != nil) {
+      c.utils.HandleError(w, r, errors.HTTPServerError{Err: brokerErr})
+
+      return
+    }
+
+    brkrgAccntRes["cash"] = brokerRes.Cash
+
+    brokerageAccountRes = append(brokerageAccountRes, brkrgAccntRes)
+  }
+
+	render.JSON(w, r, brokerageAccountRes)
 }
 
 func (c *Controllers) CreateBrokerageAccount(w http.ResponseWriter, r *http.Request) {

@@ -15,6 +15,7 @@ import (
 )
 
 var ErrAlpacaAPI = errors.New("alpaca api error")
+var bitConversion = 64
 
 type Broker struct {
 	alpacaAPIKey    string
@@ -182,10 +183,10 @@ func (brkr *Broker) GetAccount(accountID string) (*broker.Account, error) {
 		return nil, errAlpaca
 	}
 
-	cash, errCash := strconv.ParseFloat(alpacaResponse["cash"].(string), 64)
+	cash, errCash := strconv.ParseFloat(alpacaResponse["cash"].(string), bitConversion)
 
 	if errCash != nil {
-		return nil, errCash
+		return nil, fmt.Errorf("error parsing the cash amount: %w", errCash)
 	}
 
 	account := broker.Account{
