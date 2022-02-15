@@ -61,4 +61,4 @@ lint-fix:
 
 .PHONY: lint-docker
 lint-docker:
-	docker run --rm -v ${PWD}:/data -w /data ${DOCKER_GOLANG_LINT} golangci-lint run
+	docker run --rm -v ${PWD}:/data -w /data ${DOCKER_GOLANG_LINT} golangci-lint run --timeout=3m
