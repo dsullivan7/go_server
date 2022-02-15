@@ -1,7 +1,6 @@
 package controllers_test
 
 import (
-	"time"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -11,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -33,14 +33,14 @@ func TestBankAccountGet(t *testing.T) {
 	alpacaACHRelationshipID := "alpacaACHRelationshipID"
 
 	bankAccount := models.BankAccount{
-		BankAccountID: bankAccountID,
-		UserID:   &userID,
-		Name: &name,
-		PlaidAccessToken: &plaidAccessToken,
-		PlaidAccountID: &plaidAccountID,
+		BankAccountID:           bankAccountID,
+		UserID:                  &userID,
+		Name:                    &name,
+		PlaidAccessToken:        &plaidAccessToken,
+		PlaidAccountID:          &plaidAccountID,
 		AlpacaACHRelationshipID: &alpacaACHRelationshipID,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt:               time.Now(),
+		UpdatedAt:               time.Now(),
 	}
 
 	testServer.Store.On("GetBankAccount", bankAccountID).Return(&bankAccount, nil)
@@ -98,14 +98,14 @@ func TestBankAccountList(t *testing.T) {
 	alpacaACHRelationshipID1 := "alpacaACHRelationshipID1"
 
 	bankAccount1 := models.BankAccount{
-		BankAccountID: bankAccountID1,
-		UserID:   &userID1,
-		Name: &name1,
-		PlaidAccessToken: &plaidAccessToken1,
-		PlaidAccountID: &plaidAccountID1,
+		BankAccountID:           bankAccountID1,
+		UserID:                  &userID1,
+		Name:                    &name1,
+		PlaidAccessToken:        &plaidAccessToken1,
+		PlaidAccountID:          &plaidAccountID1,
 		AlpacaACHRelationshipID: &alpacaACHRelationshipID1,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt:               time.Now(),
+		UpdatedAt:               time.Now(),
 	}
 
 	bankAccountID2 := uuid.New()
@@ -117,17 +117,19 @@ func TestBankAccountList(t *testing.T) {
 	alpacaACHRelationshipID2 := "alpacaACHRelationshipID2"
 
 	bankAccount2 := models.BankAccount{
-		BankAccountID: bankAccountID2,
-		UserID:   &userID2,
-		Name: &name2,
-		PlaidAccessToken: &plaidAccessToken2,
-		PlaidAccountID: &plaidAccountID2,
+		BankAccountID:           bankAccountID2,
+		UserID:                  &userID2,
+		Name:                    &name2,
+		PlaidAccessToken:        &plaidAccessToken2,
+		PlaidAccountID:          &plaidAccountID2,
 		AlpacaACHRelationshipID: &alpacaACHRelationshipID2,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt:               time.Now(),
+		UpdatedAt:               time.Now(),
 	}
 
-	testServer.Store.On("ListBankAccounts", map[string]interface{}{}).Return([]models.BankAccount{bankAccount1, bankAccount2}, nil)
+	testServer.Store.
+		On("ListBankAccounts", map[string]interface{}{}).
+		Return([]models.BankAccount{bankAccount1, bankAccount2}, nil)
 
 	req := httptest.NewRequest(
 		http.MethodGet,
@@ -207,17 +209,19 @@ func TestBankAccountListQueryParams(t *testing.T) {
 	alpacaACHRelationshipID := "alpacaACHRelationshipID"
 
 	bankAccount := models.BankAccount{
-		BankAccountID: bankAccountID,
-		UserID:   &userID,
-		Name: &name,
-		PlaidAccessToken: &plaidAccessToken,
-		PlaidAccountID: &plaidAccountID,
+		BankAccountID:           bankAccountID,
+		UserID:                  &userID,
+		Name:                    &name,
+		PlaidAccessToken:        &plaidAccessToken,
+		PlaidAccountID:          &plaidAccountID,
 		AlpacaACHRelationshipID: &alpacaACHRelationshipID,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt:               time.Now(),
+		UpdatedAt:               time.Now(),
 	}
 
-	testServer.Store.On("ListBankAccounts", map[string]interface{}{ "user_id": userID.String() }).Return([]models.BankAccount{bankAccount}, nil)
+	testServer.Store.
+		On("ListBankAccounts", map[string]interface{}{"user_id": userID.String()}).
+		Return([]models.BankAccount{bankAccount}, nil)
 
 	req := httptest.NewRequest(
 		http.MethodGet,
@@ -274,22 +278,22 @@ func TestBankAccountCreate(t *testing.T) {
 	alpacaACHRelationshipID := "alpacaACHRelationshipID"
 
 	bankAccountPayload := models.BankAccount{
-		UserID:           &userID,
-		Name:             &name,
-		PlaidAccountID:   &plaidAccountID,
-		PlaidAccessToken: &plaidAccessToken,
+		UserID:                  &userID,
+		Name:                    &name,
+		PlaidAccountID:          &plaidAccountID,
+		PlaidAccessToken:        &plaidAccessToken,
 		AlpacaACHRelationshipID: &alpacaACHRelationshipID,
 	}
 
 	bankAccountCreated := models.BankAccount{
-		BankAccountID: bankAccountID,
-		UserID:   &userID,
-		Name: &name,
-		PlaidAccessToken: &plaidAccessToken,
-		PlaidAccountID: &plaidAccountID,
+		BankAccountID:           bankAccountID,
+		UserID:                  &userID,
+		Name:                    &name,
+		PlaidAccessToken:        &plaidAccessToken,
+		PlaidAccountID:          &plaidAccountID,
 		AlpacaACHRelationshipID: &alpacaACHRelationshipID,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt:               time.Now(),
+		UpdatedAt:               time.Now(),
 	}
 
 	brokerageAccountID := uuid.New()
@@ -297,10 +301,10 @@ func TestBankAccountCreate(t *testing.T) {
 
 	brokerageAccount := models.BrokerageAccount{
 		BrokerageAccountID: brokerageAccountID,
-		UserID:   &userID,
-		AlpacaAccountID: &alpacaAccountID,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		UserID:             &userID,
+		AlpacaAccountID:    &alpacaAccountID,
+		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
 	}
 
 	jsonStr := []byte(fmt.Sprintf(
@@ -385,17 +389,19 @@ func TestBankAccountModify(t *testing.T) {
 	bankAccountPayload := models.BankAccount{}
 
 	bankAccountModified := models.BankAccount{
-		BankAccountID: bankAccountID,
-		UserID:   &userID,
-		Name: &name,
-		PlaidAccessToken: &plaidAccessToken,
-		PlaidAccountID: &plaidAccountID,
+		BankAccountID:           bankAccountID,
+		UserID:                  &userID,
+		Name:                    &name,
+		PlaidAccessToken:        &plaidAccessToken,
+		PlaidAccountID:          &plaidAccountID,
 		AlpacaACHRelationshipID: &alpacaACHRelationshipID,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt:               time.Now(),
+		UpdatedAt:               time.Now(),
 	}
 
-	testServer.Store.On("ModifyBankAccount", bankAccountModified.BankAccountID, bankAccountPayload).Return(&bankAccountModified, nil)
+	testServer.Store.
+		On("ModifyBankAccount", bankAccountModified.BankAccountID, bankAccountPayload).
+		Return(&bankAccountModified, nil)
 
 	req := httptest.NewRequest(
 		http.MethodPut,

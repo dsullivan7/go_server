@@ -1,7 +1,6 @@
 package controllers_test
 
 import (
-	"time"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -11,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -29,10 +29,10 @@ func TestPortfolioGet(t *testing.T) {
 
 	portfolio := models.Portfolio{
 		PortfolioID: portfolioID,
-		UserID:   &userID,
-		Risk:   3,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		UserID:      &userID,
+		Risk:        3,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
 	}
 
 	testServer.Store.On("GetPortfolio", portfolioID).Return(&portfolio, nil)
@@ -83,10 +83,10 @@ func TestPortfolioList(t *testing.T) {
 
 	portfolio1 := models.Portfolio{
 		PortfolioID: portfolioID1,
-		UserID:   &userID1,
-		Risk:   3,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		UserID:      &userID1,
+		Risk:        3,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
 	}
 
 	portfolioID2 := uuid.New()
@@ -94,10 +94,10 @@ func TestPortfolioList(t *testing.T) {
 
 	portfolio2 := models.Portfolio{
 		PortfolioID: portfolioID2,
-		UserID:   &userID2,
-		Risk:   4,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		UserID:      &userID2,
+		Risk:        4,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
 	}
 
 	testServer.Store.On("ListPortfolios", map[string]interface{}{}).Return([]models.Portfolio{portfolio1, portfolio2}, nil)
@@ -170,13 +170,16 @@ func TestPortfolioListQueryParams(t *testing.T) {
 
 	portfolio := models.Portfolio{
 		PortfolioID: portfolioID,
-		UserID:   &userID,
-		Risk:   3,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		UserID:      &userID,
+		Risk:        3,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
 	}
 
-	testServer.Store.On("ListPortfolios", map[string]interface{}{ "user_id": userID.String() }).Return([]models.Portfolio{portfolio}, nil)
+	testServer.Store.On(
+		"ListPortfolios",
+		map[string]interface{}{"user_id": userID.String()},
+	).Return([]models.Portfolio{portfolio}, nil)
 
 	req := httptest.NewRequest(
 		http.MethodGet,
@@ -232,16 +235,16 @@ func TestPortfolioCreate(t *testing.T) {
 	))
 
 	portfolioPayload := models.Portfolio{
-		UserID:   &userID,
-		Risk:  risk,
+		UserID: &userID,
+		Risk:   risk,
 	}
 
 	portfolioCreated := models.Portfolio{
-		PortfolioID:    uuid.New(),
-		UserID:   &userID,
-		Risk:  risk,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		PortfolioID: uuid.New(),
+		UserID:      &userID,
+		Risk:        risk,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
 	}
 
 	testServer.Store.On("CreatePortfolio", portfolioPayload).Return(&portfolioCreated, nil)
@@ -294,15 +297,15 @@ func TestPortfolioModify(t *testing.T) {
 	))
 
 	portfolioPayload := models.Portfolio{
-		Risk:  risk,
+		Risk: risk,
 	}
 
 	portfolioModified := models.Portfolio{
-		PortfolioID:    uuid.New(),
-		UserID:   &userID,
-		Risk:  risk,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		PortfolioID: uuid.New(),
+		UserID:      &userID,
+		Risk:        risk,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
 	}
 
 	testServer.Store.On("ModifyPortfolio", portfolioModified.PortfolioID, portfolioPayload).Return(&portfolioModified, nil)

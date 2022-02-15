@@ -44,10 +44,12 @@ func (c *Controllers) ListBankAccounts(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, bankAccounts)
 }
 
+// nolint:funlen
 func (c *Controllers) CreateBankAccount(w http.ResponseWriter, r *http.Request) {
 	var bankAccountReq map[string]string
 
 	errDecode := json.NewDecoder(r.Body).Decode(&bankAccountReq)
+
 	if errDecode != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errDecode})
 
@@ -80,7 +82,11 @@ func (c *Controllers) CreateBankAccount(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	plaidProcessorToken, errPlaidProcessorToken := c.plaidClient.CreateProcessorToken(plaidAccessToken, plaidAccountID, "alpaca")
+	plaidProcessorToken, errPlaidProcessorToken := c.plaidClient.CreateProcessorToken(
+		plaidAccessToken,
+		plaidAccountID,
+		"alpaca",
+	)
 
 	if errPlaidProcessorToken != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errPlaidProcessorToken})
@@ -88,7 +94,10 @@ func (c *Controllers) CreateBankAccount(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	alpacaACHRelationshipID, errACHRelationship := c.broker.CreateACHRelationship(*brokerageAccount.AlpacaAccountID, plaidProcessorToken)
+	alpacaACHRelationshipID, errACHRelationship := c.broker.CreateACHRelationship(
+		*brokerageAccount.AlpacaAccountID,
+		plaidProcessorToken,
+	)
 
 	if errACHRelationship != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errACHRelationship})
@@ -99,10 +108,10 @@ func (c *Controllers) CreateBankAccount(w http.ResponseWriter, r *http.Request) 
 	userID := uuid.Must(uuid.Parse(bankAccountReq["user_id"]))
 
 	bankAccountPayload := models.BankAccount{
-		UserID:           &userID,
-		Name:             &name,
-		PlaidAccountID:   &plaidAccountID,
-		PlaidAccessToken: &plaidAccessToken,
+		UserID:                  &userID,
+		Name:                    &name,
+		PlaidAccountID:          &plaidAccountID,
+		PlaidAccessToken:        &plaidAccessToken,
 		AlpacaACHRelationshipID: &alpacaACHRelationshipID,
 	}
 

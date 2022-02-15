@@ -1,17 +1,17 @@
 package controllers_test
 
 import (
-	"time"
 	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"go_server/internal/models"
 	"go_server/internal/broker"
+	"go_server/internal/models"
 	"go_server/test/utils"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -32,10 +32,10 @@ func TestBrokerageAccountGet(t *testing.T) {
 
 	brokerageAccount := models.BrokerageAccount{
 		BrokerageAccountID: brokerageAccountID,
-		UserID:   &userID,
-		AlpacaAccountID: &alpacaAccountID,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		UserID:             &userID,
+		AlpacaAccountID:    &alpacaAccountID,
+		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
 	}
 
 	testServer.Store.On("GetBrokerageAccount", brokerageAccountID).Return(&brokerageAccount, nil)
@@ -88,15 +88,15 @@ func TestBrokerageAccountList(t *testing.T) {
 
 	brokerageAccount1 := models.BrokerageAccount{
 		BrokerageAccountID: brokerageAccountID1,
-		UserID:   &userID1,
-		AlpacaAccountID: &alpacaAccountID1,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		UserID:             &userID1,
+		AlpacaAccountID:    &alpacaAccountID1,
+		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
 	}
 
 	alpacaAccount1 := broker.Account{
 		AccountID: alpacaAccountID1,
-		Cash: 234.56,
+		Cash:      234.56,
 	}
 
 	brokerageAccountID2 := uuid.New()
@@ -106,18 +106,20 @@ func TestBrokerageAccountList(t *testing.T) {
 
 	brokerageAccount2 := models.BrokerageAccount{
 		BrokerageAccountID: brokerageAccountID2,
-		UserID:   &userID2,
-		AlpacaAccountID: &alpacaAccountID2,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		UserID:             &userID2,
+		AlpacaAccountID:    &alpacaAccountID2,
+		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
 	}
 
 	alpacaAccount2 := broker.Account{
 		AccountID: alpacaAccountID2,
-		Cash: 456.56,
+		Cash:      456.56,
 	}
 
-	testServer.Store.On("ListBrokerageAccounts", map[string]interface{}{}).Return([]models.BrokerageAccount{brokerageAccount1, brokerageAccount2}, nil)
+	testServer.Store.
+		On("ListBrokerageAccounts", map[string]interface{}{}).
+		Return([]models.BrokerageAccount{brokerageAccount1, brokerageAccount2}, nil)
 	testServer.Broker.On("GetAccount", alpacaAccountID1).Return(&alpacaAccount1, nil)
 	testServer.Broker.On("GetAccount", alpacaAccountID2).Return(&alpacaAccount2, nil)
 
@@ -191,18 +193,20 @@ func TestBrokerageAccountListQueryParams(t *testing.T) {
 
 	brokerageAccount := models.BrokerageAccount{
 		BrokerageAccountID: brokerageAccountID,
-		UserID:   &userID,
-		AlpacaAccountID: &alpacaAccountID,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		UserID:             &userID,
+		AlpacaAccountID:    &alpacaAccountID,
+		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
 	}
 
 	alpacaAccount := broker.Account{
 		AccountID: alpacaAccountID,
-		Cash: 234.56,
+		Cash:      234.56,
 	}
 
-	testServer.Store.On("ListBrokerageAccounts", map[string]interface{}{ "user_id": userID.String() }).Return([]models.BrokerageAccount{brokerageAccount}, nil)
+	testServer.Store.
+		On("ListBrokerageAccounts", map[string]interface{}{"user_id": userID.String()}).
+		Return([]models.BrokerageAccount{brokerageAccount}, nil)
 	testServer.Broker.On("GetAccount", alpacaAccountID).Return(&alpacaAccount, nil)
 
 	req := httptest.NewRequest(
@@ -265,16 +269,16 @@ func TestBrokerageAccountCreate(t *testing.T) {
 	alpacaAccountID := "alpacaAccountID"
 
 	brokerageAccountPayload := models.BrokerageAccount{
-		UserID:           &userID,
-		AlpacaAccountID:   &alpacaAccountID,
+		UserID:          &userID,
+		AlpacaAccountID: &alpacaAccountID,
 	}
 
 	brokerageAccountCreated := models.BrokerageAccount{
 		BrokerageAccountID: brokerageAccountID,
-		UserID:   &userID,
-		AlpacaAccountID: &alpacaAccountID,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		UserID:             &userID,
+		AlpacaAccountID:    &alpacaAccountID,
+		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
 	}
 
 	jsonStr := []byte(fmt.Sprintf(
@@ -306,7 +310,23 @@ func TestBrokerageAccountCreate(t *testing.T) {
 		fundingSource,
 	))
 
-	testServer.Broker.On("CreateAccount", firstName, lastName, dateOfBirth, taxID, emailAddress, phoneNumber, streetAddress, city, state, postalCode, fundingSource, ipAddress).Return(alpacaAccountID, nil)
+	testServer.Broker.
+		On(
+			"CreateAccount",
+			firstName,
+			lastName,
+			dateOfBirth,
+			taxID,
+			emailAddress,
+			phoneNumber,
+			streetAddress,
+			city,
+			state,
+			postalCode,
+			fundingSource,
+			ipAddress,
+		).
+		Return(alpacaAccountID, nil)
 	testServer.Store.On("CreateBrokerageAccount", brokerageAccountPayload).Return(&brokerageAccountCreated, nil)
 
 	req := httptest.NewRequest(
@@ -360,13 +380,17 @@ func TestBrokerageAccountModify(t *testing.T) {
 
 	brokerageAccountModified := models.BrokerageAccount{
 		BrokerageAccountID: brokerageAccountID,
-		UserID:   &userID,
-		AlpacaAccountID: &alpacaAccountID,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		UserID:             &userID,
+		AlpacaAccountID:    &alpacaAccountID,
+		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
 	}
 
-	testServer.Store.On("ModifyBrokerageAccount", brokerageAccountModified.BrokerageAccountID, brokerageAccountPayload).Return(&brokerageAccountModified, nil)
+	testServer.Store.On(
+		"ModifyBrokerageAccount",
+		brokerageAccountModified.BrokerageAccountID,
+		brokerageAccountPayload,
+	).Return(&brokerageAccountModified, nil)
 
 	req := httptest.NewRequest(
 		http.MethodPut,

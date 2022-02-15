@@ -1,7 +1,7 @@
 package broker
 
 type Account struct {
-	Cash    float64
+	Cash      float64
 	AccountID string
 }
 

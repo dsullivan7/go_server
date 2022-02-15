@@ -69,12 +69,12 @@ func (c *Controllers) CreateBankTransfer(w http.ResponseWriter, r *http.Request)
 
 	userID := uuid.Must(uuid.Parse(bankTransferReq["user_id"].(string)))
 
-  bankTransferPayload := models.BankTransfer{
-    UserID: &userID,
-    Amount: bankTransferReq["amount"].(float64),
-    Status: "PENDING",
-    AlpacaTransferID: &alpacaTransferID,
-  }
+	bankTransferPayload := models.BankTransfer{
+		UserID:           &userID,
+		Amount:           bankTransferReq["amount"].(float64),
+		Status:           "PENDING",
+		AlpacaTransferID: &alpacaTransferID,
+	}
 
 	bankTransfer, err := c.store.CreateBankTransfer(bankTransferPayload)
 

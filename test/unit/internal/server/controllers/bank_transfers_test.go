@@ -1,7 +1,6 @@
 package controllers_test
 
 import (
-	"time"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -11,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -29,13 +29,13 @@ func TestBankTransferGet(t *testing.T) {
 	alpacaTransferID := "alpacaTransferID"
 
 	bankTransfer := models.BankTransfer{
-		BankTransferID: bankTransferID,
-		UserID:   &userID,
-		Amount: 123.45,
-		Status: "approved",
+		BankTransferID:   bankTransferID,
+		UserID:           &userID,
+		Amount:           123.45,
+		Status:           "approved",
 		AlpacaTransferID: &alpacaTransferID,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
 	}
 
 	testServer.Store.On("GetBankTransfer", bankTransferID).Return(&bankTransfer, nil)
@@ -88,13 +88,13 @@ func TestBankTransferList(t *testing.T) {
 	alpacaTransferID1 := "alpacaTransferID1"
 
 	bankTransfer1 := models.BankTransfer{
-		BankTransferID: bankTransferID1,
-		UserID:   &userID1,
-		Amount: 123.45,
-		Status: "approved",
+		BankTransferID:   bankTransferID1,
+		UserID:           &userID1,
+		Amount:           123.45,
+		Status:           "approved",
 		AlpacaTransferID: &alpacaTransferID1,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
 	}
 
 	bankTransferID2 := uuid.New()
@@ -102,16 +102,18 @@ func TestBankTransferList(t *testing.T) {
 	alpacaTransferID2 := "alpacaTransferID2"
 
 	bankTransfer2 := models.BankTransfer{
-		BankTransferID: bankTransferID2,
-		UserID:   &userID2,
-		Amount: 456.78,
-		Status: "pending",
+		BankTransferID:   bankTransferID2,
+		UserID:           &userID2,
+		Amount:           456.78,
+		Status:           "pending",
 		AlpacaTransferID: &alpacaTransferID2,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
 	}
 
-	testServer.Store.On("ListBankTransfers", map[string]interface{}{}).Return([]models.BankTransfer{bankTransfer1, bankTransfer2}, nil)
+	testServer.Store.
+		On("ListBankTransfers", map[string]interface{}{}).
+		Return([]models.BankTransfer{bankTransfer1, bankTransfer2}, nil)
 
 	req := httptest.NewRequest(
 		http.MethodGet,
@@ -185,16 +187,18 @@ func TestBankTransferListQueryParams(t *testing.T) {
 	alpacaTransferID := "alpacaTransferID"
 
 	bankTransfer := models.BankTransfer{
-		BankTransferID: bankTransferID,
-		UserID:   &userID,
-		Amount: 123.45,
-		Status: "approved",
+		BankTransferID:   bankTransferID,
+		UserID:           &userID,
+		Amount:           123.45,
+		Status:           "approved",
 		AlpacaTransferID: &alpacaTransferID,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
 	}
 
-	testServer.Store.On("ListBankTransfers", map[string]interface{}{ "user_id": userID.String() }).Return([]models.BankTransfer{bankTransfer}, nil)
+	testServer.Store.
+		On("ListBankTransfers", map[string]interface{}{"user_id": userID.String()}).
+		Return([]models.BankTransfer{bankTransfer}, nil)
 
 	req := httptest.NewRequest(
 		http.MethodGet,
@@ -260,20 +264,20 @@ func TestBankTransferCreate(t *testing.T) {
 	))
 
 	bankTransferPayload := models.BankTransfer{
-		UserID:   &userID,
-		Amount: amount,
-		Status: "PENDING",
+		UserID:           &userID,
+		Amount:           amount,
+		Status:           "PENDING",
 		AlpacaTransferID: &alpacaTransferID,
 	}
 
 	bankTransferCreated := models.BankTransfer{
-		BankTransferID:    uuid.New(),
-		UserID:   &userID,
-		Amount: amount,
-		Status: "PENDING",
+		BankTransferID:   uuid.New(),
+		UserID:           &userID,
+		Amount:           amount,
+		Status:           "PENDING",
 		AlpacaTransferID: &alpacaTransferID,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
 	}
 
 	testServer.Broker.On(
@@ -333,16 +337,18 @@ func TestBankTransferModify(t *testing.T) {
 	bankTransferPayload := models.BankTransfer{}
 
 	bankTransferModified := models.BankTransfer{
-		BankTransferID:    uuid.New(),
-		UserID:   &userID,
-		Amount: 123.45,
-		Status: "approved",
+		BankTransferID:   uuid.New(),
+		UserID:           &userID,
+		Amount:           123.45,
+		Status:           "approved",
 		AlpacaTransferID: &alpacaTransferID,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
 	}
 
-	testServer.Store.On("ModifyBankTransfer", bankTransferModified.BankTransferID, bankTransferPayload).Return(&bankTransferModified, nil)
+	testServer.Store.
+		On("ModifyBankTransfer", bankTransferModified.BankTransferID, bankTransferPayload).
+		Return(&bankTransferModified, nil)
 
 	req := httptest.NewRequest(
 		http.MethodPut,

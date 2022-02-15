@@ -7,15 +7,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
 	"go_server/internal/broker"
 	goServerHTTP "go_server/internal/http"
 	"net/http"
+	"strconv"
 	"time"
 )
 
 var ErrAlpacaAPI = errors.New("alpaca api error")
-var bitConversion = 64
+
+const bitConversion = 64
 
 type Broker struct {
 	alpacaAPIKey    string
@@ -95,8 +96,7 @@ func (brkr *Broker) sendRequest(
 	return alpacaResponse, nil
 }
 
-// CreateAccount creates an account for the user.
-func (brkr *Broker) CreateAccount(
+func getCreateAccountBody(
 	givenName string,
 	familyName string,
 	dateOfBirth string,
@@ -109,8 +109,8 @@ func (brkr *Broker) CreateAccount(
 	postalCode string,
 	fundingSource string,
 	ipAddress string,
-) (string, error) {
-	body := map[string]interface{}{
+) map[string]interface{} {
+	return map[string]interface{}{
 		"contact": map[string]interface{}{
 			"email_address":  emailAddress,
 			"phone_number":   phoneNumber,
@@ -157,6 +157,37 @@ func (brkr *Broker) CreateAccount(
 			},
 		},
 	}
+}
+
+// CreateAccount creates an account for the user.
+func (brkr *Broker) CreateAccount(
+	givenName string,
+	familyName string,
+	dateOfBirth string,
+	taxID string,
+	emailAddress string,
+	phoneNumber string,
+	streetAddress string,
+	city string,
+	state string,
+	postalCode string,
+	fundingSource string,
+	ipAddress string,
+) (string, error) {
+	body := getCreateAccountBody(
+		givenName,
+		familyName,
+		dateOfBirth,
+		taxID,
+		emailAddress,
+		phoneNumber,
+		streetAddress,
+		city,
+		state,
+		postalCode,
+		fundingSource,
+		ipAddress,
+	)
 
 	alpacaResponse, errAlpaca := brkr.sendRequest(
 		"/v1/accounts",
@@ -191,7 +222,7 @@ func (brkr *Broker) GetAccount(accountID string) (*broker.Account, error) {
 
 	account := broker.Account{
 		AccountID: alpacaResponse["id"].(string),
-		Cash: cash,
+		Cash:      cash,
 	}
 
 	return &account, nil
@@ -243,11 +274,10 @@ func (brkr *Broker) CreateTransfer(
 	direction string,
 ) (string, error) {
 	body := map[string]interface{}{
-		"transfer_type":          "ach",
-		"relationship_id":        relationshipID,
-		"amount":                 amount,
-		"direction":              direction,
-		"additional_information": "/fixtures/status=APPROVED/fixtures/",
+		"transfer_type":   "ach",
+		"relationship_id": relationshipID,
+		"amount":          amount,
+		"direction":       direction,
 	}
 
 	alpacaResponse, errAlpaca := brkr.sendRequest(

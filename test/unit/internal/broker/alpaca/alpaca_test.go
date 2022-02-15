@@ -75,7 +75,7 @@ func TestAlpacaGetAccount(t *testing.T) {
 	)
 
 	body := map[string]interface{}{
-		"id": "test",
+		"id":   "test",
 		"cash": "123.45",
 	}
 

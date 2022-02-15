@@ -2,6 +2,7 @@ package broker
 
 import (
 	"go_server/internal/broker"
+
 	"github.com/stretchr/testify/mock"
 )
 

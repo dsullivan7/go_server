@@ -1,18 +1,18 @@
 package utils
 
 import (
+	"go_server/internal/auth"
 	"go_server/internal/captcha/twocaptcha"
 	"go_server/internal/config"
 	goServerRodCrawler "go_server/internal/crawler/rod"
+	"go_server/internal/logger"
 	goServerZapLogger "go_server/internal/logger/zap"
 	"go_server/internal/server"
 	"go_server/internal/server/graph"
-	"go_server/internal/logger"
-	"go_server/internal/auth"
-	mockPlaid "go_server/test/mocks/plaid"
-	mockBroker "go_server/test/mocks/broker"
-	mockStore "go_server/test/mocks/store"
 	mockAuth "go_server/test/mocks/auth"
+	mockBroker "go_server/test/mocks/broker"
+	mockPlaid "go_server/test/mocks/plaid"
+	mockStore "go_server/test/mocks/store"
 
 	"github.com/go-chi/chi"
 	"github.com/go-rod/rod"
@@ -20,15 +20,15 @@ import (
 )
 
 type TestServer struct {
-	Server	server.Server
-	Router	*chi.Mux
+	Server      server.Server
+	Router      *chi.Mux
 	Config      *config.Config
 	Resolver    *graph.Resolver
 	Logger      logger.Logger
-	Store	*mockStore.MockStore
-	Auth      	auth.Auth
-	PlaidClient      	*mockPlaid.MockPlaid
-	Broker      	*mockBroker.MockBroker
+	Store       *mockStore.MockStore
+	Auth        auth.Auth
+	PlaidClient *mockPlaid.MockPlaid
+	Broker      *mockBroker.MockBroker
 }
 
 func NewTestServer() (*TestServer, error) {
