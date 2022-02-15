@@ -74,6 +74,18 @@
           "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/TWO_CAPTCHA_KEY"
         },
         {
+          "name": "ALPACA_API_URL",
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/ALPACA_API_URL"
+        },
+        {
+          "name": "ALPACA_API_KEY",
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/ALPACA_API_KEY"
+        },
+        {
+          "name": "ALPACA_API_SECRET",
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/ALPACA_API_SECRET"
+        },
+        {
           "name": "PLAID_REDIRECT_URI",
           "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/PLAID_REDIRECT_URI"
         },
