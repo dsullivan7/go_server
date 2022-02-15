@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"go_server/internal/broker"
 	goServerHTTP "go_server/internal/http"
 	"net/http"
@@ -167,6 +168,32 @@ func (brkr *Broker) CreateAccount(
 	}
 
 	return alpacaResponse["id"].(string), nil
+}
+
+// GetAccount retreives the given account.
+func (brkr *Broker) GetAccount(accountID string) (*broker.Account, error) {
+	alpacaResponse, errAlpaca := brkr.sendRequest(
+		fmt.Sprint("/v1/trading/accounts/", accountID, "/account"),
+		http.MethodGet,
+		nil,
+	)
+
+	if errAlpaca != nil {
+		return nil, errAlpaca
+	}
+
+	cash, errCash := strconv.ParseFloat(alpacaResponse["cash"].(string), 64)
+
+	if errCash != nil {
+		return nil, errCash
+	}
+
+	account := broker.Account{
+		AccountID: alpacaResponse["id"].(string),
+		Cash: cash,
+	}
+
+	return &account, nil
 }
 
 // DeleteAccount deactivates an active account.

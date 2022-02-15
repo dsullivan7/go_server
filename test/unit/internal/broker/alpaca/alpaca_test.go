@@ -61,3 +61,41 @@ func TestAlpacaCreateAccount(t *testing.T) {
 
 	mockHTTPClient.AssertExpectations(t)
 }
+
+func TestAlpacaGetAccount(t *testing.T) {
+	t.Parallel()
+
+	mockHTTPClient := mockHTTP.NewClient()
+
+	alpacaClient := alpaca.NewBroker(
+		"alpacaAPIKey",
+		"alpacaAPISecret",
+		"alpacaAPIURL",
+		mockHTTPClient,
+	)
+
+	body := map[string]interface{}{
+		"id": "test",
+		"cash": "123.45",
+	}
+
+	jsonBytes, errMarshal := json.Marshal(body)
+
+	assert.Nil(t, errMarshal)
+
+	mockHTTPClient.On("Do", mock.Anything).Return(
+		&http.Response{
+			StatusCode: 200,
+			Body:       ioutil.NopCloser(bytes.NewBufferString(string(jsonBytes))),
+		},
+		nil,
+	)
+
+	account, errAcc := alpacaClient.GetAccount("test")
+
+	assert.Nil(t, errAcc)
+	assert.Equal(t, account.AccountID, "test")
+	assert.Equal(t, account.Cash, 123.45)
+
+	mockHTTPClient.AssertExpectations(t)
+}

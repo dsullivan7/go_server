@@ -1,6 +1,7 @@
 package broker
 
 import (
+	"go_server/internal/broker"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -42,6 +43,14 @@ func (mockBroker *MockBroker) CreateAccount(
 	)
 
 	return args.String(0), args.Error(1)
+}
+
+func (mockBroker *MockBroker) GetAccount(
+	accountID string,
+) (*broker.Account, error) {
+	args := mockBroker.Called(accountID)
+
+	return args.Get(0).(*broker.Account), args.Error(1)
 }
 
 func (mockBroker *MockBroker) DeleteAccount(

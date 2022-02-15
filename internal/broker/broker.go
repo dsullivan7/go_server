@@ -1,5 +1,10 @@
 package broker
 
+type Account struct {
+	Cash    float64
+	AccountID string
+}
+
 type Broker interface {
 	CreateAccount(
 		givenName string,
@@ -15,6 +20,7 @@ type Broker interface {
 		fundingSource string,
 		ipAddress string,
 	) (string, error)
+	GetAccount(accountID string) (*Account, error)
 	DeleteAccount(accountID string) error
 	CreateOrder(
 		accountID string,
