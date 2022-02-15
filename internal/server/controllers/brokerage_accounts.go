@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+	"time"
 	"encoding/json"
 	"go_server/internal/errors"
 	"go_server/internal/models"
@@ -10,6 +12,43 @@ import (
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
 )
+
+type BrokerageAccountResponse struct {
+	BrokerageAccountID uuid.UUID  `json:"brokerage_account_id"`
+	UserID             *uuid.UUID `json:"user_id"`
+	AlpacaAccountID    *string    `json:"alpaca_account_id"`
+	Cash    					 *float64    `json:"cash"`
+	CreatedAt          time.Time  `json:"created_at"`
+	UpdatedAt          time.Time  `json:"updated_at"`
+}
+
+func (c *Controllers) getBrokerageAccountResponse(
+	brokerageAccount models.BrokerageAccount,
+) (*BrokerageAccountResponse, error) {
+	var brokerageAccountResponse BrokerageAccountResponse
+
+	brkrgAccntJSON, errDecode := json.Marshal(brokerageAccount)
+
+	if errDecode != nil {
+		return nil, fmt.Errorf("failed to decode the model: %w", errDecode)
+	}
+
+	errEncode := json.Unmarshal(brkrgAccntJSON, &brokerageAccountResponse)
+
+	if errEncode != nil {
+		return nil, fmt.Errorf("failed to encode the model: %w", errEncode)
+	}
+
+	brokerRes, brokerErr := c.broker.GetAccount(*brokerageAccount.AlpacaAccountID)
+
+	if brokerErr != nil {
+		return nil, fmt.Errorf("failed to request the account: %w", brokerErr)
+	}
+
+	brokerageAccountResponse.Cash = &brokerRes.Cash
+
+	return &brokerageAccountResponse, nil
+}
 
 func (c *Controllers) GetBrokerageAccount(w http.ResponseWriter, r *http.Request) {
 	brokerageAccountID := uuid.Must(uuid.Parse(chi.URLParam(r, "brokerage_account_id")))
@@ -41,41 +80,21 @@ func (c *Controllers) ListBrokerageAccounts(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	brokerageAccountRes := make([]map[string]interface{}, len(brokerageAccounts))
+	brokerageAccountResArray := make([]BrokerageAccountResponse, len(brokerageAccounts))
 
 	for i, brokerageAccount := range brokerageAccounts {
-		var brkrgAccntRes map[string]interface{}
+		brkrgAccntRes, errConversion := c.getBrokerageAccountResponse(brokerageAccount)
 
-		brkrgAccntJSON, errDecode := json.Marshal(brokerageAccount)
-
-		if errDecode != nil {
-			c.utils.HandleError(w, r, errors.HTTPServerError{Err: errDecode})
+		if errConversion != nil {
+			c.utils.HandleError(w, r, errors.HTTPServerError{Err: errConversion})
 
 			return
 		}
 
-		errEncode := json.Unmarshal(brkrgAccntJSON, &brkrgAccntRes)
-
-		if errEncode != nil {
-			c.utils.HandleError(w, r, errors.HTTPServerError{Err: errEncode})
-
-			return
-		}
-
-		brokerRes, brokerErr := c.broker.GetAccount(*brokerageAccount.AlpacaAccountID)
-
-		if brokerErr != nil {
-			c.utils.HandleError(w, r, errors.HTTPServerError{Err: brokerErr})
-
-			return
-		}
-
-		brkrgAccntRes["cash"] = brokerRes.Cash
-
-		brokerageAccountRes[i] = brkrgAccntRes
+		brokerageAccountResArray[i] = *brkrgAccntRes
 	}
 
-	render.JSON(w, r, brokerageAccountRes)
+	render.JSON(w, r, brokerageAccountResArray)
 }
 
 func (c *Controllers) CreateBrokerageAccount(w http.ResponseWriter, r *http.Request) {

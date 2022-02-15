@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"go_server/internal/broker"
 	"go_server/internal/models"
+	"go_server/internal/server/controllers"
 	"go_server/test/utils"
 	"net/http"
 	"net/http/httptest"
@@ -85,6 +86,7 @@ func TestBrokerageAccountList(t *testing.T) {
 	userID1 := uuid.New()
 
 	alpacaAccountID1 := "alpacaAccountID1"
+	cash1 := 234.56
 
 	brokerageAccount1 := models.BrokerageAccount{
 		BrokerageAccountID: brokerageAccountID1,
@@ -96,13 +98,14 @@ func TestBrokerageAccountList(t *testing.T) {
 
 	alpacaAccount1 := broker.Account{
 		AccountID: alpacaAccountID1,
-		Cash:      234.56,
+		Cash:      cash1,
 	}
 
 	brokerageAccountID2 := uuid.New()
 	userID2 := uuid.New()
 
 	alpacaAccountID2 := "alpacaAccountID2"
+	cash2 := 456.56
 
 	brokerageAccount2 := models.BrokerageAccount{
 		BrokerageAccountID: brokerageAccountID2,
@@ -114,7 +117,7 @@ func TestBrokerageAccountList(t *testing.T) {
 
 	alpacaAccount2 := broker.Account{
 		AccountID: alpacaAccountID2,
-		Cash:      456.56,
+		Cash:      cash2,
 	}
 
 	testServer.Store.On(
@@ -142,13 +145,13 @@ func TestBrokerageAccountList(t *testing.T) {
 
 	decoder := json.NewDecoder(res.Body)
 
-	var brokerageAccountsFound []models.BrokerageAccount
+	var brokerageAccountsFound []controllers.BrokerageAccountResponse
 	errDecoder := decoder.Decode(&brokerageAccountsFound)
 	assert.Nil(t, errDecoder)
 
 	assert.Equal(t, 2, len(brokerageAccountsFound))
 
-	var brokerageAccountResponse models.BrokerageAccount
+	var brokerageAccountResponse controllers.BrokerageAccountResponse
 
 	for _, value := range brokerageAccountsFound {
 		if value.BrokerageAccountID == brokerageAccount1.BrokerageAccountID {
@@ -161,6 +164,7 @@ func TestBrokerageAccountList(t *testing.T) {
 	assert.Equal(t, brokerageAccountResponse.BrokerageAccountID, brokerageAccount1.BrokerageAccountID)
 	assert.Equal(t, *brokerageAccountResponse.UserID, *brokerageAccount1.UserID)
 	assert.Equal(t, *brokerageAccountResponse.AlpacaAccountID, *brokerageAccount1.AlpacaAccountID)
+	assert.Equal(t, *brokerageAccountResponse.Cash, cash1)
 	assert.WithinDuration(t, brokerageAccountResponse.CreatedAt, brokerageAccount1.CreatedAt, 0)
 	assert.WithinDuration(t, brokerageAccountResponse.UpdatedAt, brokerageAccount1.UpdatedAt, 0)
 
@@ -175,6 +179,7 @@ func TestBrokerageAccountList(t *testing.T) {
 	assert.Equal(t, brokerageAccountResponse.BrokerageAccountID, brokerageAccount2.BrokerageAccountID)
 	assert.Equal(t, *brokerageAccountResponse.UserID, *brokerageAccount2.UserID)
 	assert.Equal(t, *brokerageAccountResponse.AlpacaAccountID, *brokerageAccount2.AlpacaAccountID)
+	assert.Equal(t, *brokerageAccountResponse.Cash, cash2)
 	assert.WithinDuration(t, brokerageAccountResponse.CreatedAt, brokerageAccount2.CreatedAt, 0)
 	assert.WithinDuration(t, brokerageAccountResponse.UpdatedAt, brokerageAccount2.UpdatedAt, 0)
 
@@ -191,6 +196,7 @@ func TestBrokerageAccountListQueryParams(t *testing.T) {
 	brokerageAccountID := uuid.New()
 
 	alpacaAccountID := "alpacaAccountID"
+	cash := 123.45
 
 	brokerageAccount := models.BrokerageAccount{
 		BrokerageAccountID: brokerageAccountID,
@@ -202,7 +208,7 @@ func TestBrokerageAccountListQueryParams(t *testing.T) {
 
 	alpacaAccount := broker.Account{
 		AccountID: alpacaAccountID,
-		Cash:      234.56,
+		Cash:      cash,
 	}
 
 	testServer.Store.
@@ -228,7 +234,7 @@ func TestBrokerageAccountListQueryParams(t *testing.T) {
 
 	decoder := json.NewDecoder(res.Body)
 
-	var brokerageAccountsFound []models.BrokerageAccount
+	var brokerageAccountsFound []controllers.BrokerageAccountResponse
 	errDecoder := decoder.Decode(&brokerageAccountsFound)
 	assert.Nil(t, errDecoder)
 
@@ -239,6 +245,7 @@ func TestBrokerageAccountListQueryParams(t *testing.T) {
 	assert.Equal(t, brokerageAccountResponse.BrokerageAccountID, brokerageAccount.BrokerageAccountID)
 	assert.Equal(t, *brokerageAccountResponse.UserID, *brokerageAccount.UserID)
 	assert.Equal(t, *brokerageAccountResponse.AlpacaAccountID, *brokerageAccount.AlpacaAccountID)
+	assert.Equal(t, *brokerageAccountResponse.Cash, cash)
 	assert.WithinDuration(t, brokerageAccountResponse.CreatedAt, brokerageAccount.CreatedAt, 0)
 	assert.WithinDuration(t, brokerageAccountResponse.UpdatedAt, brokerageAccount.UpdatedAt, 0)
 
