@@ -117,9 +117,10 @@ func TestBrokerageAccountList(t *testing.T) {
 		Cash:      456.56,
 	}
 
-	testServer.Store.
-		On("ListBrokerageAccounts", map[string]interface{}{}).
-		Return([]models.BrokerageAccount{brokerageAccount1, brokerageAccount2}, nil)
+	testServer.Store.On(
+		"ListBrokerageAccounts",
+		map[string]interface{}{},
+	).Return([]models.BrokerageAccount{brokerageAccount1, brokerageAccount2}, nil)
 	testServer.Broker.On("GetAccount", alpacaAccountID1).Return(&alpacaAccount1, nil)
 	testServer.Broker.On("GetAccount", alpacaAccountID2).Return(&alpacaAccount2, nil)
 

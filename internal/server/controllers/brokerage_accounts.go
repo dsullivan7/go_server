@@ -43,9 +43,9 @@ func (c *Controllers) ListBrokerageAccounts(w http.ResponseWriter, r *http.Reque
 
 	brokerageAccountRes := make([]map[string]interface{}, len(brokerageAccounts))
 
-	var brkrgAccntRes map[string]interface{}
-
 	for i, brokerageAccount := range brokerageAccounts {
+		var brkrgAccntRes map[string]interface{}
+
 		brkrgAccntJSON, errDecode := json.Marshal(brokerageAccount)
 
 		if errDecode != nil {
