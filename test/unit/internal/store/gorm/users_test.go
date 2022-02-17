@@ -55,10 +55,6 @@ func TestDBIntegration(parentT *testing.T) {
           AddRow(userID, createdAt, updatedAt))
     mock.ExpectCommit()
 
-    // mock.ExpectExec("INSERT INTO users").
-    //   WithArgs(firstName, lastName, auth0ID).
-    //   WillReturnResult(sqlmock.NewResult(1, 1))
-
     user := models.User{
       FirstName: &firstName,
       LastName: &lastName,
