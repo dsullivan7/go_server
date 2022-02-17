@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"go_server/internal/auth/auth0"
 	goServerAlpaca "go_server/internal/broker/alpaca"
-	"go_server/internal/captcha/twocaptcha"
 	"go_server/internal/config"
-	goServerRodCrawler "go_server/internal/crawler/rod"
 	"go_server/internal/db"
 	goServerHTTP "go_server/internal/http"
 	goServerZapLogger "go_server/internal/logger/zap"
@@ -15,10 +13,6 @@ import (
 	"go_server/internal/store/gorm"
 	"log"
 	"net/http"
-
-	"github.com/go-rod/rod"
-	"github.com/go-rod/rod/lib/launcher"
-	"github.com/go-rod/rod/lib/launcher/flags"
 
 	"go.uber.org/zap"
 
@@ -70,14 +64,6 @@ func Run() {
 	// initialize http client
 	httpClient := goServerHTTP.NewClient()
 
-	// initialize 2captcha
-	captchaKey := config.TwoCaptchaKey
-	path, _ := launcher.LookPath()
-	u := launcher.New().Set(flags.NoSandbox).Bin(path).MustLaunch()
-	browser := rod.New().ControlURL(u)
-	captcha := twocaptcha.NewTwoCaptcha(captchaKey, logger)
-	crawler := goServerRodCrawler.NewCrawler(browser, captcha)
-
 	// initialize plaid
 	plaidConfig := plaid.NewConfiguration()
 	plaidConfig.AddDefaultHeader("PLAID-CLIENT-ID", config.PlaidClientID)
@@ -93,7 +79,7 @@ func Run() {
 	auth.Init()
 
 	router := chi.NewRouter()
-	handler := server.NewChiServer(config, router, store, crawler, plaidClient, broker, auth, logger)
+	handler := server.NewChiServer(config, router, store, plaidClient, broker, auth, logger)
 
 	httpServer := http.Server{
 		Addr:    fmt.Sprintf(":%s", config.Port),

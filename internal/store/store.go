@@ -19,11 +19,11 @@ type Store interface {
 	ModifyReview(reviewID uuid.UUID, reviewPayload models.Review) (*models.Review, error)
 	DeleteReview(reviewID uuid.UUID) error
 
-	GetIndustry(industryID uuid.UUID) (*models.Industry, error)
-	ListIndustries(query map[string]interface{}) ([]models.Industry, error)
-	CreateIndustry(industryPayload models.Industry) (*models.Industry, error)
-	ModifyIndustry(industryID uuid.UUID, industryPayload models.Industry) (*models.Industry, error)
-	DeleteIndustry(industryID uuid.UUID) error
+	GetTag(tagID uuid.UUID) (*models.Tag, error)
+	ListTags(query map[string]interface{}) ([]models.Tag, error)
+	CreateTag(tagPayload models.Tag) (*models.Tag, error)
+	ModifyTag(tagID uuid.UUID, tagPayload models.Tag) (*models.Tag, error)
+	DeleteTag(tagID uuid.UUID) error
 
 	GetBankAccount(bankAccountID uuid.UUID) (*models.BankAccount, error)
 	ListBankAccounts(query map[string]interface{}) ([]models.BankAccount, error)
@@ -52,12 +52,12 @@ type Store interface {
 	ModifyPortfolio(portfolioID uuid.UUID, portfolioPayload models.Portfolio) (*models.Portfolio, error)
 	DeletePortfolio(portfolioID uuid.UUID) error
 
-	GetPortfolioIndustry(portfolioIndustryID uuid.UUID) (*models.PortfolioIndustry, error)
-	ListPortfolioIndustries(query map[string]interface{}) ([]models.PortfolioIndustry, error)
-	CreatePortfolioIndustry(portfolioIndustryPayload models.PortfolioIndustry) (*models.PortfolioIndustry, error)
-	ModifyPortfolioIndustry(
-		portfolioIndustryID uuid.UUID,
-		portfolioIndustryPayload models.PortfolioIndustry,
-	) (*models.PortfolioIndustry, error)
-	DeletePortfolioIndustry(portfolioIndustryID uuid.UUID) error
+	GetPortfolioTag(portfolioTagID uuid.UUID) (*models.PortfolioTag, error)
+	ListPortfolioTags(query map[string]interface{}) ([]models.PortfolioTag, error)
+	CreatePortfolioTag(portfolioTagPayload models.PortfolioTag) (*models.PortfolioTag, error)
+	ModifyPortfolioTag(
+		portfolioTagID uuid.UUID,
+		portfolioTagPayload models.PortfolioTag,
+	) (*models.PortfolioTag, error)
+	DeletePortfolioTag(portfolioTagID uuid.UUID) error
 }

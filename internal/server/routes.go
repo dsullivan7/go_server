@@ -52,11 +52,11 @@ func (s *ChiServer) Init() http.Handler {
 		r.Delete("/api/reviews/{review_id}", controllers.DeleteReview)
 		r.Put("/api/reviews/{review_id}", controllers.ModifyReview)
 
-		r.Get("/api/industries/{industry_id}", controllers.GetIndustry)
-		r.Get("/api/industries", controllers.ListIndustries)
-		r.Post("/api/industries", controllers.CreateIndustry)
-		r.Delete("/api/industries/{industry_id}", controllers.DeleteIndustry)
-		r.Put("/api/industries/{industry_id}", controllers.ModifyIndustry)
+		r.Get("/api/tags/{tag_id}", controllers.GetTag)
+		r.Get("/api/tags", controllers.ListTags)
+		r.Post("/api/tags", controllers.CreateTag)
+		r.Delete("/api/tags/{tag_id}", controllers.DeleteTag)
+		r.Put("/api/tags/{tag_id}", controllers.ModifyTag)
 
 		r.Get("/api/bank-accounts/{bank_account_id}", controllers.GetBankAccount)
 		r.Get("/api/bank-accounts", controllers.ListBankAccounts)
@@ -82,15 +82,13 @@ func (s *ChiServer) Init() http.Handler {
 		r.Delete("/api/portfolios/{portfolio_id}", controllers.DeletePortfolio)
 		r.Put("/api/portfolios/{portfolio_id}", controllers.ModifyPortfolio)
 
-		r.Get("/api/portfolio-industries/{portfolio_industry_id}", controllers.GetPortfolioIndustry)
-		r.Get("/api/portfolio-industries", controllers.ListPortfolioIndustries)
-		r.Post("/api/portfolio-industries", controllers.CreatePortfolioIndustry)
-		r.Delete("/api/portfolio-industries/{portfolio_industry_id}", controllers.DeletePortfolioIndustry)
-		r.Put("/api/portfolio-industries/{portfolio_industry_id}", controllers.ModifyPortfolioIndustry)
+		r.Get("/api/portfolio-tags/{portfolio_tag_id}", controllers.GetPortfolioTag)
+		r.Get("/api/portfolio-tags", controllers.ListPortfolioTags)
+		r.Post("/api/portfolio-tags", controllers.CreatePortfolioTag)
+		r.Delete("/api/portfolio-tags/{portfolio_tag_id}", controllers.DeletePortfolioTag)
+		r.Put("/api/portfolio-tags/{portfolio_tag_id}", controllers.ModifyPortfolioTag)
 
 		r.Post("/api/plaid/token", controllers.CreatePlaidToken)
-
-		r.Get("/api/snap", controllers.GetSnap)
 
 		handler := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
 		r.Handle("/query", handler)

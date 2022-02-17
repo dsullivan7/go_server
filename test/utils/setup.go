@@ -2,9 +2,7 @@ package utils
 
 import (
 	"go_server/internal/auth"
-	"go_server/internal/captcha/twocaptcha"
 	"go_server/internal/config"
-	goServerRodCrawler "go_server/internal/crawler/rod"
 	"go_server/internal/logger"
 	goServerZapLogger "go_server/internal/logger/zap"
 	"go_server/internal/server"
@@ -15,7 +13,6 @@ import (
 	mockStore "go_server/test/mocks/store"
 
 	"github.com/go-chi/chi"
-	"github.com/go-rod/rod"
 	"go.uber.org/zap"
 )
 
@@ -61,21 +58,13 @@ func NewTestServer() (*TestServer, error) {
 	ath := mockAuth.NewMockAuth()
 	testServer.Auth = ath
 
-	browser := rod.New()
-
-	captchaKey := "key"
-
-	captcha := twocaptcha.NewTwoCaptcha(captchaKey, logger)
-
-	crawler := goServerRodCrawler.NewCrawler(browser, captcha)
-
 	pld := mockPlaid.NewMockPlaid()
 	testServer.PlaidClient = pld
 
 	brkr := mockBroker.NewMockBroker()
 	testServer.Broker = brkr
 
-	srvr := server.NewChiServer(config, router, str, crawler, pld, brkr, ath, logger)
+	srvr := server.NewChiServer(config, router, str, pld, brkr, ath, logger)
 	srvr.Init()
 
 	testServer.Server = srvr
