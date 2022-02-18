@@ -27,6 +27,7 @@ x-db-environment: &db-environment
   DB_NAME: $DB_NAME
   DB_PASSWORD: $DB_PASSWORD
   DB_DROP: $DB_DROP
+  SEEDER_DIR: $SEEDER_DIR
   PGPASSWORD: $DB_PASSWORD
 
 services:
@@ -68,9 +69,18 @@ services:
       *db-environment
 
   db-init:
+    command: 'sh -c /app/dbinit.sh'
     build:
       context: .
-      dockerfile: Dockerfile.db-init
+      dockerfile: Dockerfile.postgres
+    environment:
+      *db-environment
+
+  db-seed:
+    command: 'sh -c /app/dbseed.sh'
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres
     environment:
       *db-environment
 

@@ -92,13 +92,15 @@ jobs:
           at: ~/data
       - aws-cli/setup:
           aws-region: AWS_REGION
+      # assume role
       - aws-assume-role:
           role: 'dev-admin'
+      # create db
       - aws-ecr/build-and-push-image:
           checkout: false
           repo: pongo-db-init-57c8178
           tag: ${CIRCLE_SHA1}
-          dockerfile: Dockerfile.db-init
+          dockerfile: Dockerfile.postgres
       - envsubst:
           input: task-definition-db-init.template.json
           output: task-definition.json
@@ -109,6 +111,7 @@ jobs:
           task-definition: 'pongo-db-init'
           subnet-ids: 'subnet-075e79ab6b9ead172,subnet-0548e2af7ea21ed1a'
           security-group-ids: 'sg-0fc108c880310be04'
+      # migrate db
       - aws-ecr/build-and-push-image:
           checkout: false
           repo: pongo-migrate-990bd9f
@@ -124,6 +127,18 @@ jobs:
           task-definition: 'pongo-migrate'
           subnet-ids: 'subnet-075e79ab6b9ead172,subnet-0548e2af7ea21ed1a'
           security-group-ids: 'sg-0fc108c880310be04'
+      # seed db
+      - envsubst:
+          input: task-definition-seed.template.json
+          output: task-definition.json
+      - aws-ecs/update-task-definition-from-json:
+          task-definition-json: task-definition.json
+      - aws-ecs/run-task:
+          cluster: 'pongo-ecs-cluster-1520594'
+          task-definition: 'pongo-seed'
+          subnet-ids: 'subnet-075e79ab6b9ead172,subnet-0548e2af7ea21ed1a'
+          security-group-ids: 'sg-0fc108c880310be04'
+      # deploy app
       - aws-ecr/build-and-push-image:
           checkout: false
           repo: pongo-app-72db723
