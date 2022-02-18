@@ -60,4 +60,19 @@ type Store interface {
 		portfolioTagPayload models.PortfolioTag,
 	) (*models.PortfolioTag, error)
 	DeletePortfolioTag(portfolioTagID uuid.UUID) error
+
+	GetSecurity(securityID uuid.UUID) (*models.Security, error)
+	ListSecurities(query map[string]interface{}) ([]models.Security, error)
+	CreateSecurity(securityPayload models.Security) (*models.Security, error)
+	ModifySecurity(securityID uuid.UUID, securityPayload models.Security) (*models.Security, error)
+	DeleteSecurity(securityID uuid.UUID) error
+
+	GetSecurityTag(securityTagID uuid.UUID) (*models.SecurityTag, error)
+	ListSecurityTags(query map[string]interface{}) ([]models.SecurityTag, error)
+	CreateSecurityTag(securityTagPayload models.SecurityTag) (*models.SecurityTag, error)
+	ModifySecurityTag(
+		securityTagID uuid.UUID,
+		securityTagPayload models.SecurityTag,
+	) (*models.SecurityTag, error)
+	DeleteSecurityTag(securityTagID uuid.UUID) error
 }

@@ -28,9 +28,9 @@ type PortfolioHolding struct {
 
 const portfolioTotal = 100.0
 
-// GetPortfolio creates a set of portfolio holdings
+// GetPortfolio retreives a set of portfolio holdings
 // according to the specified portfolio and portfolio tags.
-func (srvc *Service) GetPortfolio(
+func (srvc *Service) GetPortfolioHoldings(
 	portfolio models.Portfolio,
 	portfolioTags []models.PortfolioTag,
 	securities []models.Security,

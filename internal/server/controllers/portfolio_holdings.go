@@ -2,35 +2,24 @@ package controllers
 
 import (
 	"go_server/internal/errors"
-	"go_server/internal/models"
 	"net/http"
 	"github.com/google/uuid"
 
 	"github.com/go-chi/render"
 )
 
-var securityID1 = uuid.New()
-
-var securities = []models.Security{
-	models.Security{
-		Symbol: "APPL",
-		SecurityID: securityID1,
-	},
-}
-
-var securityTags = []models.SecurityTag{
-	{
-		SecurityID: securityID1,
-		SecurityID: securityID1,
-	},
-}
-
 func (c *Controllers) ListPortfolioHoldings(w http.ResponseWriter, r *http.Request) {
 	query := map[string]interface{}{}
-	portfolioID := r.URL.Query().Get("portfolio_id")
+	portfolioID := uuid.Must(uuid.Parse(r.URL.Query().Get("portfolio_id")))
 
-	if portfolioID != "" {
-		query["portfolio_id"] = portfolioID
+	query["portfolio_id"] = portfolioID
+
+	portfolio, errPortfolio := c.store.GetPortfolio(portfolioID)
+
+	if errPortfolio != nil {
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errPortfolio})
+
+		return
 	}
 
 	securities, errSecurities := c.store.ListSecurities(query)
@@ -57,7 +46,7 @@ func (c *Controllers) ListPortfolioHoldings(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	c.services.GetPortfolio()
+	portfolioHoldings := c.services.GetPortfolioHoldings(portfolio, portfolioTags, securities, securityTags)
 
 	render.JSON(w, r, portfolioHoldings)
 }
