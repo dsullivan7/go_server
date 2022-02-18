@@ -12,6 +12,7 @@ import (
 	"go_server/internal/server/graph"
 	"go_server/internal/server/middlewares"
 	"go_server/internal/server/utils"
+	"go_server/internal/services"
 	"go_server/internal/store"
 
 	"github.com/go-chi/chi"
@@ -35,6 +36,7 @@ type ChiServer struct {
 func NewChiServer(
 	cfg *config.Config,
 	router *chi.Mux,
+	srvc services.IService,
 	str store.Store,
 	pld plaid.IClient,
 	brkr broker.Broker,
@@ -42,7 +44,7 @@ func NewChiServer(
 	lggr logger.Logger,
 ) Server {
 	utils := utils.NewServerUtils(lggr)
-	controllers := controllers.NewControllers(cfg, str, pld, brkr, utils, lggr)
+	controllers := controllers.NewControllers(cfg, str, srvc, pld, brkr, utils, lggr)
 	resolver := graph.NewResolver(cfg, str, lggr)
 	middlewares := middlewares.NewMiddlewares(cfg, str, ath, utils, lggr)
 

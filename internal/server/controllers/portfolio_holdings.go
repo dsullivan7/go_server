@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"go_server/internal/errors"
 	"net/http"
+	"go_server/internal/errors"
 	"github.com/google/uuid"
 
 	"github.com/go-chi/render"
@@ -32,8 +32,8 @@ func (c *Controllers) ListPortfolioHoldings(w http.ResponseWriter, r *http.Reque
 
 	securityTags, errSecurityTags := c.store.ListSecurityTags(query)
 
-	if errSecurities != nil {
-		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errSecurities})
+	if errSecurityTags != nil {
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errSecurityTags})
 
 		return
 	}
@@ -46,7 +46,7 @@ func (c *Controllers) ListPortfolioHoldings(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	portfolioHoldings := c.services.GetPortfolioHoldings(portfolio, portfolioTags, securities, securityTags)
+	portfolioHoldings := c.services.GetPortfolioHoldings(*portfolio, portfolioTags, securities, securityTags)
 
 	render.JSON(w, r, portfolioHoldings)
 }

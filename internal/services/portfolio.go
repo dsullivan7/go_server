@@ -6,7 +6,7 @@ import (
 )
 
 type IService interface {
-	GetPortfolio(
+	GetPortfolioHoldings(
 		models.Portfolio,
 		[]models.PortfolioTag,
 		[]models.Security,
