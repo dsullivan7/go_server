@@ -25,6 +25,10 @@
       },
       "secrets": [
         {
+          "name": "SEEDER_DIR",
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/SEEDER_DIR"
+        },
+        {
           "name": "DB_USER",
           "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/DB_USER"
         },
