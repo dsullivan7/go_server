@@ -22,8 +22,8 @@ func NewService() IService {
 }
 
 type PortfolioHolding struct {
-	Symbol string
-	Amount float64
+	Symbol string `json:"symbol"`
+	Amount float64 `json:"amount"`
 }
 
 const portfolioTotal = 100.0

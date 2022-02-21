@@ -9,6 +9,7 @@ import (
 	goServerHTTP "go_server/internal/http"
 	goServerZapLogger "go_server/internal/logger/zap"
 	goServerPlaid "go_server/internal/plaid"
+	"go_server/internal/services"
 	"go_server/internal/server"
 	"go_server/internal/store/gorm"
 	"log"
@@ -61,6 +62,8 @@ func Run() {
 
 	store := gorm.NewStore(db)
 
+	srvc := services.NewService()
+
 	// initialize http client
 	httpClient := goServerHTTP.NewClient()
 
@@ -79,7 +82,7 @@ func Run() {
 	auth.Init()
 
 	router := chi.NewRouter()
-	handler := server.NewChiServer(config, router, store, plaidClient, broker, auth, logger)
+	handler := server.NewChiServer(config, router, srvc, store, plaidClient, broker, auth, logger)
 
 	httpServer := http.Server{
 		Addr:    fmt.Sprintf(":%s", config.Port),

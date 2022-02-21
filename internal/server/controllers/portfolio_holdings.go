@@ -22,7 +22,7 @@ func (c *Controllers) ListPortfolioHoldings(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	securities, errSecurities := c.store.ListSecurities(query)
+	securities, errSecurities := c.store.ListSecurities(map[string]interface{}{})
 
 	if errSecurities != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errSecurities})
@@ -30,7 +30,7 @@ func (c *Controllers) ListPortfolioHoldings(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	securityTags, errSecurityTags := c.store.ListSecurityTags(query)
+	securityTags, errSecurityTags := c.store.ListSecurityTags(map[string]interface{}{})
 
 	if errSecurityTags != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errSecurityTags})

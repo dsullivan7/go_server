@@ -88,6 +88,8 @@ func (s *ChiServer) Init() http.Handler {
 		r.Delete("/api/portfolio-tags/{portfolio_tag_id}", controllers.DeletePortfolioTag)
 		r.Put("/api/portfolio-tags/{portfolio_tag_id}", controllers.ModifyPortfolioTag)
 
+		r.Get("/api/portfolio-holdings", controllers.ListPortfolioHoldings)
+
 		r.Post("/api/plaid/token", controllers.CreatePlaidToken)
 
 		handler := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
