@@ -7,60 +7,60 @@ import (
 	"go_server/test/utils"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-  "github.com/google/uuid"
 )
 
-func TestDBIntegration(parentT *testing.T) {
-  parentT.Parallel()
+func TestDBIntegration(tParent *testing.T) {
+	tParent.Parallel()
 
-  cfg, errConfig := config.NewConfig()
+	cfg, errConfig := config.NewConfig()
 
-  assert.Nil(parentT, errConfig)
+	assert.Nil(tParent, errConfig)
 
-  connection, errConnection := db.NewSQLConnection(
-    cfg.DBHost,
-    cfg.DBName,
-    cfg.DBPort,
-    cfg.DBUser,
-    cfg.DBPassword,
-    cfg.DBSSL,
-  )
-  assert.Nil(parentT, errConnection)
+	connection, errConnection := db.NewSQLConnection(
+		cfg.DBHost,
+		cfg.DBName,
+		cfg.DBPort,
+		cfg.DBUser,
+		cfg.DBPassword,
+		cfg.DBSSL,
+	)
+	assert.Nil(tParent, errConnection)
 
-  db, errDB := db.NewGormDB(connection)
-  assert.Nil(parentT, errDB)
+	db, errDB := db.NewGormDB(connection)
+	assert.Nil(tParent, errDB)
 
-  dbUtility := utils.NewSQLDatabaseUtility(connection)
+	dbUtility := utils.NewSQLDatabaseUtility(connection)
 
-  errTruncateBefore := dbUtility.TruncateAll()
-  assert.Nil(parentT, errTruncateBefore)
+	errTruncateBefore := dbUtility.TruncateAll()
+	assert.Nil(tParent, errTruncateBefore)
 
-  defer func() {
-    errTruncateAfter := dbUtility.TruncateAll()
-    assert.Nil(parentT, errTruncateAfter)
-  }()
+	tParent.Cleanup(func() {
+		errTruncateAfter := dbUtility.TruncateAll()
+		assert.Nil(tParent, errTruncateAfter)
+	})
 
-  parentT.Run("User", func(t *testing.T) {
-    t.Parallel()
-    firstName := "firstName"
-    lastName := "lastName"
-    auth0ID := uuid.New().String()
+	tParent.Run("User", func(t *testing.T) {
+		t.Parallel()
+		firstName := "firstName"
+		lastName := "lastName"
+		auth0ID := uuid.New().String()
 
-    user := models.User{
-      FirstName: &firstName,
-      LastName: &lastName,
-      Auth0ID: &auth0ID,
-    }
+		user := models.User{
+			FirstName: &firstName,
+			LastName:  &lastName,
+			Auth0ID:   &auth0ID,
+		}
 
-    err := db.Create(&user).Error
-    assert.Nil(t, err)
+		err := db.Create(&user).Error
+		assert.Nil(t, err)
 
-    assert.Equal(t, *user.FirstName, firstName)
-    assert.Equal(t, *user.LastName, lastName)
-    assert.Equal(t, *user.Auth0ID, auth0ID)
-    assert.NotNil(t, user.CreatedAt)
-    assert.NotNil(t, user.UpdatedAt)
-    assert.NotNil(t, user.UserID)
-  })
+		assert.Equal(t, *user.FirstName, firstName)
+		assert.Equal(t, *user.LastName, lastName)
+		assert.Equal(t, *user.Auth0ID, auth0ID)
+		assert.NotNil(t, user.CreatedAt)
+		assert.NotNil(t, user.UpdatedAt)
+		assert.NotNil(t, user.UserID)
+	})
 }

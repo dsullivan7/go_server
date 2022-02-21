@@ -6,15 +6,15 @@ import (
 	"go_server/internal/logger"
 	"go_server/internal/plaid"
 	"go_server/internal/server/utils"
-	"go_server/internal/store"
 	"go_server/internal/services"
+	"go_server/internal/store"
 )
 
 type Controllers struct {
 	config      *config.Config
 	store       store.Store
 	plaidClient plaid.IClient
-	services services.IService
+	services    services.IService
 	broker      broker.Broker
 	utils       *utils.ServerUtils
 	logger      logger.Logger
@@ -31,7 +31,7 @@ func NewControllers(
 ) *Controllers {
 	return &Controllers{
 		store:       str,
-		services:      srvc,
+		services:    srvc,
 		config:      cfg,
 		plaidClient: plaidClient,
 		broker:      brkr,

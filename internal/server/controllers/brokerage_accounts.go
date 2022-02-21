@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"fmt"
-	"time"
 	"encoding/json"
+	"fmt"
 	"go_server/internal/errors"
 	"go_server/internal/models"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
@@ -17,7 +17,7 @@ type BrokerageAccountResponse struct {
 	BrokerageAccountID uuid.UUID  `json:"brokerage_account_id"`
 	UserID             *uuid.UUID `json:"user_id"`
 	AlpacaAccountID    *string    `json:"alpaca_account_id"`
-	Cash    					 *float64    `json:"cash"`
+	Cash               *float64   `json:"cash"`
 	CreatedAt          time.Time  `json:"created_at"`
 	UpdatedAt          time.Time  `json:"updated_at"`
 }

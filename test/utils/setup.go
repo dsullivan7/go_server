@@ -10,6 +10,7 @@ import (
 	mockAuth "go_server/test/mocks/auth"
 	mockBroker "go_server/test/mocks/broker"
 	mockPlaid "go_server/test/mocks/plaid"
+	mockServices "go_server/test/mocks/services"
 	mockStore "go_server/test/mocks/store"
 
 	"github.com/go-chi/chi"
@@ -20,6 +21,7 @@ type TestServer struct {
 	Server      server.Server
 	Router      *chi.Mux
 	Config      *config.Config
+	Service     *mockServices.MockService
 	Resolver    *graph.Resolver
 	Logger      logger.Logger
 	Store       *mockStore.MockStore
@@ -61,10 +63,13 @@ func NewTestServer() (*TestServer, error) {
 	pld := mockPlaid.NewMockPlaid()
 	testServer.PlaidClient = pld
 
+	srvc := mockServices.NewMockService()
+	testServer.Service = srvc
+
 	brkr := mockBroker.NewMockBroker()
 	testServer.Broker = brkr
 
-	srvr := server.NewChiServer(config, router, str, pld, brkr, ath, logger)
+	srvr := server.NewChiServer(config, router, srvc, str, pld, brkr, ath, logger)
 	srvr.Init()
 
 	testServer.Server = srvr

@@ -1,8 +1,8 @@
 package services
 
 import (
-	"math"
 	"go_server/internal/models"
+	"math"
 )
 
 type IService interface {
@@ -22,7 +22,7 @@ func NewService() IService {
 }
 
 type PortfolioHolding struct {
-	Symbol string `json:"symbol"`
+	Symbol string  `json:"symbol"`
 	Amount float64 `json:"amount"`
 }
 
@@ -63,12 +63,12 @@ func (srvc *Service) GetPortfolioHoldings(
 
 	for securitySymbol, securityWeight := range securityWeightMap {
 		var amount float64
-		if (currentIndex + 1 == len(securityWeightMap)) {
+		if currentIndex+1 == len(securityWeightMap) {
 			amount = remaining
 		} else {
 			raw := (float64(securityWeight) / float64(totalWeight)) * float64(portfolioTotal)
 			// round the amount to 2 decimal places
-			amount = math.Round(raw * 100) / 100
+			amount = math.Round(raw*portfolioTotal) / portfolioTotal
 			remaining -= amount
 		}
 

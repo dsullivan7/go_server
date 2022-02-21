@@ -1,8 +1,9 @@
 package controllers
 
 import (
-	"net/http"
 	"go_server/internal/errors"
+	"net/http"
+
 	"github.com/google/uuid"
 
 	"github.com/go-chi/render"
