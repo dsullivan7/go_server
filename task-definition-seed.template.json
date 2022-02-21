@@ -1,5 +1,5 @@
 {
-  "family": "pongo-db-init",
+  "family": "pongo-seed",
   "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/pongo-ecs-exec-role",
   "networkMode": "awsvpc",
   "requiresCompatibilities": [
@@ -9,7 +9,7 @@
   "memory": "1024",
   "containerDefinitions": [
     {
-      "name": "pongo-db-init",
+      "name": "pongo-seed",
       "command": ["sh", "-c", "/app/dbseed.sh"],
       "image": "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-2.amazonaws.com/pongo-postgres-0adb28f:${CIRCLE_SHA1}",
       "essential": true,
