@@ -10,7 +10,7 @@
   "containerDefinitions": [
     {
       "name": "pongo-db-init",
-      "command": ["sh", "-c", "/app/dbinit.sh"],
+      "command": ["sh", "-c", "/app/dbseed.sh"],
       "image": "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-2.amazonaws.com/pongo-postgres-0adb28f:${CIRCLE_SHA1}",
       "essential": true,
       "cpu": 10,
