@@ -98,7 +98,7 @@ jobs:
       # create db
       - aws-ecr/build-and-push-image:
           checkout: false
-          repo: pongo-db-init-57c8178
+          repo: pongo-postgres-0adb28f
           tag: ${CIRCLE_SHA1}
           dockerfile: Dockerfile.postgres
       - envsubst:
