@@ -63,4 +63,27 @@ func TestDBIntegration(tParent *testing.T) {
 		assert.NotNil(t, user.UpdatedAt)
 		assert.NotNil(t, user.UserID)
 	})
+
+	tParent.Run("Order", func(t *testing.T) {
+		t.Parallel()
+		firstName := "firstName"
+		lastName := "lastName"
+		auth0ID := uuid.New().String()
+
+		user := models.User{
+			FirstName: &firstName,
+			LastName:  &lastName,
+			Auth0ID:   &auth0ID,
+		}
+
+		err := db.Create(&user).Error
+		assert.Nil(t, err)
+
+		assert.Equal(t, *user.FirstName, firstName)
+		assert.Equal(t, *user.LastName, lastName)
+		assert.Equal(t, *user.Auth0ID, auth0ID)
+		assert.NotNil(t, user.CreatedAt)
+		assert.NotNil(t, user.UpdatedAt)
+		assert.NotNil(t, user.UserID)
+	})
 }
