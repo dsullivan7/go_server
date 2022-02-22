@@ -27,6 +27,11 @@ func (c *Controllers) GetOrder(w http.ResponseWriter, r *http.Request) {
 
 func (c *Controllers) ListOrders(w http.ResponseWriter, r *http.Request) {
 	query := map[string]interface{}{}
+	userID := r.URL.Query().Get("user_id")
+
+	if userID != "" {
+		query["user_id"] = userID
+	}
 
 	orders, err := c.store.ListOrders(query)
 

@@ -75,4 +75,10 @@ type Store interface {
 		securityTagPayload models.SecurityTag,
 	) (*models.SecurityTag, error)
 	DeleteSecurityTag(securityTagID uuid.UUID) error
+
+	GetOrder(orderID uuid.UUID) (*models.Order, error)
+	ListOrders(query map[string]interface{}) ([]models.Order, error)
+	CreateOrder(orderPayload models.Order) (*models.Order, error)
+	ModifyOrder(orderID uuid.UUID, orderPayload models.Order) (*models.Order, error)
+	DeleteOrder(orderID uuid.UUID) error
 }
