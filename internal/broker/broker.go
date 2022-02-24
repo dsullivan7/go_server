@@ -25,7 +25,7 @@ type Broker interface {
 	CreateOrder(
 		accountID string,
 		symbol string,
-		quantity float64,
+		amount float64,
 		side string,
 	) (string, error)
 	CreateTransfer(

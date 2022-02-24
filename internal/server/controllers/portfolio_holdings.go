@@ -47,7 +47,7 @@ func (c *Controllers) ListPortfolioHoldings(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	portfolioHoldings := c.services.GetPortfolioHoldings(*portfolio, portfolioTags, securities, securityTags)
+	portfolioHoldings := c.services.ListPortfolioHoldings(*portfolio, portfolioTags, securities, securityTags)
 
 	render.JSON(w, r, portfolioHoldings)
 }

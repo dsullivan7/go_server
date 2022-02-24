@@ -15,7 +15,7 @@ func NewMockService() *MockService {
 	return &MockService{}
 }
 
-func (mockService *MockService) GetPortfolioHoldings(
+func (mockService *MockService) ListPortfolioHoldings(
 	portfolio models.Portfolio,
 	portfolioTags []models.PortfolioTag,
 	securities []models.Security,

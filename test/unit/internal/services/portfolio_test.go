@@ -158,7 +158,7 @@ func TestPortfolio(tParent *testing.T) {
 		tc := testCase
 		tParent.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			actual := srvc.GetPortfolioHoldings(tc.portfolio, tc.portfolioTags, tc.securities, tc.securityTags)
+			actual := srvc.ListPortfolioHoldings(tc.portfolio, tc.portfolioTags, tc.securities, tc.securityTags)
 			assert.ElementsMatch(t, tc.target, actual)
 		})
 	}

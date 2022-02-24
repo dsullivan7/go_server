@@ -8,8 +8,9 @@ import (
 
 type Order struct {
 	OrderID uuid.UUID `json:"order_id" gorm:"primary_key;type:uuid;default:uuid_generate_v4()"`
-	UserID          *uuid.UUID `json:"user_id" gorm:"primary_key;type:uuid;default:uuid_generate_v4()"`
-	PortfolioID    *uuid.UUID `json:"portfolio_id" gorm:"primary_key;type:uuid;default:uuid_generate_v4()"`
+	ParentOrderID          *uuid.UUID `json:"parent_order_id" gorm:"type:uuid"`
+	UserID          *uuid.UUID `json:"user_id" gorm:"type:uuid"`
+	PortfolioID    *uuid.UUID `json:"portfolio_id" gorm:"type:uuid"`
 	Amount      float64   `json:"amount"`
 	Side      string   `json:"side"`
 	AlpacaOrderID      *string   `json:"alpaca_order_id"`

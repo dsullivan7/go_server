@@ -6,7 +6,7 @@ import (
 )
 
 type IService interface {
-	GetPortfolioHoldings(
+	ListPortfolioHoldings(
 		models.Portfolio,
 		[]models.PortfolioTag,
 		[]models.Security,
@@ -26,11 +26,12 @@ type PortfolioHolding struct {
 	Amount float64 `json:"amount"`
 }
 
-const portfolioTotal = 100.0
+const portfolioTotal = 1.0
+const roundValue = 100
 
-// GetPortfolio retreives a set of portfolio holdings
+// ListPortfolioHoldings retreives a set of portfolio holdings
 // according to the specified portfolio and portfolio tags.
-func (srvc *Service) GetPortfolioHoldings(
+func (srvc *Service) ListPortfolioHoldings(
 	portfolio models.Portfolio,
 	portfolioTags []models.PortfolioTag,
 	securities []models.Security,
@@ -68,7 +69,7 @@ func (srvc *Service) GetPortfolioHoldings(
 		} else {
 			raw := (float64(securityWeight) / float64(totalWeight)) * float64(portfolioTotal)
 			// round the amount to 2 decimal places
-			amount = math.Round(raw*portfolioTotal) / portfolioTotal
+			amount = math.Round(raw*roundValue) / roundValue
 			remaining -= amount
 		}
 

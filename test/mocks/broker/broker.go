@@ -65,13 +65,13 @@ func (mockBroker *MockBroker) DeleteAccount(
 func (mockBroker *MockBroker) CreateOrder(
 	accountID string,
 	symbol string,
-	quantity float64,
+	amount float64,
 	side string,
 ) (string, error) {
 	args := mockBroker.Called(
 		accountID,
 		symbol,
-		quantity,
+		amount,
 		side,
 	)
 

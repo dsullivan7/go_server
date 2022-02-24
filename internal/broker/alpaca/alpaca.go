@@ -244,10 +244,10 @@ func (brkr *Broker) DeleteAccount(accountID string) error {
 }
 
 // CreateOrder creates an order for an account.
-func (brkr *Broker) CreateOrder(accountID string, symbol string, quantity float64, side string) (string, error) {
+func (brkr *Broker) CreateOrder(accountID string, symbol string, amount float64, side string) (string, error) {
 	body := map[string]interface{}{
 		"symbol":        symbol,
-		"qty":           quantity,
+		"notional": 		 amount,
 		"side":          side,
 		"type":          "market",
 		"time_in_force": "day",

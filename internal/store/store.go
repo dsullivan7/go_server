@@ -13,12 +13,6 @@ type Store interface {
 	ModifyUser(userID uuid.UUID, userPayload models.User) (*models.User, error)
 	DeleteUser(userID uuid.UUID) error
 
-	GetReview(reviewID uuid.UUID) (*models.Review, error)
-	ListReviews(query map[string]interface{}) ([]models.Review, error)
-	CreateReview(reviewPayload models.Review) (*models.Review, error)
-	ModifyReview(reviewID uuid.UUID, reviewPayload models.Review) (*models.Review, error)
-	DeleteReview(reviewID uuid.UUID) error
-
 	GetTag(tagID uuid.UUID) (*models.Tag, error)
 	ListTags(query map[string]interface{}) ([]models.Tag, error)
 	CreateTag(tagPayload models.Tag) (*models.Tag, error)
