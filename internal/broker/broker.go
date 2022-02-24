@@ -21,6 +21,7 @@ type Broker interface {
 		ipAddress string,
 	) (string, error)
 	GetAccount(accountID string) (*Account, error)
+	ListAccounts(query string) ([]Account, error)
 	DeleteAccount(accountID string) error
 	CreateOrder(
 		accountID string,

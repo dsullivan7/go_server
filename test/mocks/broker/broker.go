@@ -54,6 +54,14 @@ func (mockBroker *MockBroker) GetAccount(
 	return args.Get(0).(*broker.Account), args.Error(1)
 }
 
+func (mockBroker *MockBroker) ListAccounts(
+	query string,
+) ([]broker.Account, error) {
+	args := mockBroker.Called(query)
+
+	return args.Get(0).([]broker.Account), args.Error(1)
+}
+
 func (mockBroker *MockBroker) DeleteAccount(
 	accountID string,
 ) error {

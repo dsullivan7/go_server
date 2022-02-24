@@ -43,7 +43,7 @@ func (brkr *Broker) sendRequest(
 	path string,
 	method string,
 	body map[string]interface{},
-) (map[string]interface{}, error) {
+) (interface{}, error) {
 	context := context.Background()
 
 	jsonBytes, errMarshal := json.Marshal(body)
@@ -79,7 +79,7 @@ func (brkr *Broker) sendRequest(
 
 	decoder := json.NewDecoder(res.Body)
 
-	var alpacaResponse map[string]interface{}
+	var alpacaResponse interface{}
 
 	errDecode := decoder.Decode(&alpacaResponse)
 
@@ -90,7 +90,7 @@ func (brkr *Broker) sendRequest(
 	if res.StatusCode != http.StatusOK &&
 		res.StatusCode != http.StatusCreated &&
 		res.StatusCode != http.StatusNoContent {
-		return nil, fmt.Errorf("%w: %s", ErrAlpacaAPI, alpacaResponse["message"])
+		return nil, fmt.Errorf("%w: %s", ErrAlpacaAPI, alpacaResponse.(map[string]string)["message"])
 	}
 
 	return alpacaResponse, nil
@@ -189,17 +189,18 @@ func (brkr *Broker) CreateAccount(
 		ipAddress,
 	)
 
-	alpacaResponse, errAlpaca := brkr.sendRequest(
+	rawResponse, errAlpaca := brkr.sendRequest(
 		"/v1/accounts",
 		http.MethodPost,
 		body,
 	)
+	alpacaResponse := rawResponse.(map[string]string)
 
 	if errAlpaca != nil {
 		return "", errAlpaca
 	}
 
-	return alpacaResponse["id"].(string), nil
+	return alpacaResponse["id"], nil
 }
 
 // GetAccount retreives the given account.
@@ -214,18 +215,48 @@ func (brkr *Broker) GetAccount(accountID string) (*broker.Account, error) {
 		return nil, errAlpaca
 	}
 
-	cash, errCash := strconv.ParseFloat(alpacaResponse["cash"].(string), bitConversion)
+	cash, errCash := strconv.ParseFloat(alpacaResponse.(map[string]interface{})["cash"].(string), bitConversion)
 
 	if errCash != nil {
 		return nil, fmt.Errorf("error parsing the cash amount: %w", errCash)
 	}
 
 	account := broker.Account{
-		AccountID: alpacaResponse["id"].(string),
+		AccountID: alpacaResponse.(map[string]interface{})["id"].(string),
 		Cash:      cash,
 	}
 
 	return &account, nil
+}
+
+// ListAccounts retreives a list of accounts given the query.
+func (brkr *Broker) ListAccounts(query string) ([]broker.Account, error) {
+	alpacaResponse, errAlpaca := brkr.sendRequest(
+		fmt.Sprint("/v1/accounts?query=", query),
+		http.MethodGet,
+		nil,
+	)
+
+	if errAlpaca != nil {
+		return nil, errAlpaca
+	}
+
+	accounts := make([]broker.Account, len(alpacaResponse.([]interface{})))
+
+	for i, alpacaAccount := range alpacaResponse.([]interface{}) {
+		cash, errCash := strconv.ParseFloat(alpacaAccount.(map[string]interface{})["cash"].(string), bitConversion)
+
+		if errCash != nil {
+			return nil, fmt.Errorf("error parsing the cash amount: %w", errCash)
+		}
+
+		accounts[i] = broker.Account{
+			AccountID: alpacaAccount.(map[string]interface{})["id"].(string),
+			Cash:      cash,
+		}
+	}
+
+	return accounts, nil
 }
 
 // DeleteAccount deactivates an active account.
@@ -253,17 +284,18 @@ func (brkr *Broker) CreateOrder(accountID string, symbol string, amount float64,
 		"time_in_force": "day",
 	}
 
-	alpacaResponse, errAlpaca := brkr.sendRequest(
+	rawResponse, errAlpaca := brkr.sendRequest(
 		fmt.Sprint("/v1/trading/accounts/", accountID, "/orders"),
 		http.MethodPost,
 		body,
 	)
+	alpacaResponse := rawResponse.(map[string]string)
 
 	if errAlpaca != nil {
 		return "", errAlpaca
 	}
 
-	return alpacaResponse["id"].(string), nil
+	return alpacaResponse["id"], nil
 }
 
 // CreateTransfer creates a transfer for an account.
@@ -280,17 +312,18 @@ func (brkr *Broker) CreateTransfer(
 		"direction":       direction,
 	}
 
-	alpacaResponse, errAlpaca := brkr.sendRequest(
+	rawResponse, errAlpaca := brkr.sendRequest(
 		fmt.Sprint("/v1/accounts/", accountID, "/transfers"),
 		http.MethodPost,
 		body,
 	)
+	alpacaResponse := rawResponse.(map[string]string)
 
 	if errAlpaca != nil {
 		return "", errAlpaca
 	}
 
-	return alpacaResponse["id"].(string), nil
+	return alpacaResponse["id"], nil
 }
 
 // CreateACHRelationship creates an ach relastionship for an account.
@@ -302,15 +335,16 @@ func (brkr *Broker) CreateACHRelationship(
 		"processor_token": processorToken,
 	}
 
-	alpacaResponse, errAlpaca := brkr.sendRequest(
+	rawResponse, errAlpaca := brkr.sendRequest(
 		fmt.Sprint("/v1/accounts/", accountID, "/ach_relationships"),
 		http.MethodPost,
 		body,
 	)
+	alpacaResponse := rawResponse.(map[string]string)
 
 	if errAlpaca != nil {
 		return "", errAlpaca
 	}
 
-	return alpacaResponse["id"].(string), nil
+	return alpacaResponse["id"], nil
 }
