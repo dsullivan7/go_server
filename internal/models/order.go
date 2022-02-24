@@ -13,6 +13,7 @@ type Order struct {
 	PortfolioID    *uuid.UUID `json:"portfolio_id" gorm:"type:uuid"`
 	Amount      float64   `json:"amount"`
 	Side      string   `json:"side"`
+	Symbol      *string   `json:"symbol"`
 	AlpacaOrderID      *string   `json:"alpaca_order_id"`
 	CreatedAt      time.Time `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt      time.Time `json:"updated_at" gorm:"default:CURRENT_TIMESTAMP"`

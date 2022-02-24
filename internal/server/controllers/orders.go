@@ -124,15 +124,16 @@ func (c *Controllers) CreateOrder(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		orderPayload := models.Order{
+		orderPayloadChild := models.Order{
 			UserID:           &userID,
-			ParentOrderID: &orderPayload.OrderID,
+			ParentOrderID: &order.OrderID,
 			AlpacaOrderID: &alpacaOrderID,
-			Amount:           orderReq["amount"].(float64),
+			Amount:           portfolioHolding.Amount * orderReq["amount"].(float64),
+			Symbol:           &portfolioHolding.Symbol,
 			Side:           "buy",
 		}
 
-		_, err := c.store.CreateOrder(orderPayload)
+		_, err := c.store.CreateOrder(orderPayloadChild)
 
 		if err != nil {
 			c.utils.HandleError(w, r, errors.HTTPUserError{Err: err})
@@ -140,8 +141,6 @@ func (c *Controllers) CreateOrder(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
-
 
 	if err != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: err})

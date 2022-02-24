@@ -46,12 +46,6 @@ func (s *ChiServer) Init() http.Handler {
 		r.Delete("/api/users/{user_id}", controllers.DeleteUser)
 		r.Put("/api/users/{user_id}", controllers.ModifyUser)
 
-		r.Get("/api/reviews/{review_id}", controllers.GetReview)
-		r.Get("/api/reviews", controllers.ListReviews)
-		r.Post("/api/reviews", controllers.CreateReview)
-		r.Delete("/api/reviews/{review_id}", controllers.DeleteReview)
-		r.Put("/api/reviews/{review_id}", controllers.ModifyReview)
-
 		r.Get("/api/tags/{tag_id}", controllers.GetTag)
 		r.Get("/api/tags", controllers.ListTags)
 		r.Post("/api/tags", controllers.CreateTag)

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"go_server/internal/models"
+	"go_server/internal/services"
 	"go_server/test/utils"
 	"net/http"
 	"net/http/httptest"
@@ -256,8 +257,14 @@ func TestOrderCreate(t *testing.T) {
 
 	userID := uuid.New()
 	portfolioID := uuid.New()
+	securityID := uuid.New()
+	tagID := uuid.New()
+	parentOrderID := uuid.New()
 	alpacaOrderID := "alpacaOrderID"
+	alpacaAccountID := "alpacaAccountID"
+	symbol := "symbol"
 	amount := 123.45
+	holdingFraction := .75
 
 	jsonStr := []byte(fmt.Sprintf(
 		`{
@@ -271,25 +278,95 @@ func TestOrderCreate(t *testing.T) {
 		amount,
 	))
 
-	orderPayload := models.Order{
+	brokerageAccount := models.BrokerageAccount{
+		UserID: &userID,
+		AlpacaAccountID:   &alpacaAccountID,
+	}
+
+	portfolio := models.Portfolio{
+		UserID: &userID,
+		PortfolioID:   portfolioID,
+	}
+
+	securities := []models.Security{
+		models.Security{
+			Symbol: symbol,
+		},
+	}
+
+	securityTags := []models.SecurityTag{
+		models.SecurityTag{
+			SecurityID: securityID,
+			TagID: tagID,
+		},
+	}
+
+	portfolioTags := []models.PortfolioTag{
+		models.PortfolioTag{
+			PortfolioID: portfolioID,
+			TagID: tagID,
+		},
+	}
+
+	portfolioHoldings := []services.PortfolioHolding{
+		services.PortfolioHolding{
+			Symbol: symbol,
+			Amount: holdingFraction,
+		},
+	}
+
+	orderPayloadParent := models.Order{
 		UserID: &userID,
 		PortfolioID:   &portfolioID,
 		Amount:   amount,
 		Side: "buy",
 	}
 
-	orderCreated := models.Order{
-		OrderID: uuid.New(),
+	orderCreatedParent := models.Order{
+		OrderID: parentOrderID,
 		UserID:      &userID,
 		PortfolioID:        &portfolioID,
-		AlpacaOrderID:        &alpacaOrderID,
 		Amount:        amount,
 		Side: "buy",
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
 
-	testServer.Store.On("CreateOrder", orderPayload).Return(&orderCreated, nil)
+	orderPayloadChild := models.Order{
+		UserID: &userID,
+		ParentOrderID:   &parentOrderID,
+		AlpacaOrderID: &alpacaOrderID,
+		Symbol: &symbol,
+		Amount: amount * holdingFraction,
+		Side: "buy",
+	}
+
+	orderCreatedChild := models.Order{
+		OrderID: uuid.New(),
+		UserID:      &userID,
+		PortfolioID:        &portfolioID,
+		AlpacaOrderID:        &alpacaOrderID,
+		Amount:        amount * holdingFraction,
+		Side: "buy",
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	testServer.Store.On("ListBrokerageAccounts", map[string]interface{}{ "user_id": userID.String()}).Return([]models.BrokerageAccount{ brokerageAccount }, nil)
+	testServer.Store.On("GetPortfolio", portfolioID).Return(&portfolio, nil)
+	testServer.Store.On("ListSecurities", map[string]interface{}{}).Return(securities, nil)
+	testServer.Store.On("ListSecurityTags", map[string]interface{}{}).Return(securityTags, nil)
+	testServer.Store.On("ListPortfolioTags", map[string]interface{}{ "portfolio_id": portfolioID.String()}).Return(portfolioTags, nil)
+	testServer.Service.On(
+		"ListPortfolioHoldings",
+		portfolio,
+		portfolioTags,
+		securities,
+		securityTags,
+	).Return(portfolioHoldings, nil)
+	testServer.Store.On("CreateOrder", orderPayloadParent).Return(&orderCreatedParent, nil)
+	testServer.Broker.On("CreateOrder", alpacaAccountID, symbol, amount * holdingFraction, "buy").Return(alpacaOrderID, nil)
+	testServer.Store.On("CreateOrder", orderPayloadChild).Return(&orderCreatedChild, nil)
 
 	req := httptest.NewRequest(
 		http.MethodPost,
@@ -313,16 +390,18 @@ func TestOrderCreate(t *testing.T) {
 	errDecoder := decoder.Decode(&orderResponse)
 	assert.Nil(t, errDecoder)
 
-	assert.Equal(t, orderResponse.OrderID, orderCreated.OrderID)
-	assert.Equal(t, orderResponse.UserID, orderCreated.UserID)
-	assert.Equal(t, orderResponse.PortfolioID, orderCreated.PortfolioID)
-	assert.Equal(t, orderResponse.AlpacaOrderID, orderCreated.AlpacaOrderID)
-	assert.Equal(t, orderResponse.Amount, orderCreated.Amount)
-	assert.Equal(t, orderResponse.Side, orderCreated.Side)
-	assert.WithinDuration(t, orderResponse.CreatedAt, orderCreated.CreatedAt, 0)
-	assert.WithinDuration(t, orderResponse.UpdatedAt, orderCreated.UpdatedAt, 0)
+	assert.Equal(t, orderResponse.OrderID, orderCreatedParent.OrderID)
+	assert.Equal(t, orderResponse.UserID, orderCreatedParent.UserID)
+	assert.Equal(t, orderResponse.PortfolioID, orderCreatedParent.PortfolioID)
+	assert.Equal(t, orderResponse.AlpacaOrderID, orderCreatedParent.AlpacaOrderID)
+	assert.Equal(t, orderResponse.Amount, orderCreatedParent.Amount)
+	assert.Equal(t, orderResponse.Side, orderCreatedParent.Side)
+	assert.WithinDuration(t, orderResponse.CreatedAt, orderCreatedParent.CreatedAt, 0)
+	assert.WithinDuration(t, orderResponse.UpdatedAt, orderCreatedParent.UpdatedAt, 0)
 
 	testServer.Store.AssertExpectations(t)
+	testServer.Broker.AssertExpectations(t)
+	testServer.Service.AssertExpectations(t)
 }
 
 func TestOrderModify(t *testing.T) {
