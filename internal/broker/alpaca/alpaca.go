@@ -90,7 +90,7 @@ func (brkr *Broker) sendRequest(
 	if res.StatusCode != http.StatusOK &&
 		res.StatusCode != http.StatusCreated &&
 		res.StatusCode != http.StatusNoContent {
-		return nil, fmt.Errorf("%w: %s", ErrAlpacaAPI, alpacaResponse.(map[string]string)["message"])
+		return nil, fmt.Errorf("%w: %s", ErrAlpacaAPI, alpacaResponse.(map[string]interface{})["message"].(string))
 	}
 
 	return alpacaResponse, nil
@@ -189,18 +189,17 @@ func (brkr *Broker) CreateAccount(
 		ipAddress,
 	)
 
-	rawResponse, errAlpaca := brkr.sendRequest(
+	alpacaResponse, errAlpaca := brkr.sendRequest(
 		"/v1/accounts",
 		http.MethodPost,
 		body,
 	)
-	alpacaResponse := rawResponse.(map[string]string)
 
 	if errAlpaca != nil {
 		return "", errAlpaca
 	}
 
-	return alpacaResponse["id"], nil
+	return alpacaResponse.(map[string]interface{})["id"].(string), nil
 }
 
 // GetAccount retreives the given account.
@@ -284,18 +283,17 @@ func (brkr *Broker) CreateOrder(accountID string, symbol string, amount float64,
 		"time_in_force": "day",
 	}
 
-	rawResponse, errAlpaca := brkr.sendRequest(
+	alpacaResponse, errAlpaca := brkr.sendRequest(
 		fmt.Sprint("/v1/trading/accounts/", accountID, "/orders"),
 		http.MethodPost,
 		body,
 	)
-	alpacaResponse := rawResponse.(map[string]string)
 
 	if errAlpaca != nil {
 		return "", errAlpaca
 	}
 
-	return alpacaResponse["id"], nil
+	return alpacaResponse.(map[string]interface{})["id"].(string), nil
 }
 
 // CreateTransfer creates a transfer for an account.
@@ -312,18 +310,17 @@ func (brkr *Broker) CreateTransfer(
 		"direction":       direction,
 	}
 
-	rawResponse, errAlpaca := brkr.sendRequest(
+	alpacaResponse, errAlpaca := brkr.sendRequest(
 		fmt.Sprint("/v1/accounts/", accountID, "/transfers"),
 		http.MethodPost,
 		body,
 	)
-	alpacaResponse := rawResponse.(map[string]string)
 
 	if errAlpaca != nil {
 		return "", errAlpaca
 	}
 
-	return alpacaResponse["id"], nil
+	return alpacaResponse.(map[string]interface{})["id"].(string), nil
 }
 
 // CreateACHRelationship creates an ach relastionship for an account.
@@ -335,16 +332,15 @@ func (brkr *Broker) CreateACHRelationship(
 		"processor_token": processorToken,
 	}
 
-	rawResponse, errAlpaca := brkr.sendRequest(
+	alpacaResponse, errAlpaca := brkr.sendRequest(
 		fmt.Sprint("/v1/accounts/", accountID, "/ach_relationships"),
 		http.MethodPost,
 		body,
 	)
-	alpacaResponse := rawResponse.(map[string]string)
 
 	if errAlpaca != nil {
 		return "", errAlpaca
 	}
 
-	return alpacaResponse["id"], nil
+	return alpacaResponse.(map[string]interface{})["id"].(string), nil
 }
