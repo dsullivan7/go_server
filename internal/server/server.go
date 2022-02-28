@@ -3,7 +3,7 @@ package server
 import (
 	"net/http"
 
-	"go_server/internal/auth"
+	"go_server/internal/authentication"
 	"go_server/internal/broker"
 	"go_server/internal/config"
 	"go_server/internal/logger"
@@ -40,7 +40,7 @@ func NewChiServer(
 	str store.Store,
 	pld plaid.IClient,
 	brkr broker.Broker,
-	ath auth.Auth,
+	ath authentication.Authentication,
 	lggr logger.Logger,
 ) Server {
 	utils := utils.NewServerUtils(lggr)

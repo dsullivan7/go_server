@@ -10,11 +10,11 @@ require (
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/cors v1.2.0
 	github.com/go-chi/render v1.0.1
-	github.com/go-rod/rod v0.101.8
 	github.com/google/uuid v1.2.0
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/jackc/pgx/v4 v4.15.0 // indirect
 	github.com/lib/pq v1.10.2
+	github.com/osohq/go-oso v0.26.0
 	github.com/plaid/plaid-go v1.10.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/stretchr/testify v1.7.0

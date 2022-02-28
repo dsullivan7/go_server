@@ -6,17 +6,17 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 
-	"go_server/internal/auth"
+	"go_server/internal/authentication"
 	"go_server/test/mocks/consts"
 )
 
-type MockAuth struct{}
+type MockAuthentication struct{}
 
-func NewMockAuth() auth.Auth {
-	return &MockAuth{}
+func NewMockAuthentication() authentication.Authentication {
+	return &MockAuthentication{}
 }
 
-func (auth *MockAuth) CheckJWT(w http.ResponseWriter, r *http.Request) error {
+func (auth *MockAuthentication) CheckJWT(w http.ResponseWriter, r *http.Request) error {
 	jwtToken := &jwt.Token{Claims: jwt.MapClaims{"sub": consts.LoggedInAuth0Id}}
 
 	newRequest := r.WithContext(context.WithValue(r.Context(), "user", jwtToken)) //nolint:revive,staticcheck

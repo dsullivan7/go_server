@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"go_server/internal/logger"
+	"go_server/internal/authentication"
 
 	jwtMiddleware "github.com/auth0/go-jwt-middleware"
 	"github.com/dgrijalva/jwt-go"
@@ -70,24 +71,24 @@ func getPemCert(token *jwt.Token, domain string) (string, error) {
 	return cert, nil
 }
 
-type Auth struct {
+type Authentication struct {
 	mw       *jwtMiddleware.JWTMiddleware
 	domain   string
 	audience string
 	logger   logger.Logger
 }
 
-func NewAuth(domain string, audience string, logger logger.Logger) *Auth {
+func NewAuth(domain string, audience string, logger logger.Logger) authentication.Authentication {
 	logger.Info(fmt.Sprintf("Initialize auth with domain '%s' and audience '%s'", domain, audience))
 
-	return &Auth{
+	return &Authentication{
 		domain:   domain,
 		audience: audience,
 		logger:   logger,
 	}
 }
 
-func (auth *Auth) Init() {
+func (auth *Authentication) Init() {
 	mw := jwtMiddleware.New(jwtMiddleware.Options{
 		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
 			// Verify 'aud' claim
@@ -123,7 +124,7 @@ func (auth *Auth) Init() {
 	auth.mw = mw
 }
 
-func (auth *Auth) CheckJWT(w http.ResponseWriter, r *http.Request) error {
+func (auth *Authentication) CheckJWT(w http.ResponseWriter, r *http.Request) error {
 	if err := auth.mw.CheckJWT(w, r); err != nil {
 		return fmt.Errorf("error checking jwt: %w", err)
 	}

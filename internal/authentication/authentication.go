@@ -1,9 +1,9 @@
-package auth
+package authentication
 
 import (
 	"net/http"
 )
 
-type Auth interface {
+type Authentication interface {
 	CheckJWT(w http.ResponseWriter, r *http.Request) error
 }

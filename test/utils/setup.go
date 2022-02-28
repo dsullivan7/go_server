@@ -1,13 +1,13 @@
 package utils
 
 import (
-	"go_server/internal/auth"
+	"go_server/internal/authentication"
 	"go_server/internal/config"
 	"go_server/internal/logger"
 	goServerZapLogger "go_server/internal/logger/zap"
 	"go_server/internal/server"
 	"go_server/internal/server/graph"
-	mockAuth "go_server/test/mocks/auth"
+	mockAuthentication "go_server/test/mocks/authentication"
 	mockBroker "go_server/test/mocks/broker"
 	mockPlaid "go_server/test/mocks/plaid"
 	mockServices "go_server/test/mocks/services"
@@ -25,7 +25,7 @@ type TestServer struct {
 	Resolver    *graph.Resolver
 	Logger      logger.Logger
 	Store       *mockStore.MockStore
-	Auth        auth.Auth
+	Authentication        authentication.Authentication
 	PlaidClient *mockPlaid.MockPlaid
 	Broker      *mockBroker.MockBroker
 }
@@ -57,8 +57,8 @@ func NewTestServer() (*TestServer, error) {
 	router := chi.NewRouter()
 	testServer.Router = router
 
-	ath := mockAuth.NewMockAuth()
-	testServer.Auth = ath
+	ath := mockAuthentication.NewMockAuthentication()
+	testServer.Authentication = ath
 
 	pld := mockPlaid.NewMockPlaid()
 	testServer.PlaidClient = pld
