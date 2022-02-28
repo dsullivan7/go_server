@@ -88,6 +88,12 @@ func (s *ChiServer) Init() http.Handler {
 		r.Delete("/api/tags/{tag_id}", controllers.DeleteTag)
 		r.Put("/api/tags/{tag_id}", controllers.ModifyTag)
 
+		r.Get("/api/orders/{order_id}", controllers.GetOrder)
+		r.Get("/api/orders", controllers.ListOrders)
+		r.Post("/api/orders", controllers.CreateOrder)
+		r.Delete("/api/orders/{order_id}", controllers.DeleteOrder)
+		r.Put("/api/orders/{order_id}", controllers.ModifyOrder)
+
 		r.Get("/api/portfolio-holdings", controllers.ListPortfolioHoldings)
 
 		r.Post("/api/plaid/token", controllers.CreatePlaidToken)
