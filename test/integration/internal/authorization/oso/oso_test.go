@@ -11,34 +11,39 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUser(t *testing.T) {
-  t.Parallel()
+func TestOso(tParent *testing.T) {
+  tParent.Parallel()
 
   o, errOso := oso.NewOso()
 
-  assert.Nil(t, errOso)
+  assert.Nil(tParent, errOso)
 
   osoAuthorization := goServerOso.NewAuthorization(o)
 
   errInit := osoAuthorization.Init()
-  assert.Nil(t, errInit)
+  assert.Nil(tParent, errInit)
 
-  userID1 := uuid.New()
-  userID2 := uuid.New()
+  tParent.Run("User", func(t *testing.T) {
+    userID1 := uuid.New()
+    userID2 := uuid.New()
 
-  user1 := models.User{ UserID: userID1 }
-  user2 := models.User{ UserID: userID2 }
-  user3 := models.User{ UserID: userID1 }
+    user1 := models.User{ UserID: userID1 }
+    user2 := models.User{ UserID: userID2 }
+    user3 := models.User{ UserID: userID1 }
 
-  errValidRead := osoAuthorization.Authorize(user1, "read", user3)
-  assert.Nil(t, errValidRead)
+    errValidRead := osoAuthorization.Authorize(user1, "read", user3)
+    assert.Nil(t, errValidRead)
 
-  errValidModify := osoAuthorization.Authorize(user1, "modify", user3)
-  assert.Nil(t, errValidModify)
+    // errValidModify := osoAuthorization.Authorize(user1, "modify", user3)
+    // assert.Nil(t, errValidModify)
+    //
+    // errValidCreate := osoAuthorization.Authorize(user1, "create", user3)
+    // assert.Nil(t, errValidCreate)
+    //
+    // errValidDelete := osoAuthorization.Authorize(user1, "delete", user3)
+    // assert.Nil(t, errValidDelete)
 
-  errValidDelete := osoAuthorization.Authorize(user1, "delete", user3)
-  assert.Nil(t, errValidDelete)
-
-  errInvalidRead := osoAuthorization.Authorize(user1, "read", user2)
-  assert.NotNil(t, errInvalidRead)
+    errInvalidRead := osoAuthorization.Authorize(user1, "read", user2)
+    assert.NotNil(t, errInvalidRead)
+  })
 }

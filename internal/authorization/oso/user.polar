@@ -1,8 +1,6 @@
 actor User {}
 
-resource User {
-  permissions = ["read", "create", "modify", "delete"];
-}
+resource User {}
 
 has_permission(user: User, "read", userResource: User) if
   user.UserID = userResource.UserID;
