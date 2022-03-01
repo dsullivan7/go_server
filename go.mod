@@ -1,6 +1,6 @@
 module go_server
 
-go 1.15
+go 1.17
 
 require (
 	github.com/99designs/gqlgen v0.14.0
