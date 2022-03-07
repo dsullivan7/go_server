@@ -23,6 +23,7 @@ func NewService() IService {
 
 type PortfolioHolding struct {
 	Symbol string  `json:"symbol"`
+	Name   string  `json:"name"`
 	Amount float64 `json:"amount"`
 }
 
@@ -38,9 +39,9 @@ func (srvc *Service) ListPortfolioHoldings(
 	securityTags []models.SecurityTag,
 ) []PortfolioHolding {
 	// create a lookup map for securities
-	securitySymbolMap := map[string]string{}
+	securityMap := map[string]models.Security{}
 	for _, security := range securities {
-		securitySymbolMap[security.SecurityID.String()] = security.Symbol
+		securityMap[security.SecurityID.String()] = security
 	}
 
 	// create a map of securities to the tag weights
@@ -51,8 +52,8 @@ func (srvc *Service) ListPortfolioHoldings(
 		for _, securityTag := range securityTags {
 			if securityTag.TagID == portfolioTag.TagID {
 				// look up the security
-				securitySymbol := securitySymbolMap[securityTag.SecurityID.String()]
-				securityWeightMap[securitySymbol]++
+				security := securityMap[securityTag.SecurityID.String()]
+				securityWeightMap[security.SecurityID.String()]++
 				totalWeight++
 			}
 		}
@@ -62,7 +63,7 @@ func (srvc *Service) ListPortfolioHoldings(
 	currentIndex := 0
 	remaining := portfolioTotal
 
-	for securitySymbol, securityWeight := range securityWeightMap {
+	for securityID, securityWeight := range securityWeightMap {
 		var amount float64
 		if currentIndex+1 == len(securityWeightMap) {
 			amount = remaining
@@ -74,7 +75,8 @@ func (srvc *Service) ListPortfolioHoldings(
 		}
 
 		portfolioHoldings[currentIndex] = PortfolioHolding{
-			Symbol: securitySymbol,
+			Symbol: securityMap[securityID].Symbol,
+			Name:   securityMap[securityID].Name,
 			Amount: amount,
 		}
 		currentIndex++
