@@ -41,7 +41,7 @@ func TestOso(tParent *testing.T) {
 
 		// errValidModify := osoAuthorization.Authorize(user1, "modify", userID1)
 		// assert.Nil(t, errValidModify)
-    //
+		//
 		// errInvalidModify := osoAuthorization.Authorize(user1, "modify", userID2)
 		// assert.NotNil(t, errInvalidModify)
 
