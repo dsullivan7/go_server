@@ -44,6 +44,7 @@ func (c *Controllers) ListOrders(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, orders)
 }
 
+//nolint:funlen,cyclop
 func (c *Controllers) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	var orderReq map[string]interface{}
 
@@ -81,7 +82,9 @@ func (c *Controllers) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	portfolioTags, errPortfolioTags := c.store.ListPortfolioTags(map[string]interface{}{"portfolio_id": portfolioID.String()})
+	portfolioTags, errPortfolioTags := c.store.ListPortfolioTags(
+		map[string]interface{}{"portfolio_id": portfolioID.String()},
+	)
 
 	if errPortfolioTags != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errPortfolioTags})
@@ -91,7 +94,9 @@ func (c *Controllers) CreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	portfolioHoldings := c.services.ListPortfolioHoldings(*portfolio, portfolioTags, securities, securityTags)
 
-	brokerageAccounts, errBrokerageAccounts := c.store.ListBrokerageAccounts(map[string]interface{}{ "user_id": userID.String() })
+	brokerageAccounts, errBrokerageAccounts := c.store.ListBrokerageAccounts(
+		map[string]interface{}{"user_id": userID.String()},
+	)
 
 	if errBrokerageAccounts != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errBrokerageAccounts})
@@ -102,10 +107,10 @@ func (c *Controllers) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	alpacaAccountID := brokerageAccounts[0].AlpacaAccountID
 
 	orderPayload := models.Order{
-		UserID:           &userID,
-		PortfolioID:           &portfolioID,
-		Amount:           orderReq["amount"].(float64),
-		Side:           "buy",
+		UserID:      &userID,
+		PortfolioID: &portfolioID,
+		Amount:      orderReq["amount"].(float64),
+		Side:        "buy",
 	}
 
 	order, err := c.store.CreateOrder(orderPayload)
@@ -114,7 +119,7 @@ func (c *Controllers) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		alpacaOrderID, errOrder := c.broker.CreateOrder(
 			*alpacaAccountID,
 			portfolioHolding.Symbol,
-			portfolioHolding.Amount * orderReq["amount"].(float64),
+			portfolioHolding.Amount*orderReq["amount"].(float64),
 			"buy",
 		)
 
@@ -125,12 +130,12 @@ func (c *Controllers) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		}
 
 		orderPayloadChild := models.Order{
-			UserID:           &userID,
+			UserID:        &userID,
 			ParentOrderID: &order.OrderID,
 			AlpacaOrderID: &alpacaOrderID,
-			Amount:           portfolioHolding.Amount * orderReq["amount"].(float64),
-			Symbol:           &portfolioHolding.Symbol,
-			Side:           "buy",
+			Amount:        portfolioHolding.Amount * orderReq["amount"].(float64),
+			Symbol:        &portfolioHolding.Symbol,
+			Side:          "buy",
 		}
 
 		_, err := c.store.CreateOrder(orderPayloadChild)

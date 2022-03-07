@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"go_server/internal/logger"
 	"go_server/internal/authentication"
+	"go_server/internal/logger"
 
 	jwtMiddleware "github.com/auth0/go-jwt-middleware"
 	"github.com/dgrijalva/jwt-go"

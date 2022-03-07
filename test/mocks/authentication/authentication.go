@@ -24,3 +24,5 @@ func (auth *MockAuthentication) CheckJWT(w http.ResponseWriter, r *http.Request)
 
 	return nil
 }
+
+func (auth *MockAuthentication) Init() {}

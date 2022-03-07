@@ -18,16 +18,16 @@ import (
 )
 
 type TestServer struct {
-	Server      server.Server
-	Router      *chi.Mux
-	Config      *config.Config
-	Service     *mockServices.MockService
-	Resolver    *graph.Resolver
-	Logger      logger.Logger
-	Store       *mockStore.MockStore
-	Authentication        authentication.Authentication
-	PlaidClient *mockPlaid.MockPlaid
-	Broker      *mockBroker.MockBroker
+	Server         server.Server
+	Router         *chi.Mux
+	Config         *config.Config
+	Service        *mockServices.MockService
+	Resolver       *graph.Resolver
+	Logger         logger.Logger
+	Store          *mockStore.MockStore
+	Authentication authentication.Authentication
+	PlaidClient    *mockPlaid.MockPlaid
+	Broker         *mockBroker.MockBroker
 }
 
 func NewTestServer() (*TestServer, error) {

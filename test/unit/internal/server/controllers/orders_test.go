@@ -31,14 +31,14 @@ func TestOrderGet(t *testing.T) {
 	alpacaOrderID := "alpacaOrderID"
 
 	order := models.Order{
-		OrderID: orderID,
-		UserID:      &userID,
-		PortfolioID:      &portfolioID,
-		AlpacaOrderID:      &alpacaOrderID,
-		Amount:      123.45,
-		Side:      "buy",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		OrderID:       orderID,
+		UserID:        &userID,
+		PortfolioID:   &portfolioID,
+		AlpacaOrderID: &alpacaOrderID,
+		Amount:        123.45,
+		Side:          "buy",
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}
 
 	testServer.Store.On("GetOrder", orderID).Return(&order, nil)
@@ -92,14 +92,14 @@ func TestOrderList(t *testing.T) {
 	alpacaOrderID1 := "alpacaOrderID1"
 
 	order1 := models.Order{
-		OrderID: orderID1,
-		UserID:      &userID1,
-		PortfolioID:      &portfolioID1,
-		AlpacaOrderID:      &alpacaOrderID1,
-		Amount:      123.45,
-		Side:      "buy",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		OrderID:       orderID1,
+		UserID:        &userID1,
+		PortfolioID:   &portfolioID1,
+		AlpacaOrderID: &alpacaOrderID1,
+		Amount:        123.45,
+		Side:          "buy",
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}
 
 	orderID2 := uuid.New()
@@ -108,14 +108,14 @@ func TestOrderList(t *testing.T) {
 	alpacaOrderID2 := "alpacaOrderID2"
 
 	order2 := models.Order{
-		OrderID: orderID2,
-		UserID:      &userID2,
-		PortfolioID:      &portfolioID2,
-		AlpacaOrderID:      &alpacaOrderID2,
-		Amount:      345.67,
-		Side:      "buy",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		OrderID:       orderID2,
+		UserID:        &userID2,
+		PortfolioID:   &portfolioID2,
+		AlpacaOrderID: &alpacaOrderID2,
+		Amount:        345.67,
+		Side:          "buy",
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}
 
 	testServer.Store.On("ListOrders", map[string]interface{}{}).Return([]models.Order{order1, order2}, nil)
@@ -196,14 +196,14 @@ func TestOrderListQueryParams(t *testing.T) {
 	amount := 123.45
 
 	order := models.Order{
-		OrderID: orderID,
-		UserID:      &userID,
-		PortfolioID:        &portfolioID,
-		AlpacaOrderID:        &alpacaOrderID,
-		Amount:      amount,
-		Side:      "buy",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		OrderID:       orderID,
+		UserID:        &userID,
+		PortfolioID:   &portfolioID,
+		AlpacaOrderID: &alpacaOrderID,
+		Amount:        amount,
+		Side:          "buy",
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}
 
 	testServer.Store.On(
@@ -279,13 +279,13 @@ func TestOrderCreate(t *testing.T) {
 	))
 
 	brokerageAccount := models.BrokerageAccount{
-		UserID: &userID,
-		AlpacaAccountID:   &alpacaAccountID,
+		UserID:          &userID,
+		AlpacaAccountID: &alpacaAccountID,
 	}
 
 	portfolio := models.Portfolio{
-		UserID: &userID,
-		PortfolioID:   portfolioID,
+		UserID:      &userID,
+		PortfolioID: portfolioID,
 	}
 
 	securities := []models.Security{
@@ -297,14 +297,14 @@ func TestOrderCreate(t *testing.T) {
 	securityTags := []models.SecurityTag{
 		models.SecurityTag{
 			SecurityID: securityID,
-			TagID: tagID,
+			TagID:      tagID,
 		},
 	}
 
 	portfolioTags := []models.PortfolioTag{
 		models.PortfolioTag{
 			PortfolioID: portfolioID,
-			TagID: tagID,
+			TagID:       tagID,
 		},
 	}
 
@@ -316,47 +316,51 @@ func TestOrderCreate(t *testing.T) {
 	}
 
 	orderPayloadParent := models.Order{
-		UserID: &userID,
-		PortfolioID:   &portfolioID,
-		Amount:   amount,
-		Side: "buy",
+		UserID:      &userID,
+		PortfolioID: &portfolioID,
+		Amount:      amount,
+		Side:        "buy",
 	}
 
 	orderCreatedParent := models.Order{
-		OrderID: parentOrderID,
+		OrderID:     parentOrderID,
 		UserID:      &userID,
-		PortfolioID:        &portfolioID,
-		Amount:        amount,
-		Side: "buy",
+		PortfolioID: &portfolioID,
+		Amount:      amount,
+		Side:        "buy",
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
 
 	orderPayloadChild := models.Order{
-		UserID: &userID,
-		ParentOrderID:   &parentOrderID,
+		UserID:        &userID,
+		ParentOrderID: &parentOrderID,
 		AlpacaOrderID: &alpacaOrderID,
-		Symbol: &symbol,
-		Amount: amount * holdingFraction,
-		Side: "buy",
+		Symbol:        &symbol,
+		Amount:        amount * holdingFraction,
+		Side:          "buy",
 	}
 
 	orderCreatedChild := models.Order{
-		OrderID: uuid.New(),
-		UserID:      &userID,
-		PortfolioID:        &portfolioID,
-		AlpacaOrderID:        &alpacaOrderID,
+		OrderID:       uuid.New(),
+		UserID:        &userID,
+		PortfolioID:   &portfolioID,
+		AlpacaOrderID: &alpacaOrderID,
 		Amount:        amount * holdingFraction,
-		Side: "buy",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		Side:          "buy",
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}
 
-	testServer.Store.On("ListBrokerageAccounts", map[string]interface{}{ "user_id": userID.String()}).Return([]models.BrokerageAccount{ brokerageAccount }, nil)
+	testServer.Store.
+		On("ListBrokerageAccounts", map[string]interface{}{"user_id": userID.String()}).
+		Return([]models.BrokerageAccount{brokerageAccount}, nil)
 	testServer.Store.On("GetPortfolio", portfolioID).Return(&portfolio, nil)
 	testServer.Store.On("ListSecurities", map[string]interface{}{}).Return(securities, nil)
 	testServer.Store.On("ListSecurityTags", map[string]interface{}{}).Return(securityTags, nil)
-	testServer.Store.On("ListPortfolioTags", map[string]interface{}{ "portfolio_id": portfolioID.String()}).Return(portfolioTags, nil)
+	testServer.Store.
+		On("ListPortfolioTags", map[string]interface{}{"portfolio_id": portfolioID.String()}).
+		Return(portfolioTags, nil)
 	testServer.Service.On(
 		"ListPortfolioHoldings",
 		portfolio,
@@ -365,7 +369,9 @@ func TestOrderCreate(t *testing.T) {
 		securityTags,
 	).Return(portfolioHoldings, nil)
 	testServer.Store.On("CreateOrder", orderPayloadParent).Return(&orderCreatedParent, nil)
-	testServer.Broker.On("CreateOrder", alpacaAccountID, symbol, amount * holdingFraction, "buy").Return(alpacaOrderID, nil)
+	testServer.Broker.
+		On("CreateOrder", alpacaAccountID, symbol, amount*holdingFraction, "buy").
+		Return(alpacaOrderID, nil)
 	testServer.Store.On("CreateOrder", orderPayloadChild).Return(&orderCreatedChild, nil)
 
 	req := httptest.NewRequest(
@@ -420,14 +426,14 @@ func TestOrderModify(t *testing.T) {
 	orderPayload := models.Order{}
 
 	orderModified := models.Order{
-		OrderID: uuid.New(),
-		UserID:      &userID,
-		PortfolioID:        &portfolioID,
-		AlpacaOrderID:        &alpacaOrderID,
+		OrderID:       uuid.New(),
+		UserID:        &userID,
+		PortfolioID:   &portfolioID,
+		AlpacaOrderID: &alpacaOrderID,
 		Amount:        amount,
-		Side: "buy",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		Side:          "buy",
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}
 
 	testServer.Store.On("ModifyOrder", orderModified.OrderID, orderPayload).Return(&orderModified, nil)
