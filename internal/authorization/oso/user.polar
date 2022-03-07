@@ -1,9 +1,16 @@
-actor User {}
+same_user(user: User, action, user_resource: User) if
+  action in ["read"] and
+  user.UserID = user_resource.UserID;
 
-resource User {}
-
-has_permission(user: User, "read", userResource: User) if
-  user.UserID = userResource.UserID;
+matching_user_id(user: User, action, user_id) if
+  action in ["delete", "modify"] and
+  user.UserID = user_id;
 
 allow(actor, action, resource) if
-  has_permission(actor, action, resource);
+  same_user(actor, action, resource);
+
+allow(actor, action, resource) if
+  matching_user_id(actor, action, resource);
+
+allow(actor, action, resource) if
+  matching_auth0_id(actor, action, resource);

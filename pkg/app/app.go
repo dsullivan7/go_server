@@ -2,7 +2,7 @@ package app
 
 import (
 	"fmt"
-	"go_server/internal/auth/auth0"
+	"go_server/internal/authentication/auth0"
 	goServerAlpaca "go_server/internal/broker/alpaca"
 	"go_server/internal/config"
 	"go_server/internal/db"
