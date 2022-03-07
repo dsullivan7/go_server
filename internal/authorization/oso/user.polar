@@ -11,6 +11,3 @@ allow(actor, action, resource) if
 
 allow(actor, action, resource) if
   matching_user_id(actor, action, resource);
-
-allow(actor, action, resource) if
-  matching_auth0_id(actor, action, resource);
