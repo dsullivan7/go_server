@@ -44,7 +44,7 @@ services:
       *app-environment
 
   build:
-    image: golang:1.17.0-alpine
+    image: golang:1.17
     working_dir: /app
     volumes:
       - ./:/app
