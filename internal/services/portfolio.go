@@ -3,6 +3,7 @@ package services
 import (
 	"go_server/internal/models"
 	"math"
+	"sort"
 )
 
 type IService interface {
@@ -28,7 +29,7 @@ type PortfolioHolding struct {
 }
 
 const portfolioTotal = 1.0
-const roundValue = 100
+const roundValue = 10000
 
 // ListPortfolioHoldings retreives a set of portfolio holdings
 // according to the specified portfolio and portfolio tags.
@@ -63,16 +64,25 @@ func (srvc *Service) ListPortfolioHoldings(
 	currentIndex := 0
 	remaining := portfolioTotal
 
-	for securityID, securityWeight := range securityWeightMap {
+	// sort the securityWeightMap for determinism
+	securityIDs := make([]string, 0, len(securityWeightMap))
+	for securityID := range securityWeightMap {
+		securityIDs = append(securityIDs, securityID)
+	}
+
+	sort.Strings(securityIDs)
+
+	for _, securityID := range securityIDs {
 		var amount float64
-		if currentIndex+1 == len(securityWeightMap) {
+		if currentIndex+1 == len(securityIDs) {
 			amount = remaining
 		} else {
-			raw := (float64(securityWeight) / float64(totalWeight)) * float64(portfolioTotal)
-			// round the amount to 2 decimal places
-			amount = math.Round(raw*roundValue) / roundValue
-			remaining -= amount
+			amount = (float64(securityWeightMap[securityID]) / float64(totalWeight)) * float64(portfolioTotal)
 		}
+
+		// round the amount
+		amount = math.Round(amount*roundValue) / roundValue
+		remaining -= amount
 
 		portfolioHoldings[currentIndex] = PortfolioHolding{
 			Symbol: securityMap[securityID].Symbol,
