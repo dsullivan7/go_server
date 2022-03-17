@@ -43,8 +43,10 @@ services:
     environment:
       *app-environment
 
-  build:
-    image: golang:1.17
+  golang:
+    build:
+      context: .
+      dockerfile: Dockerfile.golang
     working_dir: /app
     volumes:
       - ./:/app

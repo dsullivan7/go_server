@@ -37,15 +37,15 @@ run:
 
 .PHONY: run-docker
 run-docker:
-	docker-compose run --service-ports run
+	docker-compose up --build run
 
 .PHONY: build-docker
 build-docker:
-	docker-compose run build go build -o bin/app ./cmd/app.go
+	docker-compose run golang go build -o bin/app ./cmd/app.go
 
 .PHONY: test-docker
 test-docker:
-	docker-compose run --rm build go test -v $(TESTS)
+	docker-compose run --rm golang go test -v $(TESTS)
 
 .PHONY: lint
 lint:
