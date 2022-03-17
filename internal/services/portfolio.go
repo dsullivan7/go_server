@@ -33,7 +33,6 @@ const roundValue = 10000
 
 // ListPortfolioHoldings retreives a set of portfolio holdings
 // according to the specified portfolio and portfolio tags.
-// nolint:funlen
 func (srvc *Service) ListPortfolioHoldings(
 	portfolio models.Portfolio,
 	portfolioTags []models.PortfolioTag,
@@ -84,9 +83,6 @@ func (srvc *Service) ListPortfolioHoldings(
 		// round the amount
 		amount = math.Round(amount*roundValue) / roundValue
 		remaining -= amount
-
-		println(securityID) //nolint
-		println(amount)     //nolint
 
 		portfolioHoldings[currentIndex] = PortfolioHolding{
 			Symbol: securityMap[securityID].Symbol,
