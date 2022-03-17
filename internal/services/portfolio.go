@@ -23,9 +23,10 @@ func NewService() IService {
 }
 
 type PortfolioHolding struct {
-	Symbol string  `json:"symbol"`
-	Name   string  `json:"name"`
-	Amount float64 `json:"amount"`
+	Symbol      string  `json:"symbol"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Amount      float64 `json:"amount"`
 }
 
 const portfolioTotal = 1.0
@@ -85,9 +86,10 @@ func (srvc *Service) ListPortfolioHoldings(
 		remaining -= amount
 
 		portfolioHoldings[currentIndex] = PortfolioHolding{
-			Symbol: securityMap[securityID].Symbol,
-			Name:   securityMap[securityID].Name,
-			Amount: amount,
+			Symbol:      securityMap[securityID].Symbol,
+			Name:        securityMap[securityID].Name,
+			Description: securityMap[securityID].Description,
+			Amount:      amount,
 		}
 		currentIndex++
 	}
