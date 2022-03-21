@@ -107,7 +107,7 @@ func TestAlpacaCreateAccount(t *testing.T) {
 	assert.Equal(t, alpacaAccountID, "test")
 }
 
-func TestAlpacaGetAccount(t *testing.T) {
+func TestAlpacaListPositions(t *testing.T) {
 	t.Parallel()
 
 	accountID := "accountID"
