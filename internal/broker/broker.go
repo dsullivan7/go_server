@@ -5,6 +5,12 @@ type Account struct {
 	AccountID string
 }
 
+type Position struct {
+	PositionID  string
+	Symbol      string
+	MarketValue float64
+}
+
 type Broker interface {
 	CreateAccount(
 		givenName string,

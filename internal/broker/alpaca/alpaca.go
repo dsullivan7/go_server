@@ -228,6 +228,37 @@ func (brkr *Broker) GetAccount(accountID string) (*broker.Account, error) {
 	return &account, nil
 }
 
+// ListPostitions retreives the given account.
+func (brkr *Broker) ListPositions(accountID string) ([]broker.Position, error) {
+	alpacaResponse, errAlpaca := brkr.sendRequest(
+		fmt.Sprint("/v1/trading/accounts/", accountID, "/positions"),
+		http.MethodGet,
+		nil,
+	)
+
+	if errAlpaca != nil {
+		return nil, errAlpaca
+	}
+
+	positions := make([]broker.Position, len(alpacaResponse.([]map[string]interface{})))
+
+	for i, position := range alpacaResponse.([]map[string]interface{}) {
+		marketValue, errMarketValue := strconv.ParseFloat(position["market_value"].(string), bitConversion)
+
+		if errMarketValue != nil {
+			return nil, fmt.Errorf("error parsing the market value: %w", errMarketValue)
+		}
+
+		positions[i] = broker.Position{
+			PositionID:  position["asset_id"].(string),
+			Symbol:      position["symbol"].(string),
+			MarketValue: marketValue,
+		}
+	}
+
+	return positions, nil
+}
+
 // ListAccounts retreives a list of accounts given the query.
 func (brkr *Broker) ListAccounts(query string) ([]broker.Account, error) {
 	alpacaResponse, errAlpaca := brkr.sendRequest(
