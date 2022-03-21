@@ -74,9 +74,17 @@ func TestAlpacaGetAccount(t *testing.T) {
 		mockHTTPClient,
 	)
 
-	body := map[string]interface{}{
-		"id":   "test",
-		"cash": "123.45",
+	body := [2]map[string]interface{}{
+		{
+			"asset_id":     "asset_id_1",
+			"market_value": "345.67",
+			"symbol":       "symbol_1",
+		},
+		{
+			"asset_id":     "asset_id_2",
+			"market_value": "123.45",
+			"symbol":       "symbol_2",
+		},
 	}
 
 	jsonBytes, errMarshal := json.Marshal(body)
@@ -91,11 +99,18 @@ func TestAlpacaGetAccount(t *testing.T) {
 		nil,
 	)
 
-	account, errAcc := alpacaClient.GetAccount("test")
+	positions, errPositions := alpacaClient.ListPositions("test")
 
-	assert.Nil(t, errAcc)
-	assert.Equal(t, account.AccountID, "test")
-	assert.Equal(t, account.Cash, 123.45)
+	assert.Nil(t, errPositions)
+	assert.Equal(t, len(positions), 2)
+
+	assert.Equal(t, positions[0].PositionID, "asset_id_1")
+	assert.Equal(t, positions[0].Symbol, "symbol_1")
+	assert.Equal(t, positions[0].MarketValue, 345.67)
+
+	assert.Equal(t, positions[1].PositionID, "asset_id_2")
+	assert.Equal(t, positions[1].Symbol, "symbol_2")
+	assert.Equal(t, positions[1].MarketValue, 123.45)
 
 	mockHTTPClient.AssertExpectations(t)
 }

@@ -15,6 +15,7 @@ import (
 )
 
 var ErrAlpacaAPI = errors.New("alpaca api error")
+var ErrConversion = errors.New("conversion error")
 
 const bitConversion = 64
 
@@ -240,18 +241,21 @@ func (brkr *Broker) ListPositions(accountID string) ([]broker.Position, error) {
 		return nil, errAlpaca
 	}
 
-	positions := make([]broker.Position, len(alpacaResponse.([]map[string]interface{})))
+	positions := make([]broker.Position, len(alpacaResponse.([]interface{})))
 
-	for i, position := range alpacaResponse.([]map[string]interface{}) {
-		marketValue, errMarketValue := strconv.ParseFloat(position["market_value"].(string), bitConversion)
+	for i, position := range alpacaResponse.([]interface{}) {
+		marketValue, errMarketValue := strconv.ParseFloat(
+			position.(map[string]interface{})["market_value"].(string),
+			bitConversion,
+		)
 
 		if errMarketValue != nil {
 			return nil, fmt.Errorf("error parsing the market value: %w", errMarketValue)
 		}
 
 		positions[i] = broker.Position{
-			PositionID:  position["asset_id"].(string),
-			Symbol:      position["symbol"].(string),
+			PositionID:  position.(map[string]interface{})["asset_id"].(string),
+			Symbol:      position.(map[string]interface{})["symbol"].(string),
 			MarketValue: marketValue,
 		}
 	}
