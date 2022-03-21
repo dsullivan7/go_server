@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"go_server/internal/broker"
-	goServerHTTP "go_server/internal/http"
 	"net/http"
 	"strconv"
 	"time"
@@ -23,20 +22,17 @@ type Broker struct {
 	alpacaAPIKey    string
 	alpacaAPISecret string
 	alpacaAPIURL    string
-	httpClient      goServerHTTP.IClient
 }
 
 func NewBroker(
 	alpacaAPIKey string,
 	alpacaAPISecret string,
 	alpacaAPIURL string,
-	httpClient goServerHTTP.IClient,
 ) broker.Broker {
 	return &Broker{
 		alpacaAPIKey:    alpacaAPIKey,
 		alpacaAPISecret: alpacaAPISecret,
 		alpacaAPIURL:    alpacaAPIURL,
-		httpClient:      httpClient,
 	}
 }
 
@@ -70,7 +66,7 @@ func (brkr *Broker) sendRequest(
 		"Authorization": []string{fmt.Sprint("Basic ", authHeader)},
 	}
 
-	res, errRes := brkr.httpClient.Do(req)
+	res, errRes := http.DefaultClient.Do(req)
 
 	if errRes != nil {
 		return nil, fmt.Errorf("failed to get the response: %w", errRes)
