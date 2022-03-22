@@ -70,6 +70,14 @@ func (mockBroker *MockBroker) DeleteAccount(
 	return args.Error(0)
 }
 
+func (mockBroker *MockBroker) ListPositions(
+	accountID string,
+) ([]broker.Position, error) {
+	args := mockBroker.Called(accountID)
+
+	return args.Get(0).([]broker.Position), args.Error(1)
+}
+
 func (mockBroker *MockBroker) CreateOrder(
 	accountID string,
 	symbol string,
