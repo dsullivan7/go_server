@@ -94,7 +94,9 @@ func (s *ChiServer) Init() http.Handler {
 		r.Delete("/api/orders/{order_id}", controllers.DeleteOrder)
 		r.Put("/api/orders/{order_id}", controllers.ModifyOrder)
 
-		r.Get("/api/portfolio-holdings", controllers.ListPortfolioHoldings)
+		r.Get("/api/portfolio-recommendations", controllers.ListPortfolioRecommendations)
+
+		r.Get("/api/positions", controllers.ListPositions)
 
 		r.Post("/api/plaid/token", controllers.CreatePlaidToken)
 

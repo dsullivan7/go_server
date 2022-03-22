@@ -92,7 +92,12 @@ func (c *Controllers) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	portfolioHoldings := c.services.ListPortfolioHoldings(*portfolio, portfolioTags, securities, securityTags)
+	portfolioHoldings := c.services.ListPortfolioRecommendations(
+		*portfolio,
+		portfolioTags,
+		securities,
+		securityTags,
+	)
 
 	brokerageAccounts, errBrokerageAccounts := c.store.ListBrokerageAccounts(
 		map[string]interface{}{"user_id": userID.String()},

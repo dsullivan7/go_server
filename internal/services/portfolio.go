@@ -7,7 +7,7 @@ import (
 )
 
 type IService interface {
-	ListPortfolioHoldings(
+	ListPortfolioRecommendations(
 		models.Portfolio,
 		[]models.PortfolioTag,
 		[]models.Security,
@@ -32,9 +32,9 @@ type PortfolioHolding struct {
 const portfolioTotal = 1.0
 const roundValue = 10000
 
-// ListPortfolioHoldings retreives a set of portfolio holdings
+// ListPortfolioRecommendations retreives a list of recommendations for a portfolio
 // according to the specified portfolio and portfolio tags.
-func (srvc *Service) ListPortfolioHoldings(
+func (srvc *Service) ListPortfolioRecommendations(
 	portfolio models.Portfolio,
 	portfolioTags []models.PortfolioTag,
 	securities []models.Security,
