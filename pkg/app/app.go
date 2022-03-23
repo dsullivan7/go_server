@@ -6,7 +6,6 @@ import (
 	goServerAlpaca "go_server/internal/broker/alpaca"
 	"go_server/internal/config"
 	"go_server/internal/db"
-	goServerHTTP "go_server/internal/http"
 	goServerZapLogger "go_server/internal/logger/zap"
 	goServerPlaid "go_server/internal/plaid"
 	"go_server/internal/server"
@@ -64,9 +63,6 @@ func Run() {
 
 	srvc := services.NewService()
 
-	// initialize http client
-	httpClient := goServerHTTP.NewClient()
-
 	// initialize plaid
 	plaidConfig := plaid.NewConfiguration()
 	plaidConfig.AddDefaultHeader("PLAID-CLIENT-ID", config.PlaidClientID)
@@ -76,7 +72,7 @@ func Run() {
 	plaidClient := goServerPlaid.NewClient(plaidAPIClient, config.PlaidRedirectURI)
 
 	// initialize alpaca
-	broker := goServerAlpaca.NewBroker(config.AlpacaAPIKey, config.AlpacaAPISecret, config.AlpacaAPIURL, httpClient)
+	broker := goServerAlpaca.NewBroker(config.AlpacaAPIKey, config.AlpacaAPISecret, config.AlpacaAPIURL)
 
 	auth := auth0.NewAuth(config.Auth0Domain, config.Auth0Audience, logger)
 	auth.Init()
