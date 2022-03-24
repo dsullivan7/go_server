@@ -75,4 +75,6 @@ type Store interface {
 	CreateOrder(orderPayload models.Order) (*models.Order, error)
 	ModifyOrder(orderID uuid.UUID, orderPayload models.Order) (*models.Order, error)
 	DeleteOrder(orderID uuid.UUID) error
+
+	CreateCredential(credentialPayload models.Credential) (*models.Credential, error)
 }

@@ -98,6 +98,8 @@ func (s *ChiServer) Init() http.Handler {
 
 		r.Get("/api/positions", controllers.ListPositions)
 
+		r.Post("/api/credentials", controllers.CreateCredential)
+
 		r.Post("/api/plaid/token", controllers.CreatePlaidToken)
 
 		handler := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
