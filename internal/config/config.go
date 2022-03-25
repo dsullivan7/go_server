@@ -32,6 +32,8 @@ type Config struct {
 
 	AllowedOrigins []string
 	RouterMaxAge   int
+
+	EncryptionKey   string
 }
 
 func NewConfig() (*Config, error) {
@@ -59,6 +61,7 @@ func NewConfig() (*Config, error) {
 		Auth0Domain:      os.Getenv("AUTH0_DOMAIN"),
 		Auth0Audience:    os.Getenv("AUTH0_AUDIENCE"),
 		AllowedOrigins:   strings.Split(os.Getenv("ALLOWED_ORIGINS"), ","),
+		EncryptionKey:    os.Getenv("ENCRYPTION_KEY"),
 		RouterMaxAge:     300,
 	}
 
