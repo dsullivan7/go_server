@@ -86,6 +86,10 @@
           "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/ALPACA_API_SECRET"
         },
         {
+          "name": "ENCRYPTION_KEY",
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/ENCRYPTION_KEY"
+        },
+        {
           "name": "PLAID_REDIRECT_URI",
           "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/PLAID_REDIRECT_URI"
         },
