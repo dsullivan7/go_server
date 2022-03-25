@@ -362,7 +362,7 @@ func TestOrderCreate(t *testing.T) {
 		On("ListPortfolioTags", map[string]interface{}{"portfolio_id": portfolioID.String()}).
 		Return(portfolioTags, nil)
 	testServer.Service.On(
-		"ListPortfolioHoldings",
+		"ListPortfolioRecommendations",
 		portfolio,
 		portfolioTags,
 		securities,
