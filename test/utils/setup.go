@@ -9,10 +9,10 @@ import (
 	"go_server/internal/server/graph"
 	mockAuthentication "go_server/test/mocks/authentication"
 	mockBroker "go_server/test/mocks/broker"
+	mockCipher "go_server/test/mocks/cipher"
 	mockPlaid "go_server/test/mocks/plaid"
 	mockServices "go_server/test/mocks/services"
 	mockStore "go_server/test/mocks/store"
-	mockCipher "go_server/test/mocks/cipher"
 
 	"github.com/go-chi/chi"
 	"go.uber.org/zap"

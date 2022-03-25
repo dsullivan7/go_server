@@ -33,7 +33,7 @@ type Config struct {
 	AllowedOrigins []string
 	RouterMaxAge   int
 
-	EncryptionKey   string
+	EncryptionKey string
 }
 
 func NewConfig() (*Config, error) {

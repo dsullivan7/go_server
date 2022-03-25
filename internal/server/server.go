@@ -5,6 +5,7 @@ import (
 
 	"go_server/internal/authentication"
 	"go_server/internal/broker"
+	"go_server/internal/cipher"
 	"go_server/internal/config"
 	"go_server/internal/logger"
 	"go_server/internal/plaid"
@@ -14,7 +15,6 @@ import (
 	"go_server/internal/server/utils"
 	"go_server/internal/services"
 	"go_server/internal/store"
-	"go_server/internal/cipher"
 
 	"github.com/go-chi/chi"
 )

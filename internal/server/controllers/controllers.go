@@ -2,13 +2,13 @@ package controllers
 
 import (
 	"go_server/internal/broker"
+	"go_server/internal/cipher"
 	"go_server/internal/config"
 	"go_server/internal/logger"
 	"go_server/internal/plaid"
 	"go_server/internal/server/utils"
 	"go_server/internal/services"
 	"go_server/internal/store"
-	"go_server/internal/cipher"
 )
 
 type Controllers struct {
@@ -16,7 +16,7 @@ type Controllers struct {
 	store       store.Store
 	plaidClient plaid.IClient
 	services    services.IService
-	cipher    cipher.ICipher
+	cipher      cipher.ICipher
 	broker      broker.Broker
 	utils       *utils.ServerUtils
 	logger      logger.Logger

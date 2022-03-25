@@ -1,23 +1,23 @@
 package cipher
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"io"
-	"crypto/rand"
-	"crypto/cipher"
-	"crypto/aes"
-	"encoding/hex"
 )
 
 type ICipher interface {
-  Encrypt(phrase string, key string) (string, error)
-  Decrypt(phrase string, key string) (string, error)
+	Encrypt(phrase string, key string) (string, error)
+	Decrypt(phrase string, key string) (string, error)
 }
 
-type Cipher struct {}
+type Cipher struct{}
 
-func NewCipher() Cipher {
-  return Cipher{}
+func NewCipher() ICipher {
+	return &Cipher{}
 }
 
 func (cphr *Cipher) Encrypt(phrase string, key string) (string, error) {

@@ -11,9 +11,9 @@ func TestEncrypt(t *testing.T) {
 	t.Parallel()
 
 	// needs to be 32 bytes long
-  key := "01234567890123456789012345678901"
+	key := "01234567890123456789012345678901"
 
-  testString := "testString"
+	testString := "testString"
 
 	cphr := cipher.NewCipher()
 
@@ -32,11 +32,11 @@ func TestDecrypt(t *testing.T) {
 	t.Parallel()
 
 	// needs to be 32 bytes long
-  key := "01234567890123456789012345678901"
+	key := "01234567890123456789012345678901"
 
 	cphr := cipher.NewCipher()
 
-  testString := "a474f78e24e415e233d7e3db656cbd54a04f787efa1ce696cdf29e5ca2299e797334362c862b"
+	testString := "a474f78e24e415e233d7e3db656cbd54a04f787efa1ce696cdf29e5ca2299e797334362c862b"
 
 	decrypted, errDecrypt := cphr.Decrypt(testString, key)
 

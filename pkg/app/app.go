@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go_server/internal/authentication/auth0"
 	goServerAlpaca "go_server/internal/broker/alpaca"
+	"go_server/internal/cipher"
 	"go_server/internal/config"
 	"go_server/internal/db"
 	goServerZapLogger "go_server/internal/logger/zap"
@@ -74,11 +75,13 @@ func Run() {
 	// initialize alpaca
 	broker := goServerAlpaca.NewBroker(config.AlpacaAPIKey, config.AlpacaAPISecret, config.AlpacaAPIURL)
 
+	cphr := cipher.NewCipher()
+
 	auth := auth0.NewAuth(config.Auth0Domain, config.Auth0Audience, logger)
 	auth.Init()
 
 	router := chi.NewRouter()
-	handler := server.NewChiServer(config, router, srvc, store, plaidClient, broker, auth, logger)
+	handler := server.NewChiServer(config, router, srvc, store, plaidClient, broker, cphr, auth, logger)
 
 	httpServer := http.Server{
 		Addr:    fmt.Sprintf(":%s", config.Port),

@@ -28,7 +28,7 @@ func TestPositionsList(t *testing.T) {
 
 	brokerageAccount := models.BrokerageAccount{
 		BrokerageAccountID: brokerageAccountID,
-		AlpacaAccountID: &alpacaAccountID,
+		AlpacaAccountID:    &alpacaAccountID,
 	}
 
 	positionID1 := "positionID1"
@@ -49,7 +49,7 @@ func TestPositionsList(t *testing.T) {
 
 	testServer.Store.On("GetBrokerageAccount", brokerageAccountID).Return(&brokerageAccount, nil)
 	testServer.Broker.On("ListPositions", alpacaAccountID).Return(
-		[]broker.Position{ position1, position2 },
+		[]broker.Position{position1, position2},
 		nil,
 	)
 
