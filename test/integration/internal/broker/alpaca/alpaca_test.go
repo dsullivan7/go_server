@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go_server/internal/broker/alpaca"
 	"go_server/internal/config"
-	goServerHTTP "go_server/internal/http"
 	"testing"
 
 	"github.com/google/uuid"
@@ -20,13 +19,10 @@ func TestAlpacaCreateAccount(t *testing.T) {
 
 	assert.Nil(t, configError)
 
-	httpClient := goServerHTTP.NewClient()
-
 	alpacaClient := alpaca.NewBroker(
 		cfg.AlpacaAPIKey,
 		cfg.AlpacaAPISecret,
 		cfg.AlpacaAPIURL,
-		httpClient,
 	)
 
 	randomID := uuid.New()

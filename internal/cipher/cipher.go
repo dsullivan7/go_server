@@ -1,10 +1,15 @@
-package server
+package cipher
 
 import (
 	"fmt"
 	"crypto/cipher"
 	"encoding/hex"
 )
+
+type ICipher interface {
+  Encrypt(phrase string) (string)
+  Decrypt(phrase string) (string, error)
+}
 
 type Cipher struct {
 	cipher cipher.Block

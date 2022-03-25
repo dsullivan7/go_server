@@ -14,9 +14,9 @@ import (
 	"go_server/internal/server/utils"
 	"go_server/internal/services"
 	"go_server/internal/store"
+	"go_server/internal/cipher"
 
 	"github.com/go-chi/chi"
-	"crypto/cipher"
 )
 
 type Server interface {
@@ -41,12 +41,12 @@ func NewChiServer(
 	str store.Store,
 	pld plaid.IClient,
 	brkr broker.Broker,
-	cphr cipher.Block,
+	cphr cipher.ICipher,
 	ath authentication.Authentication,
 	lggr logger.Logger,
 ) Server {
 	utils := utils.NewServerUtils(lggr)
-	controllers := controllers.NewControllers(cfg, str, srvc, cphr, pld, brkr, utils, lggr)
+	controllers := controllers.NewControllers(cfg, srvc, str, pld, brkr, cphr, utils, lggr)
 	resolver := graph.NewResolver(cfg, str, lggr)
 	middlewares := middlewares.NewMiddlewares(cfg, str, ath, utils, lggr)
 

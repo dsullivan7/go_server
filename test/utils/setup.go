@@ -12,6 +12,7 @@ import (
 	mockPlaid "go_server/test/mocks/plaid"
 	mockServices "go_server/test/mocks/services"
 	mockStore "go_server/test/mocks/store"
+	mockCipher "go_server/test/mocks/cipher"
 
 	"github.com/go-chi/chi"
 	"go.uber.org/zap"
@@ -28,6 +29,7 @@ type TestServer struct {
 	Authentication authentication.Authentication
 	PlaidClient    *mockPlaid.MockPlaid
 	Broker         *mockBroker.MockBroker
+	Cipher         *mockCipher.MockCipher
 }
 
 func NewTestServer() (*TestServer, error) {
@@ -69,7 +71,10 @@ func NewTestServer() (*TestServer, error) {
 	brkr := mockBroker.NewMockBroker()
 	testServer.Broker = brkr
 
-	srvr := server.NewChiServer(config, router, srvc, str, pld, brkr, ath, logger)
+	cphr := mockCipher.NewMockCipher()
+	testServer.Cipher = cphr
+
+	srvr := server.NewChiServer(config, router, srvc, str, pld, brkr, cphr, ath, logger)
 	srvr.Init()
 
 	testServer.Server = srvr

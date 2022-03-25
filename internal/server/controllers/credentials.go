@@ -5,7 +5,6 @@ import (
 	"go_server/internal/errors"
 	"go_server/internal/models"
 	"net/http"
-	"crypto/aes"
 
 	"github.com/go-chi/render"
 )
@@ -21,7 +20,7 @@ func (c *Controllers) CreateCredential(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// encrypt password
-	credentialPayload.Password =
+	credentialPayload.Password = c.cipher.Encrypt(credentialPayload.Password)
 
 	tag, err := c.store.CreateCredential(credentialPayload)
 
