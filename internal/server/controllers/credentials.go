@@ -19,6 +19,16 @@ func (c *Controllers) CreateCredential(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// encrypt username
+	usernameEnc, errEnc := c.cipher.Encrypt(credentialPayload.Username, c.config.EncryptionKey)
+	if errEnc != nil {
+		c.utils.HandleError(w, r, errors.HTTPServerError{Err: errEnc})
+
+		return
+	}
+
+	credentialPayload.Username = usernameEnc
+
 	// encrypt password
 	passwordEnc, errEnc := c.cipher.Encrypt(credentialPayload.Password, c.config.EncryptionKey)
 	if errEnc != nil {

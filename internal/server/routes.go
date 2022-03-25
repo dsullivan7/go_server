@@ -36,6 +36,8 @@ func (s *ChiServer) Init() http.Handler {
 
 	router.Get("/", controllers.GetHealth)
 
+	router.Post("/api/credentials", controllers.CreateCredential)
+
 	router.Group(func(r chi.Router) {
 		r.Use(middlewares.Auth())
 		r.Use(middlewares.User())
@@ -97,8 +99,6 @@ func (s *ChiServer) Init() http.Handler {
 		r.Get("/api/portfolio-recommendations", controllers.ListPortfolioRecommendations)
 
 		r.Get("/api/positions", controllers.ListPositions)
-
-		r.Post("/api/credentials", controllers.CreateCredential)
 
 		r.Post("/api/plaid/token", controllers.CreatePlaidToken)
 
