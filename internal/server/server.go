@@ -59,3 +59,11 @@ func NewChiServer(
 		resolver:    resolver,
 	}
 }
+
+func (s *ChiServer) GetControllers() *controllers.Controllers {
+	return s.controllers
+}
+
+func (s *ChiServer) GetMiddlewares() *middlewares.Middlewares {
+	return s.middlewares
+}
