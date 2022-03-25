@@ -14,16 +14,18 @@ func NewMockCipher() *MockCipher {
 
 func (mockCipher *MockCipher) Encrypt(
 	phrase string,
-) (string) {
-	args := mockCipher.Called(phrase)
+	key string,
+) (string, error) {
+	args := mockCipher.Called(phrase, key)
 
-	return args.String(0)
+	return args.String(0), args.Error(1)
 }
 
 func (mockCipher *MockCipher) Decrypt(
 	phrase string,
+	key string,
 ) (string, error) {
-	args := mockCipher.Called(phrase)
+	args := mockCipher.Called(phrase, key)
 
 	return args.String(0), args.Error(1)
 }
