@@ -76,5 +76,17 @@ type Store interface {
 	ModifyOrder(orderID uuid.UUID, orderPayload models.Order) (*models.Order, error)
 	DeleteOrder(orderID uuid.UUID) error
 
+	GetItem(itemID uuid.UUID) (*models.Item, error)
+	ListItems(query map[string]interface{}) ([]models.Item, error)
+	CreateItem(itemPayload models.Item) (*models.Item, error)
+	ModifyItem(itemID uuid.UUID, itemPayload models.Item) (*models.Item, error)
+	DeleteItem(itemID uuid.UUID) error
+
+	GetInvoice(itemID uuid.UUID) (*models.Invoice, error)
+	ListInvoices(query map[string]interface{}) ([]models.Invoice, error)
+	CreateInvoice(itemPayload models.Invoice) (*models.Invoice, error)
+	ModifyInvoice(itemID uuid.UUID, itemPayload models.Invoice) (*models.Invoice, error)
+	DeleteInvoice(itemID uuid.UUID) error
+
 	CreateCredential(credentialPayload models.Credential) (*models.Credential, error)
 }

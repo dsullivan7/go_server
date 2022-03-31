@@ -38,6 +38,20 @@ func (s *ChiServer) Init() http.Handler {
 
 	router.Post("/api/credentials", controllers.CreateCredential)
 
+	router.Post("/api/plaid/token", controllers.CreatePlaidToken)
+
+	router.Get("/api/invoices/{invoice_id}", controllers.GetInvoice)
+	router.Get("/api/invoices", controllers.ListInvoices)
+	router.Post("/api/invoices", controllers.CreateInvoice)
+	router.Delete("/api/invoices/{invoice_id}", controllers.DeleteInvoice)
+	router.Put("/api/invoices/{invoice_id}", controllers.ModifyInvoice)
+
+	router.Get("/api/items/{item_id}", controllers.GetItem)
+	router.Get("/api/items", controllers.ListItems)
+	router.Post("/api/items", controllers.CreateItem)
+	router.Delete("/api/items/{item_id}", controllers.DeleteItem)
+	router.Put("/api/items/{item_id}", controllers.ModifyItem)
+
 	router.Group(func(r chi.Router) {
 		r.Use(middlewares.Auth())
 		r.Use(middlewares.User())
@@ -99,8 +113,6 @@ func (s *ChiServer) Init() http.Handler {
 		r.Get("/api/portfolio-recommendations", controllers.ListPortfolioRecommendations)
 
 		r.Get("/api/positions", controllers.ListPositions)
-
-		r.Post("/api/plaid/token", controllers.CreatePlaidToken)
 
 		handler := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
 		r.Handle("/query", handler)
