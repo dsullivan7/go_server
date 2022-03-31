@@ -52,6 +52,8 @@ func (s *ChiServer) Init() http.Handler {
 	router.Delete("/api/items/{item_id}", controllers.DeleteItem)
 	router.Put("/api/items/{item_id}", controllers.ModifyItem)
 
+	router.Post("/api/bank-accounts", controllers.CreateBankAccount)
+
 	router.Group(func(r chi.Router) {
 		r.Use(middlewares.Auth())
 		r.Use(middlewares.User())
@@ -70,7 +72,6 @@ func (s *ChiServer) Init() http.Handler {
 
 		r.Get("/api/bank-accounts/{bank_account_id}", controllers.GetBankAccount)
 		r.Get("/api/bank-accounts", controllers.ListBankAccounts)
-		r.Post("/api/bank-accounts", controllers.CreateBankAccount)
 		r.Delete("/api/bank-accounts/{bank_account_id}", controllers.DeleteBankAccount)
 		r.Put("/api/bank-accounts/{bank_account_id}", controllers.ModifyBankAccount)
 
