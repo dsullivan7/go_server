@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"go_server/internal/errors"
 	"go_server/internal/models"
 	"net/http"
