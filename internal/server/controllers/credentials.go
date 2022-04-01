@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"encoding/json"
 	"go_server/internal/errors"
 	"go_server/internal/models"
@@ -38,6 +39,9 @@ func (c *Controllers) CreateCredential(w http.ResponseWriter, r *http.Request) {
 	}
 
 	credentialPayload.Password = passwordEnc
+
+	c.logger.Info(fmt.Sprint("value 1: ", usernameEnc))
+	c.logger.Info(fmt.Sprint("value 2: ", passwordEnc))
 
 	tag, err := c.store.CreateCredential(credentialPayload)
 
