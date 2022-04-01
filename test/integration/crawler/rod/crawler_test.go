@@ -12,8 +12,6 @@ import (
 )
 
 func TestCrawler(t *testing.T) {
-	t.Skip("No integration")
-
 	browser := rod.New()
 
 	zapLogger, _ := zap.NewProduction()
@@ -26,5 +24,5 @@ func TestCrawler(t *testing.T) {
 
 	crawler := goServerRodCrawler.NewCrawler(browser, captcha)
 
-	crawler.Login("https://www.connectebt.com/nyebtclient/siteLogonClient.recip", "username", "password")
+	crawler.Login("http://localhost:3000", "username", "password")
 }
