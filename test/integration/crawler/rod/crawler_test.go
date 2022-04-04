@@ -12,6 +12,7 @@ import (
 )
 
 func TestCrawler(t *testing.T) {
+	t.Skip("No integration")
 	browser := rod.New()
 
 	zapLogger, _ := zap.NewProduction()
