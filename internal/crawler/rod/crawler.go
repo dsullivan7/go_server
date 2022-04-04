@@ -6,7 +6,6 @@ import (
 	"go_server/internal/crawler"
 
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/go-rod/rod"
@@ -27,9 +26,9 @@ func NewCrawler(browser *rod.Browser, captcha captcha.Captcha) crawler.Crawler {
 }
 
 func (crawler *Crawler) Login(url string, username string, password string) string {
-	cookies := crawler.LoginPage(url, username, password)
+	cxt := crawler.LoginPage(url, username, password)
 
-	return crawler.GetAuthKey(url, cookies)
+	return crawler.GetAuthKey(cxt, url)
 }
 
 func (crawler *Crawler) LoginPage(url string, username string, password string) context.Context {
@@ -43,28 +42,27 @@ func (crawler *Crawler) LoginPage(url string, username string, password string) 
 	page.MustWaitLoad()
 
 	page.MustElement("#username").MustInput("dbsullivan23+test@gmail.com")
-	page.MustElement("#password").MustInput("Asdfg1234$")
+	page.MustElement("#password").MustInput("TestPassword")
 	page.MustElement("[type=\"submit\"]").MustClick()
 
 	page.MustWaitLoad()
 	time.Sleep(RenderWait * time.Second)
 
-	cookies := browser.GetContext()
+	context := browser.GetContext()
 
-	out, _ := json.Marshal(cookies)
-	println(string(out))
-
-	return cookies
+	return context
 }
 
-func (crawler *Crawler) GetAuthKey(url string, ctx context.Context) string {
+func (crawler *Crawler) GetAuthKey(ctx context.Context, url string) string {
 	browser := rod.New().Context(ctx)
 	browser.MustConnect()
 
 	defer browser.MustClose()
 
 	time.Sleep(RenderWait * time.Second)
+
 	page := browser.MustPage(url)
+
 	page.MustWaitLoad()
 	time.Sleep(RenderWait * time.Second)
 
