@@ -83,6 +83,8 @@ github.com/go-gl/glfw/v3.3/glfw v0.0.0-20191125211704-12ad95a8df72/go.mod h1:tQ2
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20200222043503-6f7a984d4dc4/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
 github.com/go-kit/log v0.1.0/go.mod h1:zbhenjAZHb184qTLMA9ZjW7ThYL0H2mk7Q6pNt4vbaY=
 github.com/go-logfmt/logfmt v0.5.0/go.mod h1:wCYkCAKZfumFQihp8CzCvQ3paCTfi41vtzG1KdI/P7A=
+github.com/go-rod/rod v0.104.4 h1:sQR35AFo9ceR7ksh+Ld81bQzIbrXlQH/IO46iCWqxts=
+github.com/go-rod/rod v0.104.4/go.mod h1:trmrxxg+qUodIIQiYeyJbW5ZMo0FSajmdEGw2tHzlM4=
 github.com/go-stack/stack v1.8.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/melR3HDY=
 github.com/gofrs/uuid v4.0.0+incompatible h1:1SD/1F5pU8p29ybwgQSwpQk+mwdRrXCYuPhW6m+TnJw=
 github.com/gofrs/uuid v4.0.0+incompatible/go.mod h1:b2aQJv3Z4Fp6yNu3cdSllBxTCLRxnplIgP/c0N/04lM=
@@ -285,6 +287,16 @@ github.com/urfave/negroni v1.0.0/go.mod h1:Meg73S6kFm/4PpbYdq35yYWoCZ9mS/YSx+lKn
 github.com/vektah/dataloaden v0.2.1-0.20190515034641-a19b9a6e7c9e/go.mod h1:/HUdMve7rvxZma+2ZELQeNh88+003LL7Pf/CZ089j8U=
 github.com/vektah/gqlparser/v2 v2.2.0 h1:bAc3slekAAJW6sZTi07aGq0OrfaCjj4jxARAaC7g2EM=
 github.com/vektah/gqlparser/v2 v2.2.0/go.mod h1:i3mQIGIrbK2PD1RrCeMTlVbkF2FJ6WkU1KJlJlC+3F4=
+github.com/ysmood/goob v0.3.1 h1:qMp5364BGS1DLJVrAqUxTF6KOFt0YDot8GC70u/0jbI=
+github.com/ysmood/goob v0.3.1/go.mod h1:S3lq113Y91y1UBf1wj1pFOxeahvfKkCk6mTWTWbDdWs=
+github.com/ysmood/got v0.19.1 h1:EuONavT9bfly3VunaA+Dt3lBMnQgUFlbUi8dWaz+ddw=
+github.com/ysmood/got v0.19.1/go.mod h1:pE1l4LOwOBhQg6A/8IAatkGp7uZjnalzrZolnlhhMgY=
+github.com/ysmood/gotrace v0.4.0 h1:NkiFGkr8AXxkEosLFudsvw5aGoBY5N7wFPOI4ZSCkb4=
+github.com/ysmood/gotrace v0.4.0/go.mod h1:TzhIG7nHDry5//eYZDYcTzuJLYQIkykJzCRIo4/dzQM=
+github.com/ysmood/gson v0.7.0 h1:oQhY2FQtfy3+bgaNeqopd7NGAB6Me+UpG0n7oO4VDko=
+github.com/ysmood/gson v0.7.0/go.mod h1:3Kzs5zDl21g5F/BlLTNcuAGAYLKt2lV5G8D1zF3RNmg=
+github.com/ysmood/leakless v0.7.0 h1:XCGdaPExyoreoQd+H5qgxM3ReNbSPFsEXpSKwbXbwQw=
+github.com/ysmood/leakless v0.7.0/go.mod h1:R8iAXPRaG97QJwqxs74RdwzcRHT1SWCGTNqY8q0JvMQ=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

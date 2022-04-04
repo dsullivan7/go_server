@@ -10,6 +10,7 @@ require (
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/cors v1.2.0
 	github.com/go-chi/render v1.0.1
+	github.com/go-rod/rod v0.104.4
 	github.com/google/uuid v1.2.0
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/jackc/pgx/v4 v4.15.0 // indirect
@@ -44,6 +45,9 @@ require (
 	github.com/mitchellh/mapstructure v0.0.0-20180203102830-a4e142e9c047 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/objx v0.2.0 // indirect
+	github.com/ysmood/goob v0.3.1 // indirect
+	github.com/ysmood/gson v0.7.0 // indirect
+	github.com/ysmood/leakless v0.7.0 // indirect
 	go.uber.org/atomic v1.6.0 // indirect
 	go.uber.org/multierr v1.5.0 // indirect
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
