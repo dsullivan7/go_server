@@ -5,9 +5,9 @@ import (
 	"go_server/internal/captcha"
 	"go_server/internal/crawler"
 
+	"context"
 	"encoding/json"
 	"time"
-	"context"
 
 	"github.com/go-rod/rod"
 )

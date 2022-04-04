@@ -1,16 +1,16 @@
 package controllers
 
 import (
-	"fmt"
+	"context"
 	"encoding/json"
+	"fmt"
 	"go_server/internal/errors"
 	"go_server/internal/models"
-	"context"
+	"io"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
 	"strings"
-	"io"
 
 	"github.com/go-chi/render"
 )
@@ -30,7 +30,7 @@ func (c *Controllers) CreateCredential(w http.ResponseWriter, r *http.Request) {
 
 	jar, _ := cookiejar.New(nil)
 	client := &http.Client{
-    Jar: jar,
+		Jar: jar,
 	}
 
 	urlToLogin := "https://a069-access.nyc.gov/Rest/j_security_check"
@@ -51,7 +51,7 @@ func (c *Controllers) CreateCredential(w http.ResponseWriter, r *http.Request) {
 
 	resLogin, errLogin := client.Do(reqLogin)
 
-	if (errLogin != nil) {
+	if errLogin != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errLogin})
 
 		return
@@ -68,7 +68,7 @@ func (c *Controllers) CreateCredential(w http.ResponseWriter, r *http.Request) {
 		nil,
 	)
 
-	if (errReqProfile != nil) {
+	if errReqProfile != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errReqProfile})
 
 		return
@@ -78,7 +78,7 @@ func (c *Controllers) CreateCredential(w http.ResponseWriter, r *http.Request) {
 
 	resProfile, errResPorfile := client.Do(reqProfile)
 
-	if (errResPorfile != nil) {
+	if errResPorfile != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errResPorfile})
 
 		return
@@ -87,7 +87,7 @@ func (c *Controllers) CreateCredential(w http.ResponseWriter, r *http.Request) {
 	defer resProfile.Body.Close()
 	profileB, errReadProfile := io.ReadAll(resProfile.Body)
 
-	if (errReadProfile != nil) {
+	if errReadProfile != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errReadProfile})
 
 		return
@@ -102,7 +102,7 @@ func (c *Controllers) CreateCredential(w http.ResponseWriter, r *http.Request) {
 		nil,
 	)
 
-	if (errReqBenefits != nil) {
+	if errReqBenefits != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errReqBenefits})
 
 		return
@@ -111,7 +111,7 @@ func (c *Controllers) CreateCredential(w http.ResponseWriter, r *http.Request) {
 	reqBenefits.Header.Add("Referer", "https://a069-access.nyc.gov/accesshra/anycuserhome")
 
 	resBenefits, errResBenefits := client.Do(reqBenefits)
-	if (errResBenefits != nil) {
+	if errResBenefits != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errResBenefits})
 
 		return
@@ -120,7 +120,7 @@ func (c *Controllers) CreateCredential(w http.ResponseWriter, r *http.Request) {
 	defer resBenefits.Body.Close()
 	benefitsB, errReadBenefits := io.ReadAll(resBenefits.Body)
 
-	if (errReadBenefits != nil) {
+	if errReadBenefits != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errReadBenefits})
 
 		return
