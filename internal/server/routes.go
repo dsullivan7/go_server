@@ -64,6 +64,18 @@ func (s *ChiServer) Init() http.Handler {
 		r.Delete("/api/users/{user_id}", controllers.DeleteUser)
 		r.Put("/api/users/{user_id}", controllers.ModifyUser)
 
+		r.Get("/api/groups/{group_id}", controllers.GetGroup)
+		r.Get("/api/groups", controllers.ListGroups)
+		r.Post("/api/groups", controllers.CreateGroup)
+		r.Delete("/api/groups/{group_id}", controllers.DeleteGroup)
+		r.Put("/api/groups/{group_id}", controllers.ModifyGroup)
+
+		r.Get("/api/group-users/{group_user_id}", controllers.GetGroupUser)
+		r.Get("/api/group-users", controllers.ListGroupUsers)
+		r.Post("/api/group-users", controllers.CreateGroupUser)
+		r.Delete("/api/group-users/{group_user_id}", controllers.DeleteGroupUser)
+		r.Put("/api/group-users/{group_user_id}", controllers.ModifyGroupUser)
+
 		r.Get("/api/tags/{tag_id}", controllers.GetTag)
 		r.Get("/api/tags", controllers.ListTags)
 		r.Post("/api/tags", controllers.CreateTag)

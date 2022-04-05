@@ -82,6 +82,18 @@ type Store interface {
 	ModifyItem(itemID uuid.UUID, itemPayload models.Item) (*models.Item, error)
 	DeleteItem(itemID uuid.UUID) error
 
+	GetGroup(groupID uuid.UUID) (*models.Group, error)
+	ListGroups(query map[string]interface{}) ([]models.Group, error)
+	CreateGroup(groupPayload models.Group) (*models.Group, error)
+	ModifyGroup(groupID uuid.UUID, groupPayload models.Group) (*models.Group, error)
+	DeleteGroup(groupID uuid.UUID) error
+
+	GetGroupUser(groupUserID uuid.UUID) (*models.GroupUser, error)
+	ListGroupUsers(query map[string]interface{}) ([]models.GroupUser, error)
+	CreateGroupUser(groupUserPayload models.GroupUser) (*models.GroupUser, error)
+	ModifyGroupUser(groupUserID uuid.UUID, groupUserPayload models.GroupUser) (*models.GroupUser, error)
+	DeleteGroupUser(groupUserID uuid.UUID) error
+
 	GetInvoice(itemID uuid.UUID) (*models.Invoice, error)
 	ListInvoices(query map[string]interface{}) ([]models.Invoice, error)
 	CreateInvoice(itemPayload models.Invoice) (*models.Invoice, error)
