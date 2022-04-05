@@ -59,75 +59,42 @@ func (c *Controllers) CreateCredential(w http.ResponseWriter, r *http.Request) {
 
 	defer resLogin.Body.Close()
 
-	urlProfile := "https://a069-access.nyc.gov/Rest/v1/ua/profile"
+	urlPayments := "https://a069-access.nyc.gov/Rest/v1/ua/anyc/payments/1"
 
-	reqProfile, errReqProfile := http.NewRequestWithContext(
+	reqPayments, errReqPayments := http.NewRequestWithContext(
 		context,
 		http.MethodGet,
-		urlProfile,
+		urlPayments,
 		nil,
 	)
 
-	if errReqProfile != nil {
-		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errReqProfile})
+	if errReqPayments != nil {
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errReqPayments})
 
 		return
 	}
 
-	reqProfile.Header.Add("Referer", "https://a069-access.nyc.gov/accesshra/anycuserhome")
+	reqPayments.Header.Add("Referer", "https://a069-access.nyc.gov/accesshra/anycuserhome")
 
-	resProfile, errResPorfile := client.Do(reqProfile)
+	resPayments, errResPayments := client.Do(reqPayments)
 
-	if errResPorfile != nil {
-		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errResPorfile})
-
-		return
-	}
-
-	defer resProfile.Body.Close()
-	profileB, errReadProfile := io.ReadAll(resProfile.Body)
-
-	if errReadProfile != nil {
-		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errReadProfile})
+	if errResPayments != nil {
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errResPayments})
 
 		return
 	}
 
-	urlBenefits := "https://a069-access.nyc.gov/Rest/v1/ua/anyc/benefits"
+	defer resPayments.Body.Close()
+	paymentsB, errReadPayments := io.ReadAll(resPayments.Body)
 
-	reqBenefits, errReqBenefits := http.NewRequestWithContext(
-		context,
-		http.MethodGet,
-		urlBenefits,
-		nil,
-	)
-
-	if errReqBenefits != nil {
-		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errReqBenefits})
-
-		return
-	}
-
-	reqBenefits.Header.Add("Referer", "https://a069-access.nyc.gov/accesshra/anycuserhome")
-
-	resBenefits, errResBenefits := client.Do(reqBenefits)
-	if errResBenefits != nil {
-		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errResBenefits})
-
-		return
-	}
-
-	defer resBenefits.Body.Close()
-	benefitsB, errReadBenefits := io.ReadAll(resBenefits.Body)
-
-	if errReadBenefits != nil {
-		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errReadBenefits})
+	if errReadPayments != nil {
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errReadPayments})
 
 		return
 	}
 
 	res := map[string]string{
-		"response": fmt.Sprint(string(profileB), "\n", string(benefitsB)),
+		"response": string(paymentsB),
 	}
 
 	render.Status(r, http.StatusCreated)
