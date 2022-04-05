@@ -1,0 +1,21 @@
+swagger: "2.0"
+info:
+  description: "Welcome to the Ogee API."
+  version: "1.0.0"
+  title: "Ogee API"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@ogee.dev"
+host: "api.ogee.dev"
+basePath: "/api/v1"
+tags:
+- name: "credentials"
+  description: "A set of credentials for government benefits services"
+- name: "profiles"
+  description: "Information for government benefits for the user"
+schemes:
+- "https"
+paths:
+  /credentials:
+    $ref: credentials.yaml
+  $ref: profiles.yaml
