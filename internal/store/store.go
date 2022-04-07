@@ -94,11 +94,15 @@ type Store interface {
 	ModifyGroupUser(groupUserID uuid.UUID, groupUserPayload models.GroupUser) (*models.GroupUser, error)
 	DeleteGroupUser(groupUserID uuid.UUID) error
 
-	GetInvoice(itemID uuid.UUID) (*models.Invoice, error)
+	GetInvoice(invoiceID uuid.UUID) (*models.Invoice, error)
 	ListInvoices(query map[string]interface{}) ([]models.Invoice, error)
-	CreateInvoice(itemPayload models.Invoice) (*models.Invoice, error)
-	ModifyInvoice(itemID uuid.UUID, itemPayload models.Invoice) (*models.Invoice, error)
-	DeleteInvoice(itemID uuid.UUID) error
+	CreateInvoice(invoicePayload models.Invoice) (*models.Invoice, error)
+	ModifyInvoice(invoiceID uuid.UUID, invoicePayload models.Invoice) (*models.Invoice, error)
+	DeleteInvoice(invoiceID uuid.UUID) error
 
-	CreateCredential(credentialPayload models.Credential) (*models.Credential, error)
+	GetProfile(profileID uuid.UUID) (*models.Profile, error)
+	ListProfiles(query map[string]interface{}) ([]models.Profile, error)
+	CreateProfile(profilePayload models.Profile) (*models.Profile, error)
+	ModifyProfile(profileID uuid.UUID, profilePayload models.Profile) (*models.Profile, error)
+	DeleteProfile(profileID uuid.UUID) error
 }

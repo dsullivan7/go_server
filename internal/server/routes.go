@@ -36,7 +36,11 @@ func (s *ChiServer) Init() http.Handler {
 
 	router.Get("/", controllers.GetHealth)
 
-	router.Post("/api/credentials", controllers.CreateCredential)
+	router.Get("/api/profiles/{profile_id}", controllers.GetProfile)
+	router.Get("/api/profiles", controllers.ListProfiles)
+	router.Post("/api/profiles", controllers.CreateProfile)
+	router.Delete("/api/profiles/{profile_id}", controllers.DeleteProfile)
+	router.Put("/api/profiles/{profile_id}", controllers.ModifyProfile)
 
 	router.Post("/api/plaid/token", controllers.CreatePlaidToken)
 

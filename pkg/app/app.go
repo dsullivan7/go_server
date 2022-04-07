@@ -11,6 +11,7 @@ import (
 	goServerPlaid "go_server/internal/plaid"
 	"go_server/internal/server"
 	"go_server/internal/services"
+	"go_server/internal/gov"
 	"go_server/internal/store/gorm"
 	"log"
 	"net/http"
@@ -77,11 +78,13 @@ func Run() {
 
 	cphr := cipher.NewCipher()
 
+	gv := gov.NewGov()
+
 	auth := auth0.NewAuth(config.Auth0Domain, config.Auth0Audience, logger)
 	auth.Init()
 
 	router := chi.NewRouter()
-	handler := server.NewChiServer(config, router, srvc, store, plaidClient, broker, cphr, auth, logger)
+	handler := server.NewChiServer(config, router, srvc, store, plaidClient, broker, gv, cphr, auth, logger)
 
 	httpServer := http.Server{
 		Addr:    fmt.Sprintf(":%s", config.Port),

@@ -45,14 +45,10 @@ func (gormStore *Store) ModifyGroupUser(
 ) (*models.GroupUser, error) {
 	var groupUserFound models.GroupUser
 
-	errFind := gormStore.database.Where("groupUser_id = ?", groupUserID).First(&groupUserFound).Error
+	errFind := gormStore.database.Where("group_user_id = ?", groupUserID).First(&groupUserFound).Error
 
 	if errFind != nil {
 		return nil, errFind
-	}
-
-	if groupUserPayload.Name != "" {
-		groupUserFound.Name = groupUserPayload.Name
 	}
 
 	errUpdate := gormStore.database.Save(&groupUserFound).Error

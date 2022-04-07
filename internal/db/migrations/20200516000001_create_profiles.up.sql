@@ -1,5 +1,5 @@
-create table credentials (
-  credential_id uuid primary key unique not null default (uuid_generate_v4()),
+create table profiles (
+  profile_id uuid primary key unique not null default (uuid_generate_v4()),
   username text,
   password text,
   created_at timestamptz not null default (now()),

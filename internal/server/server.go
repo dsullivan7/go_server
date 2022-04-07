@@ -15,6 +15,7 @@ import (
 	"go_server/internal/server/utils"
 	"go_server/internal/services"
 	"go_server/internal/store"
+	"go_server/internal/gov"
 
 	"github.com/go-chi/chi"
 )
@@ -41,12 +42,13 @@ func NewChiServer(
 	str store.Store,
 	pld plaid.IClient,
 	brkr broker.Broker,
+	gv gov.IGov,
 	cphr cipher.ICipher,
 	ath authentication.Authentication,
 	lggr logger.Logger,
 ) Server {
 	utils := utils.NewServerUtils(lggr)
-	controllers := controllers.NewControllers(cfg, srvc, str, pld, brkr, cphr, utils, lggr)
+	controllers := controllers.NewControllers(cfg, srvc, str, pld, brkr, gv, cphr, utils, lggr)
 	resolver := graph.NewResolver(cfg, str, lggr)
 	middlewares := middlewares.NewMiddlewares(cfg, str, ath, utils, lggr)
 
