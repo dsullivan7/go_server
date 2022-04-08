@@ -1,6 +1,20 @@
 swagger: "2.0"
 info:
-  description: "Welcome to the Ogee API."
+  description: "
+    Welcome to the Ogee API.
+    \n
+    \n
+    <b>Authentication</b>
+    \n
+    \n
+    The API must authenticate using HTTP Basic authentication. Use your correspondent client_id and client_secret as the username and password. The format is client_id:client_secret. Encode the string with base-64 encoding, and you can pass it as an authentication header.
+    \n
+    \n
+    Example:
+    \n
+    \n
+    <code>Authorization: Basic Y2xpZW50X2lkOmNsaWVudF9zZWNyZXQK</code>
+  "
   version: "1.0.0"
   title: "Ogee API"
   termsOfService: "http://swagger.io/terms/"
@@ -8,6 +22,11 @@ info:
     email: "support@ogee.dev"
 host: "api.ogee.dev"
 basePath: "/api/v1"
+securityDefinitions:
+  Basic:
+    type: basic
+security:
+  - Basic: []
 tags:
 - name: "profiles"
   description: "Information for government benefits for the user"
