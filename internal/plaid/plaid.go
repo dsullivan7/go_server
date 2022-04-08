@@ -3,9 +3,15 @@ package plaid
 import (
 	"context"
 	"fmt"
+	"encoding/json"
+	"net/http"
+	"bytes"
+	"errors"
 
 	"github.com/plaid/plaid-go/plaid"
 )
+
+var ErrPlaidAPI = errors.New("plaid api error")
 
 type IClient interface {
 	CreateToken(userID string) (string, error)
@@ -16,17 +22,80 @@ type IClient interface {
 
 type Client struct {
 	client      *plaid.APIClient
+	apiURL string
 	redirectURI string
+	clientID string
+	secret string
 }
 
 func NewClient(
 	client *plaid.APIClient,
+	clientID string,
+	secret string,
+	apiURL string,
 	redirectURI string,
 ) IClient {
 	return &Client{
 		client:      client,
 		redirectURI: redirectURI,
+		clientID: clientID,
+		secret: secret,
+		apiURL: secret,
 	}
+}
+
+func (pc *Client) sendRequest(
+	path string,
+	method string,
+	body map[string]interface{},
+) (interface{}, error) {
+	context := context.Background()
+
+	jsonBytes, errMarshal := json.Marshal(body)
+
+	if errMarshal != nil {
+		return nil, fmt.Errorf("failed to construct the request body: %w", errMarshal)
+	}
+
+	req, errReq := http.NewRequestWithContext(
+		context,
+		method,
+		fmt.Sprint(pc.apiURL, path),
+		bytes.NewReader(jsonBytes),
+	)
+
+	if errReq != nil {
+		return nil, fmt.Errorf("failed to create the request: %w", errReq)
+	}
+
+	req.Header.Set("PLAID-CLIENT-ID", pc.clientID)
+	req.Header.Set("PLAID-SECRET", pc.secret)
+
+	res, errRes := http.DefaultClient.Do(req)
+
+	if errRes != nil {
+		return nil, fmt.Errorf("failed to get the response: %w", errRes)
+	}
+
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	var plaidResponse interface{}
+
+	errDecode := decoder.Decode(&plaidResponse)
+
+	if errDecode != nil {
+		return nil, fmt.Errorf("failed to decode the response: %w", errDecode)
+	}
+
+	if res.StatusCode != http.StatusOK &&
+		res.StatusCode != http.StatusCreated &&
+		res.StatusCode != http.StatusNoContent {
+		return nil, fmt.Errorf("%w: %s", ErrPlaidAPI, plaidResponse.(map[string]interface{})["message"].(string))
+	}
+
+	return plaidResponse, nil
 }
 
 // CreateToken creates a plaid token to use in link.
@@ -51,6 +120,74 @@ func (pc *Client) CreateToken(userID string) (string, error) {
 	}
 
 	return resp.GetLinkToken(), nil
+}
+
+// CreateTransferAuthorization creates an authorization for a bank transfer.
+func (pc *Client) CreateTransferAuthorization(
+	accessToken string,
+	accountID string,
+	originationAccountID string,
+	amount string,
+	transferType string,
+	legalName string,
+) (string, error) {
+	transferAuthResp, transferAuthError := pc.sendRequest(
+		"/transfer/authorization/create",
+		http.MethodPost,
+		map[string]interface{}{
+			"access_token": accessToken,
+			"account_id": accountID,
+			"origination_account_id": originationAccountID,
+			"amount": amount,
+			"type": transferType,
+			"network": "ach",
+			"ach_class": "web",
+			"user": map[string]interface{}{
+				"legal_name": legalName,
+			},
+		},
+	)
+
+	if (transferAuthError != nil) {
+		return "", transferAuthError
+	}
+
+	return transferAuthResp.(map[string]interface{})["authorization"].(map[string]interface{})["id"].(string), nil
+}
+
+// CreateTransfer creates a bank transfer.
+func (pc *Client) CreateTransfer(
+	accessToken string,
+	accountID string,
+	originationAccountID string,
+	authorizationID string,
+	amount string,
+	transferType string,
+	legalName string,
+) (string, error) {
+	transferAuthResp, transferAuthError := pc.sendRequest(
+		"/transfer/create",
+		http.MethodPost,
+		map[string]interface{}{
+			"authorization_id": authorizationID,
+			"access_token": accessToken,
+			"account_id": accountID,
+			"origination_account_id": originationAccountID,
+			"amount": amount,
+			"type": transferType,
+			"network": "ach",
+			"ach_class": "web",
+			"user": map[string]interface{}{
+				"legal_name": legalName,
+			},
+		},
+	)
+
+	if (transferAuthError != nil) {
+		return "", transferAuthError
+	}
+
+	return transferAuthResp.(map[string]interface{})["transfer"].(map[string]interface{})["id"].(string), nil
 }
 
 // GetAccessToken exchanges the plaid token for an access token.

@@ -70,7 +70,7 @@ func Run() {
 	plaidConfig.AddDefaultHeader("PLAID-SECRET", config.PlaidSecret)
 	plaidConfig.UseEnvironment(plaid.Sandbox)
 	plaidAPIClient := plaid.NewAPIClient(plaidConfig)
-	plaidClient := goServerPlaid.NewClient(plaidAPIClient, config.PlaidRedirectURI)
+	plaidClient := goServerPlaid.NewClient(plaidAPIClient, config.PlaidClientID, config.PlaidSecret, config.PlaidAPIURL, config.PlaidRedirectURI)
 
 	// initialize alpaca
 	broker := goServerAlpaca.NewBroker(config.AlpacaAPIKey, config.AlpacaAPISecret, config.AlpacaAPIURL)
