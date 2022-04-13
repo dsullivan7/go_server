@@ -25,7 +25,7 @@ type Config struct {
 	PlaidClientID    string
 	PlaidSecret      string
 	PlaidRedirectURI string
-	PlaidAPIURL string
+	PlaidAPIURL      string
 
 	AlpacaAPIKey    string
 	AlpacaAPISecret string
@@ -56,7 +56,7 @@ func NewConfig() (*Config, error) {
 		PlaidClientID:    os.Getenv("PLAID_CLIENT_ID"),
 		PlaidSecret:      os.Getenv("PLAID_SECRET"),
 		PlaidRedirectURI: os.Getenv("PLAID_REDIRECT_URI"),
-		PlaidAPIURL: os.Getenv("PLAID_API_URL"),
+		PlaidAPIURL:      os.Getenv("PLAID_API_URL"),
 		AlpacaAPIKey:     os.Getenv("ALPACA_API_KEY"),
 		AlpacaAPISecret:  os.Getenv("ALPACA_API_SECRET"),
 		AlpacaAPIURL:     os.Getenv("ALPACA_API_URL"),

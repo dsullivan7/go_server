@@ -1,12 +1,14 @@
 package plaid
 
 import (
-	"context"
-	"fmt"
-	"encoding/json"
-	"net/http"
 	"bytes"
+	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"net/http"
+
+	"go_server/internal/logger"
 
 	"github.com/plaid/plaid-go/plaid"
 )
@@ -18,14 +20,32 @@ type IClient interface {
 	CreateProcessorToken(accessToken string, accountID string, accessor string) (string, error)
 	GetAccessToken(publicToken string) (string, error)
 	GetAccount(accessToken string) (string, string, error)
+	CreateTransferAuthorization(
+		accessToken string,
+		accountID string,
+		originationAccountID string,
+		amount string,
+		transferType string,
+		legalName string,
+	) (string, error)
+	CreateTransfer(
+		accessToken string,
+		accountID string,
+		originationAccountID string,
+		authorizationID string,
+		amount string,
+		transferType string,
+		legalName string,
+	) (string, error)
 }
 
 type Client struct {
 	client      *plaid.APIClient
-	apiURL string
+	apiURL      string
 	redirectURI string
-	clientID string
-	secret string
+	clientID    string
+	secret      string
+	logger      logger.Logger
 }
 
 func NewClient(
@@ -34,13 +54,15 @@ func NewClient(
 	secret string,
 	apiURL string,
 	redirectURI string,
+	lggr logger.Logger,
 ) IClient {
 	return &Client{
 		client:      client,
 		redirectURI: redirectURI,
-		clientID: clientID,
-		secret: secret,
-		apiURL: secret,
+		clientID:    clientID,
+		secret:      secret,
+		apiURL:      apiURL,
+		logger:      lggr,
 	}
 }
 
@@ -70,6 +92,7 @@ func (pc *Client) sendRequest(
 
 	req.Header.Set("PLAID-CLIENT-ID", pc.clientID)
 	req.Header.Set("PLAID-SECRET", pc.secret)
+	req.Header.Set("Content-Type", "application/json")
 
 	res, errRes := http.DefaultClient.Do(req)
 
@@ -92,6 +115,8 @@ func (pc *Client) sendRequest(
 	if res.StatusCode != http.StatusOK &&
 		res.StatusCode != http.StatusCreated &&
 		res.StatusCode != http.StatusNoContent {
+		pc.logger.InfoWithMeta("Plaid debug", map[string]interface{}{"plaidResponse": plaidResponse})
+
 		return nil, fmt.Errorf("%w: %s", ErrPlaidAPI, plaidResponse.(map[string]interface{})["message"].(string))
 	}
 
@@ -100,26 +125,31 @@ func (pc *Client) sendRequest(
 
 // CreateToken creates a plaid token to use in link.
 func (pc *Client) CreateToken(userID string) (string, error) {
-	ctx := context.Background()
-
-	request := plaid.NewLinkTokenCreateRequest(
-		"Sunburst",
-		"en",
-		[]plaid.CountryCode{plaid.COUNTRYCODE_US},
-		*plaid.NewLinkTokenCreateRequestUser(userID),
+	tokenResp, tokenError := pc.sendRequest(
+		"/link/token/create",
+		http.MethodPost,
+		map[string]interface{}{
+			"user": map[string]string{
+				"client_user_id": userID,
+			},
+			"client_name":   "Sunburst",
+			"products":      []string{string(plaid.PRODUCTS_AUTH)},
+			"country_codes": []string{string(plaid.COUNTRYCODE_US)},
+			"language":      "en",
+			"redirect_uri":  pc.redirectURI,
+			"account_filters": map[string]interface{}{
+				"depository": map[string]interface{}{
+					"account_subtypes": []string{"checking"},
+				},
+			},
+		},
 	)
-	request.SetRedirectUri(pc.redirectURI)
-	request.SetProducts([]plaid.Products{plaid.PRODUCTS_AUTH})
 
-	resp, _, err := pc.client.PlaidApi.LinkTokenCreate(ctx).LinkTokenCreateRequest(*request).Execute()
-
-	if err != nil {
-		plaidErr, _ := plaid.ToPlaidError(err)
-
-		return "", fmt.Errorf("plaid error %w: %s", err, plaidErr.ErrorMessage)
+	if tokenError != nil {
+		return "", tokenError
 	}
 
-	return resp.GetLinkToken(), nil
+	return tokenResp.(map[string]interface{})["link_token"].(string), nil
 }
 
 // CreateTransferAuthorization creates an authorization for a bank transfer.
@@ -135,20 +165,20 @@ func (pc *Client) CreateTransferAuthorization(
 		"/transfer/authorization/create",
 		http.MethodPost,
 		map[string]interface{}{
-			"access_token": accessToken,
-			"account_id": accountID,
+			"access_token":           accessToken,
+			"account_id":             accountID,
 			"origination_account_id": originationAccountID,
-			"amount": amount,
-			"type": transferType,
-			"network": "ach",
-			"ach_class": "web",
+			"amount":                 amount,
+			"type":                   transferType,
+			"network":                "ach",
+			"ach_class":              "web",
 			"user": map[string]interface{}{
 				"legal_name": legalName,
 			},
 		},
 	)
 
-	if (transferAuthError != nil) {
+	if transferAuthError != nil {
 		return "", transferAuthError
 	}
 
@@ -169,21 +199,21 @@ func (pc *Client) CreateTransfer(
 		"/transfer/create",
 		http.MethodPost,
 		map[string]interface{}{
-			"authorization_id": authorizationID,
-			"access_token": accessToken,
-			"account_id": accountID,
+			"authorization_id":       authorizationID,
+			"access_token":           accessToken,
+			"account_id":             accountID,
 			"origination_account_id": originationAccountID,
-			"amount": amount,
-			"type": transferType,
-			"network": "ach",
-			"ach_class": "web",
+			"amount":                 amount,
+			"type":                   transferType,
+			"network":                "ach",
+			"ach_class":              "web",
 			"user": map[string]interface{}{
 				"legal_name": legalName,
 			},
 		},
 	)
 
-	if (transferAuthError != nil) {
+	if transferAuthError != nil {
 		return "", transferAuthError
 	}
 

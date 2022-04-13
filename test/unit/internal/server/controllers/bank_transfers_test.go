@@ -31,7 +31,7 @@ func TestBankTransferGet(t *testing.T) {
 	bankTransfer := models.BankTransfer{
 		BankTransferID:   bankTransferID,
 		UserID:           &userID,
-		Amount:           123.45,
+		Amount:           12345,
 		Status:           "approved",
 		AlpacaTransferID: &alpacaTransferID,
 		CreatedAt:        time.Now(),
@@ -90,7 +90,7 @@ func TestBankTransferList(t *testing.T) {
 	bankTransfer1 := models.BankTransfer{
 		BankTransferID:   bankTransferID1,
 		UserID:           &userID1,
-		Amount:           123.45,
+		Amount:           12345,
 		Status:           "approved",
 		AlpacaTransferID: &alpacaTransferID1,
 		CreatedAt:        time.Now(),
@@ -104,7 +104,7 @@ func TestBankTransferList(t *testing.T) {
 	bankTransfer2 := models.BankTransfer{
 		BankTransferID:   bankTransferID2,
 		UserID:           &userID2,
-		Amount:           456.78,
+		Amount:           45678,
 		Status:           "pending",
 		AlpacaTransferID: &alpacaTransferID2,
 		CreatedAt:        time.Now(),
@@ -189,7 +189,7 @@ func TestBankTransferListQueryParams(t *testing.T) {
 	bankTransfer := models.BankTransfer{
 		BankTransferID:   bankTransferID,
 		UserID:           &userID,
-		Amount:           123.45,
+		Amount:           12345,
 		Status:           "approved",
 		AlpacaTransferID: &alpacaTransferID,
 		CreatedAt:        time.Now(),
@@ -245,7 +245,7 @@ func TestBankTransferCreate(t *testing.T) {
 
 	userID := uuid.New()
 	alpacaTransferID := "alpacaTransferID"
-	amount := 234.45
+	amount := 23445
 
 	alpacaAccountID := "alpacaAccountID"
 	alpacaACHRelationshipID := "alpacaACHRelationshipID"
@@ -255,7 +255,7 @@ func TestBankTransferCreate(t *testing.T) {
 				"user_id": "%s",
 				"alpaca_account_id": "%s",
 				"alpaca_ach_relationship_id": "%s",
-				"amount": %f
+				"amount": %d
 			}`,
 		userID.String(),
 		alpacaAccountID,
@@ -339,7 +339,7 @@ func TestBankTransferModify(t *testing.T) {
 	bankTransferModified := models.BankTransfer{
 		BankTransferID:   uuid.New(),
 		UserID:           &userID,
-		Amount:           123.45,
+		Amount:           12345,
 		Status:           "approved",
 		AlpacaTransferID: &alpacaTransferID,
 		CreatedAt:        time.Now(),
