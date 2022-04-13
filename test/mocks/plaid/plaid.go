@@ -39,3 +39,38 @@ func (mockPlaid *MockPlaid) GetAccount(accessToken string) (string, string, erro
 
 	return args.String(0), args.String(1), args.Error(2)
 }
+
+func (mockPlaid *MockPlaid) CreateTransferAuthorization(
+	accessToken string,
+	accountID string,
+	originationAccountID string,
+	amount string,
+	transferType string,
+	legalName string,
+) (string, error) {
+	args := mockPlaid.Called(accessToken, accountID, originationAccountID, amount, transferType, legalName)
+
+	return args.String(0), args.Error(1)
+}
+
+func (mockPlaid *MockPlaid) CreateTransfer(
+	accessToken string,
+	accountID string,
+	originationAccountID string,
+	authorizationID string,
+	amount string,
+	transferType string,
+	legalName string,
+) (string, error) {
+	args := mockPlaid.Called(
+		accessToken,
+		accountID,
+		originationAccountID,
+		authorizationID,
+		amount,
+		transferType,
+		legalName,
+	)
+
+	return args.String(0), args.Error(1)
+}

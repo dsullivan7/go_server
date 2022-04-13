@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	// "fmt".
 	"encoding/json"
 	"go_server/internal/errors"
 	"go_server/internal/models"
@@ -44,6 +45,7 @@ func (c *Controllers) ListBankTransfers(w http.ResponseWriter, r *http.Request) 
 	render.JSON(w, r, bankTransfers)
 }
 
+// nolint:funlen
 func (c *Controllers) CreateBankTransfer(w http.ResponseWriter, r *http.Request) {
 	var bankTransferReq map[string]interface{}
 
@@ -54,26 +56,62 @@ func (c *Controllers) CreateBankTransfer(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	alpacaTransferID, errTransfer := c.broker.CreateTransfer(
-		bankTransferReq["alpaca_account_id"].(string),
-		bankTransferReq["alpaca_ach_relationship_id"].(string),
-		bankTransferReq["amount"].(float64),
-		"INCOMING",
-	)
-
-	if errTransfer != nil {
-		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errTransfer})
-
-		return
-	}
-
 	userID := uuid.Must(uuid.Parse(bankTransferReq["user_id"].(string)))
 
+	// user, errUser := c.store.GetUser(userID)
+	//
+	// if errUser != nil {
+	// 	c.utils.HandleError(w, r, errors.HTTPUserError{Err: errUser})
+	//
+	// 	return
+	// }
+	//
+	// var plaidOriginationAccountID string
+	// if (bankTransferReq["plaid_origination_account_id"] != nil) {
+	// 	val, ok := bankTransferReq["plaid_origination_account_id"].(string)
+	// 	if (ok) {
+	// 		plaidOriginationAccountID = val
+	// 	}
+	// }
+	//
+	// plaidTransferAuthorizationID, errTransferAuth := c.plaidClient.CreateTransferAuthorization(
+	// 	bankTransferReq["plaid_account_id"].(string),
+	// 	bankTransferReq["plaid_access_token"].(string),
+	// 	plaidOriginationAccountID,
+	// 	bankTransferReq["amount"].(string),
+	// 	"debit",
+	// 	fmt.Sprint(user.FirstName, " ", user.LastName),
+	// )
+	//
+	// if errTransferAuth != nil {
+	// 	c.utils.HandleError(w, r, errors.HTTPUserError{Err: errTransferAuth})
+	//
+	// 	return
+	// }
+	//
+	// plaidTransferID, errTransfer := c.plaidClient.CreateTransfer(
+	// 	bankTransferReq["plaid_account_id"].(string),
+	// 	bankTransferReq["plaid_access_token"].(string),
+	// 	plaidOriginationAccountID,
+	// 	plaidTransferAuthorizationID,
+	// 	bankTransferReq["amount"].(string),
+	// 	"debit",
+	// 	fmt.Sprint(user.FirstName, " ", user.LastName),
+	// )
+	//
+	// if errTransfer != nil {
+	// 	c.utils.HandleError(w, r, errors.HTTPUserError{Err: errTransfer})
+	//
+	// 	return
+	// }
+	//
+	var plaidTransferID string
+
 	bankTransferPayload := models.BankTransfer{
-		UserID:           &userID,
-		Amount:           bankTransferReq["amount"].(float64),
-		Status:           "PENDING",
-		AlpacaTransferID: &alpacaTransferID,
+		UserID:          &userID,
+		Amount:          int(bankTransferReq["amount"].(float64)),
+		Status:          "PENDING",
+		PlaidTransferID: &plaidTransferID,
 	}
 
 	bankTransfer, err := c.store.CreateBankTransfer(bankTransferPayload)

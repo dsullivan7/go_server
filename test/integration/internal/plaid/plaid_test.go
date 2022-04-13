@@ -2,12 +2,13 @@ package plaid_test
 
 import (
 	"go_server/internal/config"
+	goServerZapLogger "go_server/internal/logger/zap"
 	goServerPlaid "go_server/internal/plaid"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/plaid/plaid-go/plaid"
+	"go.uber.org/zap"
 )
 
 func TestAlpacaCreateAccount(t *testing.T) {
@@ -18,12 +19,19 @@ func TestAlpacaCreateAccount(t *testing.T) {
 
 	assert.Nil(t, configError)
 
-	plaidConfig := plaid.NewConfiguration()
-	plaidConfig.AddDefaultHeader("PLAID-CLIENT-ID", cfg.PlaidClientID)
-	plaidConfig.AddDefaultHeader("PLAID-SECRET", cfg.PlaidSecret)
-	plaidConfig.UseEnvironment(plaid.Sandbox)
-	plaidAPIClient := plaid.NewAPIClient(plaidConfig)
-	plaidClient := goServerPlaid.NewClient(plaidAPIClient, cfg.PlaidRedirectURI)
+	zapLogger, errZap := zap.NewProduction()
+
+	assert.Nil(t, errZap)
+
+	logger := goServerZapLogger.NewLogger(zapLogger)
+
+	plaidClient := goServerPlaid.NewClient(
+		cfg.PlaidClientID,
+		cfg.PlaidSecret,
+		cfg.PlaidAPIURL,
+		cfg.PlaidRedirectURI,
+		logger,
+	)
 
 	accountID := "NoLzzvE5x8sKzLzWk86eHXARMRKB43fWnLrDz"
 	accessToken := "access-sandbox-52c18719-eafa-4198-9ef9-f32fdd3300f6"
