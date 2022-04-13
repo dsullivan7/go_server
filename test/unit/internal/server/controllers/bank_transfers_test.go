@@ -29,13 +29,13 @@ func TestBankTransferGet(t *testing.T) {
 	plaidTransferID := "plaidTransferID"
 
 	bankTransfer := models.BankTransfer{
-		BankTransferID:   bankTransferID,
-		UserID:           &userID,
-		Amount:           12345,
-		Status:           "approved",
+		BankTransferID:  bankTransferID,
+		UserID:          &userID,
+		Amount:          12345,
+		Status:          "approved",
 		PlaidTransferID: &plaidTransferID,
-		CreatedAt:        time.Now(),
-		UpdatedAt:        time.Now(),
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
 	}
 
 	testServer.Store.On("GetBankTransfer", bankTransferID).Return(&bankTransfer, nil)
@@ -88,13 +88,13 @@ func TestBankTransferList(t *testing.T) {
 	plaidTransferID1 := "plaidTransferID1"
 
 	bankTransfer1 := models.BankTransfer{
-		BankTransferID:   bankTransferID1,
-		UserID:           &userID1,
-		Amount:           12345,
-		Status:           "approved",
+		BankTransferID:  bankTransferID1,
+		UserID:          &userID1,
+		Amount:          12345,
+		Status:          "approved",
 		PlaidTransferID: &plaidTransferID1,
-		CreatedAt:        time.Now(),
-		UpdatedAt:        time.Now(),
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
 	}
 
 	bankTransferID2 := uuid.New()
@@ -102,13 +102,13 @@ func TestBankTransferList(t *testing.T) {
 	plaidTransferID2 := "plaidTransferID2"
 
 	bankTransfer2 := models.BankTransfer{
-		BankTransferID:   bankTransferID2,
-		UserID:           &userID2,
-		Amount:           45678,
-		Status:           "pending",
+		BankTransferID:  bankTransferID2,
+		UserID:          &userID2,
+		Amount:          45678,
+		Status:          "pending",
 		PlaidTransferID: &plaidTransferID2,
-		CreatedAt:        time.Now(),
-		UpdatedAt:        time.Now(),
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
 	}
 
 	testServer.Store.
@@ -187,13 +187,13 @@ func TestBankTransferListQueryParams(t *testing.T) {
 	plaidTransferID := "plaidTransferID"
 
 	bankTransfer := models.BankTransfer{
-		BankTransferID:   bankTransferID,
-		UserID:           &userID,
-		Amount:           12345,
-		Status:           "approved",
+		BankTransferID:  bankTransferID,
+		UserID:          &userID,
+		Amount:          12345,
+		Status:          "approved",
 		PlaidTransferID: &plaidTransferID,
-		CreatedAt:        time.Now(),
-		UpdatedAt:        time.Now(),
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
 	}
 
 	testServer.Store.
@@ -258,20 +258,20 @@ func TestBankTransferCreate(t *testing.T) {
 	var plaidTransferID string
 
 	bankTransferPayload := models.BankTransfer{
-		UserID:           &userID,
-		Amount:           amount,
-		Status:           "PENDING",
+		UserID:          &userID,
+		Amount:          amount,
+		Status:          "PENDING",
 		PlaidTransferID: &plaidTransferID,
 	}
 
 	bankTransferCreated := models.BankTransfer{
-		BankTransferID:   uuid.New(),
-		UserID:           &userID,
-		Amount:           amount,
-		Status:           "PENDING",
+		BankTransferID:  uuid.New(),
+		UserID:          &userID,
+		Amount:          amount,
+		Status:          "PENDING",
 		PlaidTransferID: nil,
-		CreatedAt:        time.Now(),
-		UpdatedAt:        time.Now(),
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
 	}
 
 	testServer.Store.On("CreateBankTransfer", bankTransferPayload).Return(&bankTransferCreated, nil)
@@ -323,13 +323,13 @@ func TestBankTransferModify(t *testing.T) {
 	bankTransferPayload := models.BankTransfer{}
 
 	bankTransferModified := models.BankTransfer{
-		BankTransferID:   uuid.New(),
-		UserID:           &userID,
-		Amount:           12345,
-		Status:           "approved",
+		BankTransferID:  uuid.New(),
+		UserID:          &userID,
+		Amount:          12345,
+		Status:          "approved",
 		PlaidTransferID: &plaidTransferID,
-		CreatedAt:        time.Now(),
-		UpdatedAt:        time.Now(),
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
 	}
 
 	testServer.Store.

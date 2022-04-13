@@ -244,16 +244,18 @@ func (pc *Client) GetAccount(accessToken string) (string, string, error) {
 		return "", "", errAccount
 	}
 
-	accountID, okAccountType := accountsGetResp.(map[string]interface{})["accounts"].([]map[string]interface{})[0]["account_id"].(string)
+	// nolint: lll
+	accountID, okAccountType := accountsGetResp.(map[string]interface{})["accounts"].([]interface{})[0].(map[string]interface{})["account_id"].(string)
 
 	if !okAccountType {
-		return "", "", ErrTypeConversionError
+		return "", "", fmt.Errorf("accountID: %w", ErrTypeConversionError)
 	}
 
+	// nolint: lll
 	institutionID, okInstType := accountsGetResp.(map[string]interface{})["item"].(map[string]interface{})["institution_id"].(string)
 
 	if !okInstType {
-		return "", "", ErrTypeConversionError
+		return "", "", fmt.Errorf("institutionID: %w", ErrTypeConversionError)
 	}
 
 	institutionGetResp, errInstitution := pc.sendRequest(
@@ -268,10 +270,11 @@ func (pc *Client) GetAccount(accessToken string) (string, string, error) {
 		return "", "", errInstitution
 	}
 
-	institutionName, okInstNameType := institutionGetResp.(map[string]interface{})["name"].(string)
+	// nolint: lll
+	institutionName, okInstNameType := institutionGetResp.(map[string]interface{})["institution"].(map[string]interface{})["name"].(string)
 
 	if !okInstNameType {
-		return "", "", ErrTypeConversionError
+		return "", "", fmt.Errorf("institutionName: %w", ErrTypeConversionError)
 	}
 
 	return accountID, institutionName, nil
