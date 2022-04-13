@@ -17,8 +17,6 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/plaid/plaid-go/plaid"
-
 	"github.com/go-chi/chi"
 )
 
@@ -65,13 +63,7 @@ func Run() {
 	srvc := services.NewService()
 
 	// initialize plaid
-	plaidConfig := plaid.NewConfiguration()
-	plaidConfig.AddDefaultHeader("PLAID-CLIENT-ID", config.PlaidClientID)
-	plaidConfig.AddDefaultHeader("PLAID-SECRET", config.PlaidSecret)
-	plaidConfig.UseEnvironment(plaid.Sandbox)
-	plaidAPIClient := plaid.NewAPIClient(plaidConfig)
 	plaidClient := goServerPlaid.NewClient(
-		plaidAPIClient,
 		config.PlaidClientID,
 		config.PlaidSecret,
 		config.PlaidAPIURL,

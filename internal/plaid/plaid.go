@@ -14,6 +14,7 @@ import (
 )
 
 var ErrPlaidAPI = errors.New("plaid api error")
+var ErrTypeConversionError = errors.New("type conversion error")
 
 type IClient interface {
 	CreateToken(userID string) (string, error)
@@ -40,16 +41,14 @@ type IClient interface {
 }
 
 type Client struct {
-	client      *plaid.APIClient
-	apiURL      string
-	redirectURI string
 	clientID    string
 	secret      string
+	apiURL      string
+	redirectURI string
 	logger      logger.Logger
 }
 
 func NewClient(
-	client *plaid.APIClient,
 	clientID string,
 	secret string,
 	apiURL string,
@@ -57,20 +56,19 @@ func NewClient(
 	lggr logger.Logger,
 ) IClient {
 	return &Client{
-		client:      client,
-		redirectURI: redirectURI,
 		clientID:    clientID,
 		secret:      secret,
 		apiURL:      apiURL,
+		redirectURI: redirectURI,
 		logger:      lggr,
 	}
 }
 
 func (pc *Client) sendRequest(
 	path string,
-	method string,
 	body map[string]interface{},
 ) (interface{}, error) {
+	method := http.MethodPost
 	context := context.Background()
 
 	jsonBytes, errMarshal := json.Marshal(body)
@@ -127,7 +125,6 @@ func (pc *Client) sendRequest(
 func (pc *Client) CreateToken(userID string) (string, error) {
 	tokenResp, tokenError := pc.sendRequest(
 		"/link/token/create",
-		http.MethodPost,
 		map[string]interface{}{
 			"user": map[string]string{
 				"client_user_id": userID,
@@ -163,7 +160,6 @@ func (pc *Client) CreateTransferAuthorization(
 ) (string, error) {
 	transferAuthResp, transferAuthError := pc.sendRequest(
 		"/transfer/authorization/create",
-		http.MethodPost,
 		map[string]interface{}{
 			"access_token":           accessToken,
 			"account_id":             accountID,
@@ -197,7 +193,6 @@ func (pc *Client) CreateTransfer(
 ) (string, error) {
 	transferAuthResp, transferAuthError := pc.sendRequest(
 		"/transfer/create",
-		http.MethodPost,
 		map[string]interface{}{
 			"authorization_id":       authorizationID,
 			"access_token":           accessToken,
@@ -222,73 +217,80 @@ func (pc *Client) CreateTransfer(
 
 // GetAccessToken exchanges the plaid token for an access token.
 func (pc *Client) GetAccessToken(publicToken string) (string, error) {
-	ctx := context.Background()
-
-	exchangePublicTokenReq := plaid.NewItemPublicTokenExchangeRequest(publicToken)
-	exchangePublicTokenResp, _, errAccessToken := pc.client.PlaidApi.ItemPublicTokenExchange(ctx).
-		ItemPublicTokenExchangeRequest(*exchangePublicTokenReq).
-		Execute()
+	exchangePublicTokenResp, errAccessToken := pc.sendRequest(
+		"/item/public_token/exchange",
+		map[string]interface{}{
+			"public_token": publicToken,
+		},
+	)
 
 	if errAccessToken != nil {
-		plaidErr, _ := plaid.ToPlaidError(errAccessToken)
-
-		return "", fmt.Errorf("plaid error %w: %s", errAccessToken, plaidErr.ErrorMessage)
+		return "", errAccessToken
 	}
 
-	accessToken := exchangePublicTokenResp.GetAccessToken()
-
-	return accessToken, nil
+	return exchangePublicTokenResp.(map[string]interface{})["access_token"].(string), nil
 }
 
 // GetAccount uses the access token to retrieve the account information.
 func (pc *Client) GetAccount(accessToken string) (string, string, error) {
-	ctx := context.Background()
-
-	accountsGetResp, _, errAccount := pc.client.PlaidApi.AccountsGet(ctx).
-		AccountsGetRequest(*plaid.NewAccountsGetRequest(accessToken)).
-		Execute()
-
-	if errAccount != nil {
-		plaidErr, _ := plaid.ToPlaidError(errAccount)
-
-		return "", "", fmt.Errorf("plaid error %w: %s", errAccount, plaidErr.ErrorMessage)
-	}
-
-	institutionGetResp, _, errInstitution := pc.client.PlaidApi.InstitutionsGetById(ctx).
-		InstitutionsGetByIdRequest(
-			*plaid.NewInstitutionsGetByIdRequest(*accountsGetResp.Item.InstitutionId.Get(),
-				[]plaid.CountryCode{plaid.COUNTRYCODE_US},
-			)).
-		Execute()
-
-	if errInstitution != nil {
-		plaidErr, _ := plaid.ToPlaidError(errInstitution)
-
-		return "", "", fmt.Errorf("plaid error %w: %s", errInstitution, plaidErr.ErrorMessage)
-	}
-
-	institution := institutionGetResp.GetInstitution()
-
-	return accountsGetResp.GetAccounts()[0].GetAccountId(), institution.GetName(), nil
-}
-
-// CreateToken creates a plaid token to use in link.
-func (pc *Client) CreateProcessorToken(accessToken string, accountID string, processor string) (string, error) {
-	ctx := context.Background()
-
-	request := plaid.NewProcessorTokenCreateRequest(
-		accessToken,
-		accountID,
-		processor,
+	accountsGetResp, errAccount := pc.sendRequest(
+		"/accounts/get",
+		map[string]interface{}{
+			"access_token": accessToken,
+		},
 	)
 
-	resp, _, err := pc.client.PlaidApi.ProcessorTokenCreate(ctx).ProcessorTokenCreateRequest(*request).Execute()
-
-	if err != nil {
-		plaidErr, _ := plaid.ToPlaidError(err)
-
-		return "", fmt.Errorf("plaid error %w: %s", err, plaidErr.ErrorMessage)
+	if errAccount != nil {
+		return "", "", errAccount
 	}
 
-	return resp.GetProcessorToken(), nil
+	accountID, okAccountType := accountsGetResp.(map[string]interface{})["accounts"].([]map[string]interface{})[0]["account_id"].(string)
+
+	if !okAccountType {
+		return "", "", ErrTypeConversionError
+	}
+
+	institutionID, okInstType := accountsGetResp.(map[string]interface{})["item"].(map[string]interface{})["institution_id"].(string)
+
+	if !okInstType {
+		return "", "", ErrTypeConversionError
+	}
+
+	institutionGetResp, errInstitution := pc.sendRequest(
+		"/institutions/get_by_id",
+		map[string]interface{}{
+			"institution_id": institutionID,
+			"country_codes":  []string{string(plaid.COUNTRYCODE_US)},
+		},
+	)
+
+	if errInstitution != nil {
+		return "", "", errInstitution
+	}
+
+	institutionName, okInstNameType := institutionGetResp.(map[string]interface{})["name"].(string)
+
+	if !okInstNameType {
+		return "", "", ErrTypeConversionError
+	}
+
+	return accountID, institutionName, nil
+}
+
+// CreateToken creates a processor token to use in link.
+func (pc *Client) CreateProcessorToken(accessToken string, accountID string, processor string) (string, error) {
+	processorTokenResp, errProcessorToken := pc.sendRequest(
+		"/processor/token/create",
+		map[string]interface{}{
+			"access_token": accessToken,
+			"account_id":   accountID,
+			"processor":    processor,
+		},
+	)
+
+	if errProcessorToken != nil {
+		return "", errProcessorToken
+	}
+
+	return processorTokenResp.(map[string]interface{})["processor_token"].(string), nil
 }

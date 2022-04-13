@@ -62,7 +62,15 @@ func (mockPlaid *MockPlaid) CreateTransfer(
 	transferType string,
 	legalName string,
 ) (string, error) {
-	args := mockPlaid.Called(accessToken, accountID, originationAccountID, authorizationID, amount, transferType, legalName)
+	args := mockPlaid.Called(
+		accessToken,
+		accountID,
+		originationAccountID,
+		authorizationID,
+		amount,
+		transferType,
+		legalName,
+	)
 
 	return args.String(0), args.Error(1)
 }

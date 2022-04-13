@@ -45,6 +45,7 @@ func (c *Controllers) ListBankTransfers(w http.ResponseWriter, r *http.Request) 
 	render.JSON(w, r, bankTransfers)
 }
 
+// nolint:funlen
 func (c *Controllers) CreateBankTransfer(w http.ResponseWriter, r *http.Request) {
 	var bankTransferReq map[string]interface{}
 
