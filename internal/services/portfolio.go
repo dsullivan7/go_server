@@ -6,22 +6,6 @@ import (
 	"sort"
 )
 
-type IService interface {
-	ListPortfolioRecommendations(
-		models.Portfolio,
-		[]models.PortfolioTag,
-		[]models.Security,
-		[]models.SecurityTag,
-	) []PortfolioHolding
-}
-
-type Service struct {
-}
-
-func NewService() IService {
-	return &Service{}
-}
-
 type PortfolioHolding struct {
 	Symbol      string  `json:"symbol"`
 	Name        string  `json:"name"`

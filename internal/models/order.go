@@ -11,10 +11,13 @@ type Order struct {
 	ParentOrderID *uuid.UUID `json:"parent_order_id" gorm:"type:uuid"`
 	UserID        *uuid.UUID `json:"user_id" gorm:"type:uuid"`
 	PortfolioID   *uuid.UUID `json:"portfolio_id" gorm:"type:uuid"`
-	Amount        float64    `json:"amount"`
+	Amount        int    `json:"amount"`
 	Side          string     `json:"side"`
+	Status          string     `json:"side"`
 	Symbol        *string    `json:"symbol"`
 	AlpacaOrderID *string    `json:"alpaca_order_id"`
+	CompletedAt     time.Time  `json:"completed_at"`
 	CreatedAt     time.Time  `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt     time.Time  `json:"updated_at" gorm:"default:CURRENT_TIMESTAMP"`
+	ChildOrders []Order `json:"child_orders" gorm:"foreignKey:OrderID"`
 }
