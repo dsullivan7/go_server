@@ -23,6 +23,7 @@ func TestOrders(tParent *testing.T) {
 	}
 
 	uuid1 := uuid.New()
+	uuid2 := uuid.New()
 
 	tests := []testCase{
 		{
@@ -36,14 +37,27 @@ func TestOrders(tParent *testing.T) {
 						models.Order{ Amount: 100, Side: "buy" },
 					},
 				},
+				models.Order{
+					OrderID: uuid2,
+					Side: "sell",
+					Amount: 200,
+					ChildOrders: []models.Order{
+						models.Order{ Amount: 100, Side: "sell" },
+					},
+				},
 			},
 			netSecurityValue: 100,
-			netCashValue: 0,
+			netCashValue: 100,
 			target: []models.Order{
 				models.Order{
 					ParentOrderID: &uuid1,
 					Amount: 100,
 					Side: "buy",
+				},
+				models.Order{
+					ParentOrderID: &uuid2,
+					Amount: 100,
+					Side: "sell",
 				},
 			},
 		},

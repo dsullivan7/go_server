@@ -5,7 +5,7 @@ import (
 	"go_server/internal/models"
 )
 
-func (srvc *Service) getAssetOrders(openOrders []models.Order, val int) []models.Order {
+func (srvc *Service) getAssetOrders(openOrders []models.Order, val int, side string) []models.Order {
 	var orders []models.Order
 	// if the target val is greater than zero, create a child order to take the remaining asset value
 	if (val > 0) {
@@ -29,7 +29,7 @@ func (srvc *Service) getAssetOrders(openOrders []models.Order, val int) []models
 			childOrder := models.Order{
 				ParentOrderID: &openOrder.OrderID,
 				Amount: childOrderAmount,
-				Side: "buy",
+				Side: side,
 			}
 
 			orders = append(orders, childOrder)
@@ -61,11 +61,14 @@ func (srvc *Service) GetOrders(
 		}
 	}
 
-	childBuyOrders := srvc.getAssetOrders(openOrdersBuy, netSecurityValue)
+	childBuyOrders := srvc.getAssetOrders(openOrdersBuy, netSecurityValue, "buy")
+	orders = append(orders, childBuyOrders...)
+
+	childSellOrders := srvc.getAssetOrders(openOrdersSell, netCashValue, "sell")
+	orders = append(orders, childSellOrders...)
 
 	// openOrderBuy.ChildOrders = append(openOrderBuy.ChildOrders, childOrder)
 
-	orders = append(orders, childBuyOrders...)
 
 	return orders
 }
