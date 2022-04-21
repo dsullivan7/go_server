@@ -46,6 +46,8 @@ func (srvc *Service) getAssetOrders(
 			parentOrderID := openOrder.OrderID
 
 			childOrder := models.Order{
+				OrderID: uuid.New(),
+				MatchingOrderID: nil,
 				ParentOrderID: &parentOrderID,
 				Amount: childOrderAmount,
 				Side: side,
