@@ -9,6 +9,7 @@ import (
 type Order struct {
 	OrderID       uuid.UUID  `json:"order_id" gorm:"primary_key;type:uuid;default:uuid_generate_v4()"`
 	ParentOrderID *uuid.UUID `json:"parent_order_id" gorm:"type:uuid"`
+	MatchingOrderID *uuid.UUID `json:"matching_order_id" gorm:"type:uuid"`
 	UserID        *uuid.UUID `json:"user_id" gorm:"type:uuid"`
 	PortfolioID   *uuid.UUID `json:"portfolio_id" gorm:"type:uuid"`
 	Amount        int    `json:"amount"`
