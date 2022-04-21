@@ -32,8 +32,10 @@ func (srvc *Service) getAssetOrders(openOrders []models.Order, val int, side str
 			// the min of the remaining security value and the amount left in the parent order
 			childOrderAmount := int(math.Min(float64(remainingSecurityValue), float64(srvc.getAmountRemaining(openOrder))))
 
+			parentOrderID := openOrder.OrderID
+
 			childOrder := models.Order{
-				ParentOrderID: &openOrder.OrderID,
+				ParentOrderID: &parentOrderID,
 				Amount: childOrderAmount,
 				Side: side,
 			}
