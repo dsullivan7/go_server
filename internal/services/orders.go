@@ -27,8 +27,9 @@ func (srvc *Service) getAssetOrders(
 	side string,
 ) []models.Order {
 	var orders []models.Order
+
 	// if the target val is greater than zero, create a child order to take the remaining asset value
-	if (val > 0) {
+	if val > 0 {
 		remainingSecurityValue := val
 		for _, openOrder := range openOrders {
 			// break the loop if no security value remains
