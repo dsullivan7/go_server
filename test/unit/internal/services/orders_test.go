@@ -26,21 +26,20 @@ func TestOrders(tParent *testing.T) {
 				OrderID: uuid1,
 				Side: "buy",
 				Amount: 200,
-				ChildOrders: []models.Order{
-					models.Order{ Amount: 100, Side: "buy" },
-				},
 			},
 			models.Order{
 				OrderID: uuid2,
 				Side: "sell",
 				Amount: 200,
-				ChildOrders: []models.Order{
-					models.Order{ Amount: 100, Side: "sell" },
-				},
 			},
 		}
 
-		result := srvc.GetOrders(openOrders, 100, 100)
+		childOrders := []models.Order{
+			models.Order{ Amount: 100, Side: "buy", ParentOrderID: &uuid1 },
+			models.Order{ Amount: 100, Side: "sell", ParentOrderID: &uuid2 },
+		}
+
+		result := srvc.GetOrders(openOrders, childOrders, 100, 100)
 
 		assert.Equal(t, len(result), 2)
 
@@ -61,17 +60,15 @@ func TestOrders(tParent *testing.T) {
 				OrderID: uuid1,
 				Side: "buy",
 				Amount: 100,
-				ChildOrders: []models.Order{},
 			},
 			models.Order{
 				OrderID: uuid2,
 				Side: "sell",
 				Amount: 100,
-				ChildOrders: []models.Order{},
 			},
 		}
 
-		result := srvc.GetOrders(openOrders, 0, 0)
+		result := srvc.GetOrders(openOrders, []models.Order{}, 0, 0)
 
 		assert.Equal(t, len(result), 2)
 
@@ -94,33 +91,33 @@ func TestOrders(tParent *testing.T) {
 				OrderID: uuid1,
 				Side: "buy",
 				Amount: 200,
-				ChildOrders: []models.Order{
-					models.Order{
-						Side: "buy",
-						Amount: 50,
-					},
-				},
 			},
 			models.Order{
 				OrderID: uuid2,
 				Side: "sell",
 				Amount: 200,
-				ChildOrders: []models.Order{
-					models.Order{
-						Side: "sell",
-						Amount: 150,
-					},
-				},
 			},
 			models.Order{
 				OrderID: uuid3,
 				Side: "sell",
 				Amount: 200,
-				ChildOrders: []models.Order{},
 			},
 		}
 
-		result := srvc.GetOrders(openOrders, 100, 100)
+		childOrders := []models.Order{
+			models.Order{
+				ParentOrderID: &uuid1,
+				Side: "buy",
+				Amount: 50,
+			},
+			models.Order{
+				ParentOrderID: &uuid2,
+				Side: "sell",
+				Amount: 150,
+			},
+		}
+
+		result := srvc.GetOrders(openOrders, childOrders, 100, 100)
 
 		assert.Equal(t, len(result), 5)
 

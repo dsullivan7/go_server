@@ -12,7 +12,8 @@ type IService interface {
 		[]models.SecurityTag,
 	) []PortfolioHolding
 	GetOrders(
-		incompleteOrders []models.Order,
+		openOrders []models.Order,
+		childOrders []models.Order,
 		netSecurityValue int,
 		netCashValue int,
 	) []models.Order

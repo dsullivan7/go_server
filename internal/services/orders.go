@@ -2,22 +2,30 @@ package services
 
 import (
 	"math"
+
 	"go_server/internal/models"
 
 	"github.com/google/uuid"
 )
 
-func (srvc *Service) getAmountRemaining(openOrder models.Order) int {
+func (srvc *Service) getAmountRemaining(openOrder models.Order, childOrders []models.Order) int {
 	orderRemaining := openOrder.Amount
 
-	for _, childOrder := range openOrder.ChildOrders {
-		orderRemaining -= childOrder.Amount
+	for _, childOrder := range childOrders {
+		if *childOrder.ParentOrderID == openOrder.OrderID {
+			orderRemaining -= childOrder.Amount
+		}
 	}
 
 	return orderRemaining
 }
 
-func (srvc *Service) getAssetOrders(openOrders []models.Order, val int, side string) []models.Order {
+func (srvc *Service) getAssetOrders(
+	openOrders []models.Order,
+	childOrders []models.Order,
+	val int,
+	side string,
+) []models.Order {
 	var orders []models.Order
 	// if the target val is greater than zero, create a child order to take the remaining asset value
 	if (val > 0) {
@@ -30,7 +38,10 @@ func (srvc *Service) getAssetOrders(openOrders []models.Order, val int, side str
 
 			// set the amount of the child order to be
 			// the min of the remaining security value and the amount left in the parent order
-			childOrderAmount := int(math.Min(float64(remainingSecurityValue), float64(srvc.getAmountRemaining(openOrder))))
+			childOrderAmount := int(math.Min(
+				float64(remainingSecurityValue),
+				float64(srvc.getAmountRemaining(openOrder, childOrders)),
+			))
 
 			parentOrderID := openOrder.OrderID
 
@@ -49,18 +60,22 @@ func (srvc *Service) getAssetOrders(openOrders []models.Order, val int, side str
 	return orders
 }
 
-func (srvc *Service) getMatchOrders(openBuyOrders []models.Order, openSellOrders []models.Order) []models.Order {
+func (srvc *Service) getMatchOrders(
+	openBuyOrders []models.Order,
+	openSellOrders []models.Order,
+	childOrders []models.Order,
+) []models.Order {
 	var orders []models.Order
 
 	i := 0
 	j := 0
 
 	for (i < len(openBuyOrders) && j < len(openSellOrders)) {
-		openBuyOrder := &openBuyOrders[i]
-		openSellOrder := &openSellOrders[j]
+		openBuyOrder := openBuyOrders[i]
+		openSellOrder := openSellOrders[j]
 
-		remainingBuy := srvc.getAmountRemaining(*openBuyOrder)
-		remainingSell := srvc.getAmountRemaining(*openSellOrder)
+		remainingBuy := srvc.getAmountRemaining(openBuyOrder, childOrders)
+		remainingSell := srvc.getAmountRemaining(openSellOrder, childOrders)
 
 		if remainingBuy == 0 {
 			i++
@@ -95,9 +110,8 @@ func (srvc *Service) getMatchOrders(openBuyOrders []models.Order, openSellOrders
 			Side: "sell",
 		}
 
-		openBuyOrder.ChildOrders = append(openBuyOrder.ChildOrders, childOrder1)
-		openSellOrder.ChildOrders = append(openBuyOrder.ChildOrders, childOrder2)
 		orders = append(orders, childOrder1, childOrder2)
+		childOrders = append(childOrders, childOrder1, childOrder2)
 	}
 
 	return orders
@@ -106,6 +120,7 @@ func (srvc *Service) getMatchOrders(openBuyOrders []models.Order, openSellOrders
 // ListOrders returns what orders need to be made to resolve the market under the given parameters.
 func (srvc *Service) GetOrders(
   openOrders []models.Order,
+  childOrders []models.Order,
   netSecurityValue int,
   netCashValue int,
 ) []models.Order {
@@ -124,33 +139,15 @@ func (srvc *Service) GetOrders(
 		}
 	}
 
-	childBuyOrders := srvc.getAssetOrders(openOrdersBuy, netSecurityValue, "buy")
+	childBuyOrders := srvc.getAssetOrders(openOrdersBuy, childOrders, netSecurityValue, "buy")
 	orders = append(orders, childBuyOrders...)
+	childOrders = append(childOrders, childBuyOrders...)
 
-	for _, childOrder := range childBuyOrders {
-		for i := range openOrdersBuy {
-			if *childOrder.ParentOrderID == openOrdersBuy[i].OrderID {
-				openOrdersBuy[i].ChildOrders = append(openOrdersBuy[i].ChildOrders, childOrder)
-
-				break
-			}
-		}
-	}
-
-	childSellOrders := srvc.getAssetOrders(openOrdersSell, netCashValue, "sell")
+	childSellOrders := srvc.getAssetOrders(openOrdersSell, childOrders, netCashValue, "sell")
 	orders = append(orders, childSellOrders...)
+	childOrders = append(childOrders, childSellOrders...)
 
-	for _, childOrder := range childSellOrders {
-		for i := range openOrdersSell {
-			if *childOrder.ParentOrderID == openOrdersSell[i].OrderID {
-				openOrdersSell[i].ChildOrders = append(openOrdersSell[i].ChildOrders, childOrder)
-
-				break
-			}
-		}
-	}
-
-	childMatchOrders := srvc.getMatchOrders(openOrdersBuy, openOrdersSell)
+	childMatchOrders := srvc.getMatchOrders(openOrdersBuy, openOrdersSell, childOrders)
 	orders = append(orders, childMatchOrders...)
 
 	return orders
