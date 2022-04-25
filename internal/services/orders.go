@@ -2,6 +2,7 @@ package services
 
 import (
 	"math"
+	"time"
 
 	"go_server/internal/models"
 
@@ -154,4 +155,23 @@ func (srvc *Service) GetOrders(
 	orders = append(orders, childMatchOrders...)
 
 	return orders
+}
+
+// GetBalance returns the balance due to a user based on the orders and annual interest rate
+func (srvc *Service) GetReturn(orders []models.Order, interest float64, currentTime time.Time) int {
+	var returnAmount float64
+
+	for _, order := range orders {
+		hours := currentTime.Sub(order.CompletedAt).Hours()
+		amount := float64(order.Amount) * hours * (interest / 365 / 24)
+
+		switch order.Side {
+		case "buy":
+			returnAmount += amount
+		case "sell":
+			returnAmount -= amount
+		}
+	}
+
+	return int(math.Round(returnAmount))
 }

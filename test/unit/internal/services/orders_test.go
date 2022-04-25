@@ -1,6 +1,8 @@
 package services_test
 
 import (
+	"time"
+
 	"go_server/internal/models"
 	"go_server/internal/services"
 	"testing"
@@ -142,5 +144,25 @@ func TestOrders(tParent *testing.T) {
 		assert.Equal(t, result[4].Amount, 50)
 		assert.Equal(t, *result[4].ParentOrderID, uuid3)
 		assert.Equal(t, *result[4].MatchingOrderID, result[3].OrderID)
+	})
+
+	tParent.Run("GetReturn simple interest", func(t *testing.T) {
+		t.Parallel()
+
+		time1 := time.Date(2021, time.January, 1, 0, 0, 0, 0, time.UTC)
+		time2 := time.Date(2022, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+		orders := []models.Order{
+			models.Order{
+				OrderID: uuid1,
+				Side: "buy",
+				Amount: 100,
+				CompletedAt: time1,
+			},
+		}
+
+		result := srvc.GetReturn(orders, 0.05, time2)
+
+		assert.Equal(t, result, 5)
 	})
 }

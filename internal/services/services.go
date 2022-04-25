@@ -1,6 +1,8 @@
 package services
 
 import (
+	"time"
+
 	"go_server/internal/models"
 )
 
@@ -17,6 +19,7 @@ type IService interface {
 		netSecurityValue int,
 		netCashValue int,
 	) []models.Order
+	GetReturn(orders []models.Order, interest float64, currentTime time.Time) int
 }
 
 type Service struct {
