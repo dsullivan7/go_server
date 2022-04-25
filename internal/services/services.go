@@ -19,7 +19,7 @@ type IService interface {
 		netSecurityValue int,
 		netCashValue int,
 	) []models.Order
-	GetReturn(orders []models.Order, interest float64, currentTime time.Time) int
+	GetBalance(orders []models.Order, interest float64, currentTime time.Time) (int, int, int)
 }
 
 type Service struct {

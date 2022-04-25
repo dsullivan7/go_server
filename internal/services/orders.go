@@ -9,6 +9,9 @@ import (
 	"github.com/google/uuid"
 )
 
+const daysInYear = 365
+const hoursInDay = 24
+
 func (srvc *Service) getAmountRemaining(openOrder models.Order, childOrders []models.Order) int {
 	orderRemaining := openOrder.Amount
 
@@ -157,21 +160,27 @@ func (srvc *Service) GetOrders(
 	return orders
 }
 
-// GetBalance returns the balance due to a user based on the orders and annual interest rate
-func (srvc *Service) GetReturn(orders []models.Order, interest float64, currentTime time.Time) int {
-	var returnAmount float64
+// GetBalance returns the balance, principal, and interest due to a user based on the orders and annual interest rate.
+func (srvc *Service) GetBalance(orders []models.Order, interest float64, currentTime time.Time) (int, int, int) {
+	var balance int
+
+	var interestAmount float64
 
 	for _, order := range orders {
 		hours := currentTime.Sub(order.CompletedAt).Hours()
-		amount := float64(order.Amount) * hours * (interest / 365 / 24)
+		orderInterest := float64(order.Amount) * hours * (interest / daysInYear / hoursInDay)
 
 		switch order.Side {
 		case "buy":
-			returnAmount += amount
+			balance += order.Amount
+			interestAmount += orderInterest
 		case "sell":
-			returnAmount -= amount
+			balance -= order.Amount
+			interestAmount -= orderInterest
 		}
 	}
 
-	return int(math.Round(returnAmount))
+	interestAmountRounded := int(math.Round(interestAmount))
+
+	return (balance + interestAmountRounded), balance, interestAmountRounded
 }
