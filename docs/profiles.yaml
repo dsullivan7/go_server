@@ -45,6 +45,9 @@ definitions:
   ProfilesRequest:
     type: "object"
     properties:
+      type:
+        type: "string"
+        enum: [accesshra, connectebt]
       username:
         type: "string"
         format: "email"

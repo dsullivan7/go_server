@@ -25,7 +25,7 @@ func NewGov() IGov {
 }
 
 func (gv *Gov) GetProfile(username string, password string, ipAddress string, portalType string) (*Profile, error) {
-  if (portalType == "accessHRA") {
+  if (portalType == "accesshra") {
     return gv.getAccessHRAProfile(username, password, ipAddress)
   }
 

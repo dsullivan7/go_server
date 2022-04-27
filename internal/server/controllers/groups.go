@@ -23,10 +23,10 @@ func (c *Controllers) getGroupResponse(
 ) (*models.Group, error) {
 	groupResponse := models.Group(group)
 
-	apiClientID, errDecryptID := c.cipher.Decrypt(group.APIClientID, c.config.EncryptionKey)
+	apiClientKey, errDecryptKey := c.cipher.Decrypt(group.APIClientKey, c.config.EncryptionKey)
 
-	if errDecryptID != nil {
-		return nil, fmt.Errorf("error decrypting client_id: %w", errDecryptID)
+	if errDecryptKey != nil {
+		return nil, fmt.Errorf("error decrypting client_id: %w", errDecryptKey)
 	}
 
 	apiClientSecret, errDecryptSecret := c.cipher.Decrypt(group.APIClientSecret, c.config.EncryptionKey)
@@ -35,7 +35,7 @@ func (c *Controllers) getGroupResponse(
 		return nil, fmt.Errorf("error decrypting client_secret: %w", errDecryptSecret)
 	}
 
-	groupResponse.APIClientID = apiClientID
+	groupResponse.APIClientKey = apiClientKey
 	groupResponse.APIClientSecret = apiClientSecret
 
 	return &groupResponse, nil
@@ -96,7 +96,7 @@ func (c *Controllers) CreateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	apiClientID, errHexID := randomHex(idLength)
+	apiClientKey, errHexID := randomHex(idLength)
 
 	if errHexID != nil {
 		c.utils.HandleError(w, r, errors.HTTPServerError{Err: errHexID})
@@ -112,10 +112,10 @@ func (c *Controllers) CreateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	apiClientIDEnc, errEncryptID := c.cipher.Encrypt(apiClientID, c.config.EncryptionKey)
+	apiClientKeyEnc, errEncryptKey := c.cipher.Encrypt(apiClientKey, c.config.EncryptionKey)
 
-	if errEncryptID != nil {
-		c.utils.HandleError(w, r, errors.HTTPServerError{Err: errEncryptID})
+	if errEncryptKey != nil {
+		c.utils.HandleError(w, r, errors.HTTPServerError{Err: errEncryptKey})
 
 		return
 	}
@@ -130,7 +130,7 @@ func (c *Controllers) CreateGroup(w http.ResponseWriter, r *http.Request) {
 
 	groupPayload := models.Group{
 		Name: groupRequest["name"].(string),
-		APIClientID: apiClientIDEnc,
+		APIClientKey: apiClientKeyEnc,
 		APIClientSecret: apiClientSecretEnc,
 	}
 
