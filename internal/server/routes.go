@@ -111,6 +111,8 @@ func (s *ChiServer) Init() http.Handler {
 		r.Delete("/api/orders/{order_id}", controllers.DeleteOrder)
 		r.Put("/api/orders/{order_id}", controllers.ModifyOrder)
 
+		r.Get("/api/users/{user_id}/balances", controllers.GetBalances)
+
 		r.Get("/api/portfolio-recommendations", controllers.ListPortfolioRecommendations)
 
 		r.Get("/api/positions", controllers.ListPositions)

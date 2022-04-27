@@ -4,7 +4,6 @@ create table orders (
   matching_order_id uuid references orders on delete set null on update cascade,
   portfolio_id uuid references portfolios on delete set null on update cascade,
   user_id uuid references users on delete set null on update cascade,
-  bank_transaction_id uuid references bank_transactions on delete set null on update cascade,
   symbol text,
   side text,
   status text,
