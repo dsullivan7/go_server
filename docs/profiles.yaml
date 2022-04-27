@@ -8,18 +8,19 @@
     - "application/json"
     produces:
     - "application/json"
-    parameters:
-    - in: "body"
-      name: "body"
-      description: "Profile object that needs to be created"
+    requestBody:
       required: true
-      schema:
-        $ref: "#/definitions/ProfilesRequest"
+      content:
+        application/json:
+          schema:
+            $ref: "#/definitions/ProfilesRequest"
     responses:
       "201":
         description: "Success"
-        schema:
-          $ref: "#/definitions/ProfilesResponse"
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/ProfilesResponse"
 /profiles/{profile_id}:
   get:
     tags:
@@ -36,14 +37,20 @@
     responses:
       "200":
         description: "Success"
-        schema:
-          $ref: "#/definitions/ProfilesResponse"
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/ProfilesResponse"
 definitions:
   ProfilesRequest:
     type: "object"
     properties:
-      public_token:
+      username:
         type: "string"
+        format: "email"
+      password:
+        type: "string"
+        format: "password"
   ProfilesResponse:
     type: "object"
     properties:

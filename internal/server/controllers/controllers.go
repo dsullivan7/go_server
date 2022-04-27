@@ -9,6 +9,7 @@ import (
 	"go_server/internal/server/utils"
 	"go_server/internal/services"
 	"go_server/internal/store"
+	"go_server/internal/gov"
 )
 
 type Controllers struct {
@@ -18,6 +19,7 @@ type Controllers struct {
 	services    services.IService
 	cipher      cipher.ICipher
 	broker      broker.Broker
+	gov      gov.IGov
 	utils       *utils.ServerUtils
 	logger      logger.Logger
 }
@@ -28,6 +30,7 @@ func NewControllers(
 	str store.Store,
 	plaidClient plaid.IClient,
 	brkr broker.Broker,
+	gv gov.IGov,
 	cphr cipher.ICipher,
 	utls *utils.ServerUtils,
 	lggr logger.Logger,
@@ -39,6 +42,7 @@ func NewControllers(
 		cipher:      cphr,
 		plaidClient: plaidClient,
 		broker:      brkr,
+		gov:      gv,
 		logger:      lggr,
 		utils:       utls,
 	}

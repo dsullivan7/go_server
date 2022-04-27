@@ -7,6 +7,7 @@ import (
 	goServerZapLogger "go_server/internal/logger/zap"
 	"go_server/internal/server"
 	"go_server/internal/server/graph"
+	"go_server/internal/gov"
 	mockAuthentication "go_server/test/mocks/authentication"
 	mockBroker "go_server/test/mocks/broker"
 	mockCipher "go_server/test/mocks/cipher"
@@ -71,10 +72,12 @@ func NewTestServer() (*TestServer, error) {
 	brkr := mockBroker.NewMockBroker()
 	testServer.Broker = brkr
 
+	gv := gov.NewGov()
+
 	cphr := mockCipher.NewMockCipher()
 	testServer.Cipher = cphr
 
-	srvr := server.NewChiServer(config, router, srvc, str, pld, brkr, cphr, ath, logger)
+	srvr := server.NewChiServer(config, router, srvc, str, pld, brkr, gv, cphr, ath, logger)
 	srvr.Init()
 
 	testServer.Server = srvr

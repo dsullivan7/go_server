@@ -36,7 +36,11 @@ func (s *ChiServer) Init() http.Handler {
 
 	router.Get("/", controllers.GetHealth)
 
-	router.Post("/api/credentials", controllers.CreateCredential)
+	router.Get("/api/profiles/{profile_id}", controllers.GetProfile)
+	router.Get("/api/profiles", controllers.ListProfiles)
+	router.Post("/api/profiles", controllers.CreateProfile)
+	router.Delete("/api/profiles/{profile_id}", controllers.DeleteProfile)
+	router.Put("/api/profiles/{profile_id}", controllers.ModifyProfile)
 
 	router.Post("/api/plaid/token", controllers.CreatePlaidToken)
 
@@ -63,6 +67,18 @@ func (s *ChiServer) Init() http.Handler {
 		r.Post("/api/users", controllers.CreateUser)
 		r.Delete("/api/users/{user_id}", controllers.DeleteUser)
 		r.Put("/api/users/{user_id}", controllers.ModifyUser)
+
+		r.Get("/api/groups/{group_id}", controllers.GetGroup)
+		r.Get("/api/groups", controllers.ListGroups)
+		r.Post("/api/groups", controllers.CreateGroup)
+		r.Delete("/api/groups/{group_id}", controllers.DeleteGroup)
+		r.Put("/api/groups/{group_id}", controllers.ModifyGroup)
+
+		r.Get("/api/group-users/{group_user_id}", controllers.GetGroupUser)
+		r.Get("/api/group-users", controllers.ListGroupUsers)
+		r.Post("/api/group-users", controllers.CreateGroupUser)
+		r.Delete("/api/group-users/{group_user_id}", controllers.DeleteGroupUser)
+		r.Put("/api/group-users/{group_user_id}", controllers.ModifyGroupUser)
 
 		r.Get("/api/tags/{tag_id}", controllers.GetTag)
 		r.Get("/api/tags", controllers.ListTags)
