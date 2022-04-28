@@ -3,6 +3,7 @@ create table users (
   first_name text,
   last_name text,
   auth0_id text unique,
+  dwolla_customer_id text unique,
   created_at timestamptz not null default (now()),
   updated_at timestamptz not null default (now())
 );
