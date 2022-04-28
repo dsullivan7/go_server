@@ -12,6 +12,7 @@ import (
 	mockBroker "go_server/test/mocks/broker"
 	mockCipher "go_server/test/mocks/cipher"
 	mockPlaid "go_server/test/mocks/plaid"
+	mockBank "go_server/test/mocks/bank"
 	mockServices "go_server/test/mocks/services"
 	mockStore "go_server/test/mocks/store"
 
@@ -29,6 +30,7 @@ type TestServer struct {
 	Store          *mockStore.MockStore
 	Authentication authentication.Authentication
 	PlaidClient    *mockPlaid.MockPlaid
+	Bank    *mockBank.MockBank
 	Broker         *mockBroker.MockBroker
 	Cipher         *mockCipher.MockCipher
 }
@@ -72,12 +74,15 @@ func NewTestServer() (*TestServer, error) {
 	brkr := mockBroker.NewMockBroker()
 	testServer.Broker = brkr
 
+	bnk := mockBank.NewMockBank()
+	testServer.Bank = bnk
+
 	gv := gov.NewGov()
 
 	cphr := mockCipher.NewMockCipher()
 	testServer.Cipher = cphr
 
-	srvr := server.NewChiServer(config, router, srvc, str, pld, brkr, gv, cphr, ath, logger)
+	srvr := server.NewChiServer(config, router, srvc, str, pld, brkr, bnk, gv, cphr, ath, logger)
 	srvr.Init()
 
 	testServer.Server = srvr

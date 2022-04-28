@@ -9,6 +9,7 @@ import (
 	"go_server/internal/config"
 	"go_server/internal/logger"
 	"go_server/internal/plaid"
+	"go_server/internal/bank"
 	"go_server/internal/server/controllers"
 	"go_server/internal/server/graph"
 	"go_server/internal/server/middlewares"
@@ -42,13 +43,14 @@ func NewChiServer(
 	str store.Store,
 	pld plaid.IClient,
 	brkr broker.Broker,
+	bnk bank.Bank,
 	gv gov.IGov,
 	cphr cipher.ICipher,
 	ath authentication.Authentication,
 	lggr logger.Logger,
 ) Server {
 	utils := utils.NewServerUtils(lggr)
-	controllers := controllers.NewControllers(cfg, srvc, str, pld, brkr, gv, cphr, utils, lggr)
+	controllers := controllers.NewControllers(cfg, srvc, str, pld, brkr, bnk, gv, cphr, utils, lggr)
 	resolver := graph.NewResolver(cfg, str, lggr)
 	middlewares := middlewares.NewMiddlewares(cfg, str, ath, utils, lggr)
 

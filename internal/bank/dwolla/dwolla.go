@@ -202,6 +202,11 @@ func (bnk *Bank) CreateTransfer(
 
 // CreateCustomer creates a customer within dwolla.
 func (bnk *Bank) CreateCustomer(user models.User) (*models.User, error) {
+	if (user.DwollaCustomerID != nil) {
+		// this user already has a customer, return the user
+		return &user, nil
+	}
+
   body := map[string]interface{}{
     "firstName": user.FirstName,
     "lastName": user.LastName,
@@ -231,7 +236,7 @@ func (bnk *Bank) CreateCustomer(user models.User) (*models.User, error) {
 }
 
 // CreateBank creates a funding source within dwolla.
-func (bnk *Bank) CreateBank(user models.User, plaidProcessorToken string) (*models.BankAccount, error) {
+func (bnk *Bank) CreateBankAccount(user models.User, plaidProcessorToken string) (*models.BankAccount, error) {
   body := map[string]interface{}{
     "name": user.UserID.String(),
     "plaidToken": plaidProcessorToken,
@@ -250,4 +255,9 @@ func (bnk *Bank) CreateBank(user models.User, plaidProcessorToken string) (*mode
   dwollaFundingSourceID := dwollaResponse.(map[string]interface{})["id"].(string)
 
 	return &models.BankAccount{ DwollaFundingSourceID: &dwollaFundingSourceID }, nil
+}
+
+// GetPlaidAccessor returns the accessor for plaid access tokens
+func (bnk *Bank) GetPlaidAccessor() string {
+	return "dwolla"
 }

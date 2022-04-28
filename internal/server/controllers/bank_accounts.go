@@ -50,11 +50,14 @@ func (c *Controllers) CreateBankAccount(w http.ResponseWriter, r *http.Request) 
 
 	errDecode := json.NewDecoder(r.Body).Decode(&bankAccountReq)
 
-	var userID *uuid.UUID
+	userID := uuid.Must(uuid.Parse(bankAccountReq["user_id"]))
 
-	if bankAccountReq["user_id"] != "" {
-		userIDValue := uuid.Must(uuid.Parse(bankAccountReq["user_id"]))
-		userID = &userIDValue
+	user, errUser := c.store.GetUser(userID)
+
+	if errUser != nil {
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errUser})
+
+		return
 	}
 
 	if errDecode != nil {
@@ -79,50 +82,40 @@ func (c *Controllers) CreateBankAccount(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	var alpacaACHRelationshipID *string
+	customer, errCustomer := c.bank.CreateCustomer(*user)
 
-	if bankAccountReq["brokerage_account_id"] != "" {
-		brokerageAccountID := uuid.Must(uuid.Parse(bankAccountReq["brokerage_account_id"]))
+	if errCustomer != nil {
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errCustomer})
 
-		brokerageAccount, errBrokerageAccount := c.store.GetBrokerageAccount(brokerageAccountID)
+		return
+	}
 
-		if errBrokerageAccount != nil {
-			c.utils.HandleError(w, r, errors.HTTPUserError{Err: errBrokerageAccount})
+	processorToken, errProcessorToken := c.plaidClient.CreateProcessorToken(
+		plaidAccessToken,
+		plaidAccountID,
+		c.bank.GetPlaidAccessor(),
+	)
 
-			return
-		}
+	if errProcessorToken != nil {
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errProcessorToken})
 
-		plaidProcessorToken, errPlaidProcessorToken := c.plaidClient.CreateProcessorToken(
-			plaidAccessToken,
-			plaidAccountID,
-			"alpaca",
-		)
+		return
+	}
 
-		if errPlaidProcessorToken != nil {
-			c.utils.HandleError(w, r, errors.HTTPUserError{Err: errPlaidProcessorToken})
+	bankAccountIntegration, errBankAccount := c.bank.CreateBankAccount(*customer, processorToken)
 
-			return
-		}
+	if errBankAccount != nil {
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errBankAccount})
 
-		alpacaACHRelationshipIDValue, errACHRelationship := c.broker.CreateACHRelationship(
-			*brokerageAccount.AlpacaAccountID,
-			plaidProcessorToken,
-		)
-		alpacaACHRelationshipID = &alpacaACHRelationshipIDValue
-
-		if errACHRelationship != nil {
-			c.utils.HandleError(w, r, errors.HTTPUserError{Err: errACHRelationship})
-
-			return
-		}
+		return
 	}
 
 	bankAccountPayload := models.BankAccount{
-		UserID:                  userID,
+		UserID:                  &userID,
 		Name:                    &name,
 		PlaidAccountID:          &plaidAccountID,
 		PlaidAccessToken:        &plaidAccessToken,
-		AlpacaACHRelationshipID: alpacaACHRelationshipID,
+		DwollaFundingSourceID:        bankAccountIntegration.DwollaFundingSourceID,
 	}
 
 	bankAccount, err := c.store.CreateBankAccount(bankAccountPayload)

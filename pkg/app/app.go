@@ -8,7 +8,8 @@ import (
 	"go_server/internal/config"
 	"go_server/internal/db"
 	goServerZapLogger "go_server/internal/logger/zap"
-	goServerPlaid "go_server/internal/plaid"
+	"go_server/internal/plaid"
+	"go_server/internal/bank/dwolla"
 	"go_server/internal/server"
 	"go_server/internal/services"
 	"go_server/internal/gov"
@@ -24,7 +25,7 @@ import (
 const callerSkip = 2
 
 func Run() {
-	config, configErr := config.NewConfig()
+	cfg, configErr := config.NewConfig()
 
 	if configErr != nil {
 		log.Fatal(configErr)
@@ -41,12 +42,12 @@ func Run() {
 	logger := goServerZapLogger.NewLogger(zapLogger)
 
 	connection, errConnection := db.NewSQLConnection(
-		config.DBHost,
-		config.DBName,
-		config.DBPort,
-		config.DBUser,
-		config.DBPassword,
-		config.DBSSL,
+		cfg.DBHost,
+		cfg.DBName,
+		cfg.DBPort,
+		cfg.DBUser,
+		cfg.DBPassword,
+		cfg.DBSSL,
 	)
 
 	if errConnection != nil {
@@ -64,32 +65,39 @@ func Run() {
 	srvc := services.NewService()
 
 	// initialize plaid
-	plaidClient := goServerPlaid.NewClient(
-		config.PlaidClientID,
-		config.PlaidSecret,
-		config.PlaidAPIURL,
-		config.PlaidRedirectURI,
+	plaidClient := plaid.NewClient(
+		cfg.PlaidClientID,
+		cfg.PlaidSecret,
+		cfg.PlaidAPIURL,
+		cfg.PlaidRedirectURI,
 		logger,
 	)
 
 	// initialize alpaca
-	broker := goServerAlpaca.NewBroker(config.AlpacaAPIKey, config.AlpacaAPISecret, config.AlpacaAPIURL)
+	broker := goServerAlpaca.NewBroker(cfg.AlpacaAPIKey, cfg.AlpacaAPISecret, cfg.AlpacaAPIURL)
+
+	dwollaBank := dwolla.NewBank(
+		cfg.DwollaAPIKey,
+		cfg.DwollaAPISecret,
+		cfg.DwollaAPIURL,
+    logger,
+	)
 
 	cphr := cipher.NewCipher()
 
 	gv := gov.NewGov()
 
-	auth := auth0.NewAuth(config.Auth0Domain, config.Auth0Audience, logger)
+	auth := auth0.NewAuth(cfg.Auth0Domain, cfg.Auth0Audience, logger)
 	auth.Init()
 
 	router := chi.NewRouter()
-	handler := server.NewChiServer(config, router, srvc, store, plaidClient, broker, gv, cphr, auth, logger)
+	handler := server.NewChiServer(cfg, router, srvc, store, plaidClient, broker, dwollaBank, gv, cphr, auth, logger)
 
 	httpServer := http.Server{
-		Addr:    fmt.Sprintf(":%s", config.Port),
+		Addr:    fmt.Sprintf(":%s", cfg.Port),
 		Handler: handler.Init(),
 	}
 
-	logger.Info(fmt.Sprintf("started on port: %s", config.Port))
+	logger.Info(fmt.Sprintf("started on port: %s", cfg.Port))
 	log.Fatal(httpServer.ListenAndServe())
 }
