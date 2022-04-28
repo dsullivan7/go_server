@@ -15,7 +15,7 @@ import (
 )
 
 func TestDwollaCreateAccount(t *testing.T) {
-	t.Skip("No integration")
+	// t.Skip("No integration")
 	t.Parallel()
 
 	cfg, configError := config.NewConfig()
@@ -68,7 +68,12 @@ func TestDwollaCreateAccount(t *testing.T) {
 
 	// assert.Nil(t, errAcc)
 
-	bankAccount, errBank := dwollaBank.CreateBank(user, "")
+	processorToken  := "processor-sandbox-e6b301a9-35ec-4b5e-a68a-46d99eaba5ad"
+	bankAccount, errBank := dwollaBank.CreateBankAccount(user, processorToken)
+
+	println("bankAccount.DwollaFundingSourceID")
+	println(*bankAccount.DwollaFundingSourceID)
+
 	assert.Nil(t, errBank)
 	assert.NotNil(t, bankAccount.DwollaFundingSourceID)
 }

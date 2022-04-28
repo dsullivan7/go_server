@@ -4,6 +4,7 @@ create table bank_accounts (
   name text,
   plaid_access_token text,
   plaid_account_id text,
+  dwolla_funding_source_id text,
   alpaca_ach_relationship_id text,
   created_at timestamptz not null default (now()),
   updated_at timestamptz not null default (now())

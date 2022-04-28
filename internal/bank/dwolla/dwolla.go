@@ -86,6 +86,10 @@ func (bnk *Bank) sendRequest(
 
 	defer res.Body.Close()
 
+	if (res.StatusCode == http.StatusCreated) {
+		return res.Header.Get("Location"), nil
+	}
+
 	decoder := json.NewDecoder(res.Body)
 
 	var dwollaResponse interface{}
@@ -195,7 +199,8 @@ func (bnk *Bank) CreateTransfer(
 		return nil, errDwolla
 	}
 
-  dwollaTransferID := dwollaResponse.(map[string]interface{})["id"].(string)
+	split := strings.Split(dwollaResponse.(string), "/")
+  dwollaTransferID := split[len(split) - 1]
 
 	return &models.BankTransfer{ DwollaTransferID: &dwollaTransferID }, nil
 }
@@ -230,7 +235,8 @@ func (bnk *Bank) CreateCustomer(user models.User) (*models.User, error) {
 		return nil, errDwolla
 	}
 
-  dwollaCustomerID := dwollaResponse.(map[string]interface{})["id"].(string)
+	split := strings.Split(dwollaResponse.(string), "/")
+  dwollaCustomerID := split[len(split) - 1]
 
 	return &models.User{ DwollaCustomerID: &dwollaCustomerID }, nil
 }
@@ -243,7 +249,7 @@ func (bnk *Bank) CreateBankAccount(user models.User, plaidProcessorToken string)
   }
 
 	dwollaResponse, errDwolla := bnk.sendRequest(
-		fmt.Sprint("/customers/", user.DwollaCustomerID, "/funding-sources"),
+		fmt.Sprint("/customers/", *user.DwollaCustomerID, "/funding-sources"),
 		http.MethodPost,
 		body,
 	)
@@ -252,7 +258,8 @@ func (bnk *Bank) CreateBankAccount(user models.User, plaidProcessorToken string)
 		return nil, errDwolla
 	}
 
-  dwollaFundingSourceID := dwollaResponse.(map[string]interface{})["id"].(string)
+	split := strings.Split(dwollaResponse.(string), "/")
+  dwollaFundingSourceID := split[len(split) - 1]
 
 	return &models.BankAccount{ DwollaFundingSourceID: &dwollaFundingSourceID }, nil
 }

@@ -96,6 +96,9 @@ func (c *Controllers) CreateBankAccount(w http.ResponseWriter, r *http.Request) 
 		c.bank.GetPlaidAccessor(),
 	)
 
+	println("processorToken")
+	println(processorToken)
+
 	if errProcessorToken != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errProcessorToken})
 
