@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"go_server/internal/bank"
 	"go_server/internal/models"
+	"go_server/internal/logger"
 	"net/http"
   "net/url"
   "strings"
@@ -17,7 +18,6 @@ import (
 
 var ErrDwollaAPI = errors.New("dwolla api error")
 
-const bitConversion = 64
 const centsToDollars = 100
 
 type Bank struct {
@@ -26,17 +26,20 @@ type Bank struct {
 	dwollaAPIKey    string
 	dwollaAPISecret string
 	dwollaAPIURL    string
+	logger logger.Logger
 }
 
 func NewBank(
 	dwollaAPIKey string,
 	dwollaAPISecret string,
 	dwollaAPIURL string,
+	lggr logger.Logger,
 ) bank.Bank {
 	return &Bank{
 		dwollaAPIKey:    dwollaAPIKey,
 		dwollaAPISecret: dwollaAPISecret,
 		dwollaAPIURL:    dwollaAPIURL,
+		logger:    lggr,
 	}
 }
 
@@ -46,10 +49,13 @@ func (bnk *Bank) sendRequest(
 	body map[string]interface{},
 ) (interface{}, error) {
   if (bnk.dwollaAPIAccessTokenExpiresAt.IsZero() || time.Now().After(bnk.dwollaAPIAccessTokenExpiresAt)) {
-    bnk.authenticate()
+    errAuth := bnk.authenticate()
+		if errAuth != nil {
+			return nil, fmt.Errorf("failed to authenticate: %w", errAuth)
+		}
   }
 
-	context := context.Background()
+	ctxt := context.Background()
 
 	jsonBytes, errMarshal := json.Marshal(body)
 
@@ -58,7 +64,7 @@ func (bnk *Bank) sendRequest(
 	}
 
 	req, errReq := http.NewRequestWithContext(
-		context,
+		ctxt,
 		method,
 		fmt.Sprint(bnk.dwollaAPIURL, path),
 		bytes.NewReader(jsonBytes),
@@ -69,6 +75,7 @@ func (bnk *Bank) sendRequest(
 	}
 
   req.Header.Set("Accept", "application/vnd.dwolla.v1.hal+json")
+  req.Header.Set("Content-Type", "application/json")
   req.Header.Set("Authorization", fmt.Sprint("Bearer ", bnk.dwollaAPIAccessToken))
 
 	res, errRes := http.DefaultClient.Do(req)
@@ -92,6 +99,8 @@ func (bnk *Bank) sendRequest(
 	if res.StatusCode != http.StatusOK &&
 		res.StatusCode != http.StatusCreated &&
 		res.StatusCode != http.StatusNoContent {
+		bnk.logger.InfoWithMeta("Dwolla debug", map[string]interface{}{"dwollaResponse": dwollaResponse})
+
 		return nil, fmt.Errorf("%w: %s", ErrDwollaAPI, dwollaResponse.(map[string]interface{})["message"].(string))
 	}
 
@@ -99,13 +108,13 @@ func (bnk *Bank) sendRequest(
 }
 
 func (bnk *Bank) authenticate() error {
-	context := context.Background()
+	ctxt := context.Background()
 
   data := url.Values{}
   data.Set("grant_type", "client_credentials")
 
 	req, errReq := http.NewRequestWithContext(
-		context,
+		ctxt,
 		http.MethodPost,
 		fmt.Sprint(bnk.dwollaAPIURL, "/token"),
     strings.NewReader(data.Encode()),
@@ -117,7 +126,8 @@ func (bnk *Bank) authenticate() error {
 
 	authHeader := base64.StdEncoding.EncodeToString([]byte(fmt.Sprint(bnk.dwollaAPIKey, ":", bnk.dwollaAPISecret)))
 
-  req.Header.Set("Accept", "application/vnd.dwolla.v1.hal+json")
+	req.Header.Set("Accept", "application/json")
+  req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
   req.Header.Set("Authorization", fmt.Sprint("Basic ", authHeader))
 
 	res, errRes := http.DefaultClient.Do(req)
@@ -141,6 +151,8 @@ func (bnk *Bank) authenticate() error {
 	if res.StatusCode != http.StatusOK &&
 		res.StatusCode != http.StatusCreated &&
 		res.StatusCode != http.StatusNoContent {
+		bnk.logger.InfoWithMeta("Dwolla auth debug", map[string]interface{}{"dwollaResponse": dwollaResponse})
+
 		return fmt.Errorf("%w: %s", ErrDwollaAPI, dwollaResponse.(map[string]interface{})["message"].(string))
 	}
 

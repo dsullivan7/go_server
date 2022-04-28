@@ -2,6 +2,7 @@ package dwolla_test
 
 import (
 	"fmt"
+  goServerZapLogger "go_server/internal/logger/zap"
 	"go_server/internal/bank/dwolla"
 	"go_server/internal/config"
 	"go_server/internal/models"
@@ -10,9 +11,10 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/stretchr/testify/assert"
+  "go.uber.org/zap"
 )
 
-func TestAlpacaCreateAccount(t *testing.T) {
+func TestDwollaCreateAccount(t *testing.T) {
 	t.Skip("No integration")
 	t.Parallel()
 
@@ -20,10 +22,17 @@ func TestAlpacaCreateAccount(t *testing.T) {
 
 	assert.Nil(t, configError)
 
+  zapLogger, errZap := zap.NewProduction()
+
+	assert.Nil(t, errZap)
+
+	logger := goServerZapLogger.NewLogger(zapLogger)
+
 	dwollaBank := dwolla.NewBank(
 		cfg.DwollaAPIKey,
 		cfg.DwollaAPISecret,
 		cfg.DwollaAPIURL,
+    logger,
 	)
 
 	randomID := uuid.New()
@@ -39,6 +48,8 @@ func TestAlpacaCreateAccount(t *testing.T) {
   state := "NY"
   postalCode := "10009"
 
+  dwollaCustomerID := "bab9537c-610e-46cf-b60b-0f92c2578764"
+
   user := models.User{
     FirstName: &firstName,
     LastName: &lastName,
@@ -50,12 +61,14 @@ func TestAlpacaCreateAccount(t *testing.T) {
     City: &city,
     State: &state,
     PostalCode: &postalCode,
+    DwollaCustomerID: &dwollaCustomerID,
   }
 
-	dwollaUser, errAcc := dwollaBank.CreateCustomer(user)
+	// dwollaUser, errAcc := dwollaBank.CreateCustomer(user)
 
-	assert.Nil(t, errAcc)
+	// assert.Nil(t, errAcc)
 
-	bankAccount, errBank := dwollaBank.CreateBank(dwollaUser, "")
+	bankAccount, errBank := dwollaBank.CreateBank(user, "")
 	assert.Nil(t, errBank)
+	assert.NotNil(t, bankAccount.DwollaFundingSourceID)
 }
