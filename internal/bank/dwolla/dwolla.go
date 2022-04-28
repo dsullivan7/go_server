@@ -1,0 +1,241 @@
+package dwolla
+
+import (
+	"bytes"
+	"context"
+	"encoding/base64"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"go_server/internal/bank"
+	"go_server/internal/models"
+	"net/http"
+  "net/url"
+  "strings"
+  "time"
+)
+
+var ErrDwollaAPI = errors.New("dwolla api error")
+
+const bitConversion = 64
+const centsToDollars = 100
+
+type Bank struct {
+	dwollaAPIAccessToken    string
+	dwollaAPIAccessTokenExpiresAt    time.Time
+	dwollaAPIKey    string
+	dwollaAPISecret string
+	dwollaAPIURL    string
+}
+
+func NewBank(
+	dwollaAPIKey string,
+	dwollaAPISecret string,
+	dwollaAPIURL string,
+) bank.Bank {
+	return &Bank{
+		dwollaAPIKey:    dwollaAPIKey,
+		dwollaAPISecret: dwollaAPISecret,
+		dwollaAPIURL:    dwollaAPIURL,
+	}
+}
+
+func (bnk *Bank) sendRequest(
+	path string,
+	method string,
+	body map[string]interface{},
+) (interface{}, error) {
+  if (bnk.dwollaAPIAccessTokenExpiresAt.IsZero() || time.Now().After(bnk.dwollaAPIAccessTokenExpiresAt)) {
+    bnk.authenticate()
+  }
+
+	context := context.Background()
+
+	jsonBytes, errMarshal := json.Marshal(body)
+
+	if errMarshal != nil {
+		return nil, fmt.Errorf("failed to construct the request body: %w", errMarshal)
+	}
+
+	req, errReq := http.NewRequestWithContext(
+		context,
+		method,
+		fmt.Sprint(bnk.dwollaAPIURL, path),
+		bytes.NewReader(jsonBytes),
+	)
+
+	if errReq != nil {
+		return nil, fmt.Errorf("failed to create the request: %w", errReq)
+	}
+
+  req.Header.Set("Accept", "application/vnd.dwolla.v1.hal+json")
+  req.Header.Set("Authorization", fmt.Sprint("Bearer ", bnk.dwollaAPIAccessToken))
+
+	res, errRes := http.DefaultClient.Do(req)
+
+	if errRes != nil {
+		return nil, fmt.Errorf("failed to get the response: %w", errRes)
+	}
+
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	var dwollaResponse interface{}
+
+	errDecode := decoder.Decode(&dwollaResponse)
+
+	if errDecode != nil {
+		return nil, fmt.Errorf("failed to decode the response: %w", errDecode)
+	}
+
+	if res.StatusCode != http.StatusOK &&
+		res.StatusCode != http.StatusCreated &&
+		res.StatusCode != http.StatusNoContent {
+		return nil, fmt.Errorf("%w: %s", ErrDwollaAPI, dwollaResponse.(map[string]interface{})["message"].(string))
+	}
+
+	return dwollaResponse, nil
+}
+
+func (bnk *Bank) authenticate() error {
+	context := context.Background()
+
+  data := url.Values{}
+  data.Set("grant_type", "client_credentials")
+
+	req, errReq := http.NewRequestWithContext(
+		context,
+		http.MethodPost,
+		fmt.Sprint(bnk.dwollaAPIURL, "/token"),
+    strings.NewReader(data.Encode()),
+	)
+
+	if errReq != nil {
+		return fmt.Errorf("failed to create the request: %w", errReq)
+	}
+
+	authHeader := base64.StdEncoding.EncodeToString([]byte(fmt.Sprint(bnk.dwollaAPIKey, ":", bnk.dwollaAPISecret)))
+
+  req.Header.Set("Accept", "application/vnd.dwolla.v1.hal+json")
+  req.Header.Set("Authorization", fmt.Sprint("Basic ", authHeader))
+
+	res, errRes := http.DefaultClient.Do(req)
+
+	if errRes != nil {
+		return fmt.Errorf("failed to get the response: %w", errRes)
+	}
+
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	var dwollaResponse interface{}
+
+	errDecode := decoder.Decode(&dwollaResponse)
+
+	if errDecode != nil {
+		return fmt.Errorf("failed to decode the response: %w", errDecode)
+	}
+
+	if res.StatusCode != http.StatusOK &&
+		res.StatusCode != http.StatusCreated &&
+		res.StatusCode != http.StatusNoContent {
+		return fmt.Errorf("%w: %s", ErrDwollaAPI, dwollaResponse.(map[string]interface{})["message"].(string))
+	}
+
+  expirationDuration := time.Second * time.Duration(int(dwollaResponse.(map[string]interface{})["expires_in"].(float64)))
+
+  bnk.dwollaAPIAccessToken = dwollaResponse.(map[string]interface{})["access_token"].(string)
+  bnk.dwollaAPIAccessTokenExpiresAt = time.Now().Add(expirationDuration)
+
+  return nil
+}
+
+// CreateTransfer creates a transfer for the source to the destination.
+func (bnk *Bank) CreateTransfer(
+	source models.BankAccount,
+	destination models.BankAccount,
+  amount int,
+) (*models.BankTransfer, error) {
+  body := map[string]interface{}{
+    "_links": map[string]interface{}{
+      "source": map[string]string{
+        "href": fmt.Sprint(bnk.dwollaAPIURL, "/funding-sources/", source.DwollaFundingSourceID),
+      },
+      "destination": map[string]string{
+        "href": fmt.Sprint(bnk.dwollaAPIURL, "/funding-sources/", destination.DwollaFundingSourceID),
+      },
+    },
+    "amount": map[string]string{
+      "value": fmt.Sprintf("%f", amount / centsToDollars),
+      "currency": "USD",
+    },
+  }
+
+	dwollaResponse, errDwolla := bnk.sendRequest(
+		"/transfers",
+		http.MethodPost,
+		body,
+	)
+
+	if errDwolla != nil {
+		return nil, errDwolla
+	}
+
+  dwollaTransferID := dwollaResponse.(map[string]interface{})["id"].(string)
+
+	return &models.BankTransfer{ DwollaTransferID: &dwollaTransferID }, nil
+}
+
+// CreateCustomer creates a customer within dwolla.
+func (bnk *Bank) CreateCustomer(user models.User) (*models.User, error) {
+  body := map[string]interface{}{
+    "firstName": user.FirstName,
+    "lastName": user.LastName,
+    "email": user.Email,
+    "type": "personal",
+    "address1": user.Address1,
+    "city": user.City,
+    "state": user.State,
+    "postalCode": user.PostalCode,
+    "dateOfBirth": user.DateOfBirth,
+    "ssn": user.SSN,
+  }
+
+	dwollaResponse, errDwolla := bnk.sendRequest(
+		"/customers",
+		http.MethodPost,
+		body,
+	)
+
+	if errDwolla != nil {
+		return nil, errDwolla
+	}
+
+  dwollaCustomerID := dwollaResponse.(map[string]interface{})["id"].(string)
+
+	return &models.User{ DwollaCustomerID: &dwollaCustomerID }, nil
+}
+
+// CreateBank creates a funding source within dwolla.
+func (bnk *Bank) CreateBank(user models.User, plaidProcessorToken string) (*models.BankAccount, error) {
+  body := map[string]interface{}{
+    "name": user.UserID.String(),
+    "plaidToken": plaidProcessorToken,
+  }
+
+	dwollaResponse, errDwolla := bnk.sendRequest(
+		fmt.Sprint("/customers/", user.DwollaCustomerID, "/funding-sources"),
+		http.MethodPost,
+		body,
+	)
+
+	if errDwolla != nil {
+		return nil, errDwolla
+	}
+
+  dwollaFundingSourceID := dwollaResponse.(map[string]interface{})["id"].(string)
+
+	return &models.BankAccount{ DwollaFundingSourceID: &dwollaFundingSourceID }, nil
+}

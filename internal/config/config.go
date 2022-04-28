@@ -31,6 +31,10 @@ type Config struct {
 	AlpacaAPISecret string
 	AlpacaAPIURL    string
 
+	DwollaAPIKey    string
+	DwollaAPISecret string
+	DwollaAPIURL    string
+
 	AllowedOrigins []string
 	RouterMaxAge   int
 
@@ -60,6 +64,9 @@ func NewConfig() (*Config, error) {
 		AlpacaAPIKey:     os.Getenv("ALPACA_API_KEY"),
 		AlpacaAPISecret:  os.Getenv("ALPACA_API_SECRET"),
 		AlpacaAPIURL:     os.Getenv("ALPACA_API_URL"),
+		DwollaAPIKey:     os.Getenv("DWOLLA_API_KEY"),
+		DwollaAPISecret:  os.Getenv("DWOLLA_API_SECRET"),
+		DwollaAPIURL:     os.Getenv("DWOLLA_API_URL"),
 		Auth0Domain:      os.Getenv("AUTH0_DOMAIN"),
 		Auth0Audience:    os.Getenv("AUTH0_AUDIENCE"),
 		AllowedOrigins:   strings.Split(os.Getenv("ALLOWED_ORIGINS"), ","),

@@ -14,7 +14,7 @@ type Order struct {
 	PortfolioID   *uuid.UUID `json:"portfolio_id" gorm:"type:uuid"`
 	Amount        int    `json:"amount"`
 	Side          string     `json:"side"`
-	Status          string     `json:"side"`
+	Status          string     `json:"status"`
 	Symbol        *string    `json:"symbol"`
 	AlpacaOrderID *string    `json:"alpaca_order_id"`
 	CompletedAt     time.Time  `json:"completed_at"`
