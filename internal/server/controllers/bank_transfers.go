@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	// "fmt".
 	"encoding/json"
 	"go_server/internal/errors"
 	"go_server/internal/models"
@@ -56,62 +55,39 @@ func (c *Controllers) CreateBankTransfer(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	amount := int(bankTransferReq["amount"].(float64))
+
 	userID := uuid.Must(uuid.Parse(bankTransferReq["user_id"].(string)))
 
-	// user, errUser := c.store.GetUser(userID)
-	//
-	// if errUser != nil {
-	// 	c.utils.HandleError(w, r, errors.HTTPUserError{Err: errUser})
-	//
-	// 	return
-	// }
-	//
-	// var plaidOriginationAccountID string
-	// if (bankTransferReq["plaid_origination_account_id"] != nil) {
-	// 	val, ok := bankTransferReq["plaid_origination_account_id"].(string)
-	// 	if (ok) {
-	// 		plaidOriginationAccountID = val
-	// 	}
-	// }
-	//
-	// plaidTransferAuthorizationID, errTransferAuth := c.plaidClient.CreateTransferAuthorization(
-	// 	bankTransferReq["plaid_account_id"].(string),
-	// 	bankTransferReq["plaid_access_token"].(string),
-	// 	plaidOriginationAccountID,
-	// 	bankTransferReq["amount"].(string),
-	// 	"debit",
-	// 	fmt.Sprint(user.FirstName, " ", user.LastName),
-	// )
-	//
-	// if errTransferAuth != nil {
-	// 	c.utils.HandleError(w, r, errors.HTTPUserError{Err: errTransferAuth})
-	//
-	// 	return
-	// }
-	//
-	// plaidTransferID, errTransfer := c.plaidClient.CreateTransfer(
-	// 	bankTransferReq["plaid_account_id"].(string),
-	// 	bankTransferReq["plaid_access_token"].(string),
-	// 	plaidOriginationAccountID,
-	// 	plaidTransferAuthorizationID,
-	// 	bankTransferReq["amount"].(string),
-	// 	"debit",
-	// 	fmt.Sprint(user.FirstName, " ", user.LastName),
-	// )
-	//
-	// if errTransfer != nil {
-	// 	c.utils.HandleError(w, r, errors.HTTPUserError{Err: errTransfer})
-	//
-	// 	return
-	// }
-	//
-	var plaidTransferID string
+	userBankAccounts, errUserBA := c.store.ListBankAccounts(map[string]interface{}{"user_id": userID })
+
+	if errUserBA != nil {
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errUserBA})
+
+		return
+	}
+
+	masterBankAccounts, errMasterBA := c.store.ListBankAccounts(map[string]interface{}{"master_account": true })
+
+	if errMasterBA != nil {
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errMasterBA})
+
+		return
+	}
+
+	bankTransferIntegration, errInt := c.bank.CreateTransfer(userBankAccounts[0], masterBankAccounts[0], amount)
+
+	if errInt != nil {
+		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errInt})
+
+		return
+	}
 
 	bankTransferPayload := models.BankTransfer{
 		UserID:          &userID,
 		Amount:          int(bankTransferReq["amount"].(float64)),
-		Status:          "PENDING",
-		PlaidTransferID: &plaidTransferID,
+		Status:          "pending",
+		DwollaTransferID: bankTransferIntegration.DwollaTransferID,
 	}
 
 	bankTransfer, err := c.store.CreateBankTransfer(bankTransferPayload)

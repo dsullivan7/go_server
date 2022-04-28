@@ -6,6 +6,7 @@ create table bank_accounts (
   plaid_account_id text,
   dwolla_funding_source_id text,
   alpaca_ach_relationship_id text,
+  master_account boolean not null default false,
   created_at timestamptz not null default (now()),
   updated_at timestamptz not null default (now())
 );

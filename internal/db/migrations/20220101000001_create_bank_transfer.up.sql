@@ -5,6 +5,7 @@ create table bank_transfers (
   amount integer not null,
   alpaca_transfer_id text,
   plaid_transfer_id text,
+  dwolla_transfer_id text,
   created_at timestamptz not null default (now()),
   updated_at timestamptz not null default (now())
 );

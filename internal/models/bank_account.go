@@ -13,6 +13,7 @@ type BankAccount struct {
 	PlaidAccessToken        *string    `json:"plaid_access_token"`
 	PlaidAccountID          *string    `json:"plaid_account_id"`
 	DwollaFundingSourceID          *string    `json:"dwolla_funding_source_id"`
+	MasterAccount          	bool    `json:"master_account"`
 	AlpacaACHRelationshipID *string    `json:"alpaca_ach_relationship_id"`
 	CreatedAt               time.Time  `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt               time.Time  `json:"updated_at" gorm:"default:CURRENT_TIMESTAMP"`

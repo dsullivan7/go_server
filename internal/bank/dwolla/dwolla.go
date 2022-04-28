@@ -177,14 +177,14 @@ func (bnk *Bank) CreateTransfer(
   body := map[string]interface{}{
     "_links": map[string]interface{}{
       "source": map[string]string{
-        "href": fmt.Sprint(bnk.dwollaAPIURL, "/funding-sources/", source.DwollaFundingSourceID),
+        "href": fmt.Sprint(bnk.dwollaAPIURL, "/funding-sources/", *source.DwollaFundingSourceID),
       },
       "destination": map[string]string{
-        "href": fmt.Sprint(bnk.dwollaAPIURL, "/funding-sources/", destination.DwollaFundingSourceID),
+        "href": fmt.Sprint(bnk.dwollaAPIURL, "/funding-sources/", *destination.DwollaFundingSourceID),
       },
     },
     "amount": map[string]string{
-      "value": fmt.Sprintf("%f", amount / centsToDollars),
+      "value": fmt.Sprintf("%f", float64(amount) / centsToDollars),
       "currency": "USD",
     },
   }
