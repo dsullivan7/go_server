@@ -45,12 +45,13 @@ func TestDBIntegration(parentT *testing.T) {
 
 		mock.ExpectBegin()
 		mock.ExpectQuery(
+			//nolint:lll
 			regexp.QuoteMeta(`
-        INSERT INTO "users" ("auth0_id","first_name","last_name")
-        VALUES ($1,$2,$3)
+        INSERT INTO "users" ("auth0_id","dwolla_customer_id","first_name","last_name","phone_number","email","address1","city","state","postal_code","date_of_birth","ssn")
+        VALUES  ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
         RETURNING "user_id","created_at","updated_at"
        `)).
-			WithArgs(auth0ID, firstName, lastName).
+			WithArgs(auth0ID, nil, firstName, lastName, nil, nil, nil, nil, nil, nil, nil, nil).
 			WillReturnRows(
 				sqlmock.NewRows([]string{"user_id", "created_at", "updated_at"}).
 					AddRow(userID, createdAt, updatedAt))

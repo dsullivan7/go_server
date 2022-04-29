@@ -245,6 +245,7 @@ func TestBankTransferCreate(t *testing.T) {
 
 	userID := uuid.New()
 	amount := 23445
+	dwollaTransferID := "dwollaTransferID"
 
 	jsonStr := []byte(fmt.Sprintf(
 		`{
@@ -255,25 +256,45 @@ func TestBankTransferCreate(t *testing.T) {
 		amount,
 	))
 
-	var plaidTransferID string
+	bankAccount := models.BankAccount{
+		BankAccountID:  uuid.New(),
+		UserID:          &userID,
+		MasterAccount: false,
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
+	}
+
+	bankAccountMaster := models.BankAccount{
+		BankAccountID:  uuid.New(),
+		MasterAccount: true,
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
+	}
 
 	bankTransferPayload := models.BankTransfer{
 		UserID:          &userID,
 		Amount:          amount,
-		Status:          "PENDING",
-		PlaidTransferID: &plaidTransferID,
+		Status:          "pending",
+		DwollaTransferID: &dwollaTransferID,
 	}
 
 	bankTransferCreated := models.BankTransfer{
 		BankTransferID:  uuid.New(),
 		UserID:          &userID,
 		Amount:          amount,
-		Status:          "PENDING",
-		PlaidTransferID: nil,
+		Status:          "pending",
+		DwollaTransferID: &dwollaTransferID,
 		CreatedAt:       time.Now(),
 		UpdatedAt:       time.Now(),
 	}
 
+	testServer.Store.On("ListBankAccounts", map[string]interface{}{"user_id": userID}).Return([]models.BankAccount{ bankAccount }, nil)
+	testServer.Store.
+		On("ListBankAccounts", map[string]interface{}{"master_account": true}).
+		Return([]models.BankAccount{ bankAccountMaster }, nil)
+	testServer.Bank.
+		On("CreateTransfer", bankAccount, bankAccountMaster, amount).
+		Return(&models.BankTransfer{ DwollaTransferID: &dwollaTransferID }, nil)
 	testServer.Store.On("CreateBankTransfer", bankTransferPayload).Return(&bankTransferCreated, nil)
 
 	req := httptest.NewRequest(
@@ -300,7 +321,7 @@ func TestBankTransferCreate(t *testing.T) {
 
 	assert.Equal(t, bankTransferResponse.BankTransferID, bankTransferCreated.BankTransferID)
 	assert.Equal(t, bankTransferResponse.UserID, bankTransferCreated.UserID)
-	assert.Equal(t, bankTransferResponse.PlaidTransferID, bankTransferCreated.PlaidTransferID)
+	assert.Equal(t, *bankTransferResponse.DwollaTransferID, dwollaTransferID)
 	assert.Equal(t, bankTransferResponse.Status, bankTransferCreated.Status)
 	assert.Equal(t, bankTransferResponse.Amount, bankTransferCreated.Amount)
 	assert.WithinDuration(t, bankTransferResponse.CreatedAt, bankTransferCreated.CreatedAt, 0)
