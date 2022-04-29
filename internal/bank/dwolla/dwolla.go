@@ -35,12 +35,16 @@ func NewBank(
 	dwollaAPIKey string,
 	dwollaAPISecret string,
 	dwollaAPIURL string,
+	dwollaWebhookURL string,
+	dwollaWebhookSecret string,
 	lggr logger.Logger,
 ) bank.Bank {
 	return &Bank{
 		dwollaAPIKey:    dwollaAPIKey,
 		dwollaAPISecret: dwollaAPISecret,
 		dwollaAPIURL:    dwollaAPIURL,
+		dwollaWebhookURL:    dwollaWebhookURL,
+		dwollaWebhookSecret:    dwollaWebhookSecret,
 		logger:    lggr,
 	}
 }

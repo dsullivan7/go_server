@@ -47,7 +47,7 @@ func (gormStore *Store) ModifyBrokerageAccount(
 ) (*models.BrokerageAccount, error) {
 	var brokerageAccountFound models.BrokerageAccount
 
-	errFind := gormStore.database.Where("brokerage_account_id = ?", brokerageAccountID).First(&brokerageAccountFound).Error
+	errFind := gormStore.database.First(&brokerageAccountFound, brokerageAccountID).Error
 
 	if errFind != nil {
 		return nil, errFind

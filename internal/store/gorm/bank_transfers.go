@@ -45,7 +45,7 @@ func (gormStore *Store) ModifyBankTransfer(
 ) (*models.BankTransfer, error) {
 	var bankTransferFound models.BankTransfer
 
-	errFind := gormStore.database.Where("bank_account_id = ?", bankTransferID).First(&bankTransferFound).Error
+	errFind := gormStore.database.First(&bankTransferFound, bankTransferID).Error
 
 	if errFind != nil {
 		return nil, errFind
@@ -53,6 +53,10 @@ func (gormStore *Store) ModifyBankTransfer(
 
 	if bankTransferPayload.UserID != nil {
 		bankTransferFound.UserID = bankTransferPayload.UserID
+	}
+
+	if bankTransferPayload.Status != "" {
+		bankTransferFound.Status = bankTransferPayload.Status
 	}
 
 	errUpdate := gormStore.database.Save(&bankTransferFound).Error

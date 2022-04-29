@@ -5,14 +5,10 @@ import (
 	"go_server/internal/errors"
 	"go_server/internal/models"
 	"net/http"
-	"io"
 )
 
 func (c *Controllers) DwollaWebhook(w http.ResponseWriter, r *http.Request) {
-  b, _ := io.ReadAll(r.Body)
-  println(string(b))
-
-  var webhookPayload map[string]string
+  var webhookPayload map[string]interface{}
 
   errDecode := json.NewDecoder(r.Body).Decode(&webhookPayload)
 
@@ -22,9 +18,9 @@ func (c *Controllers) DwollaWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if webhookPayload["topic"] == "transfer_completed" {
+	if webhookPayload["topic"] == "customer_transfer_completed" {
     dwollaTransferID := webhookPayload["resourceId"]
-    transfers, errList := c.store.ListBankTransfers(map[string]interface{}{"DwollaTransferID": dwollaTransferID })
+    transfers, errList := c.store.ListBankTransfers(map[string]interface{}{"dwolla_transfer_id": dwollaTransferID })
 
     if errList != nil {
       c.utils.HandleError(w, r, errors.HTTPUserError{Err: errList})

@@ -34,6 +34,8 @@ type Config struct {
 	DwollaAPIKey    string
 	DwollaAPISecret string
 	DwollaAPIURL    string
+	DwollaWebhookURL    string
+	DwollaWebhookSecret    string
 
 	AllowedOrigins []string
 	RouterMaxAge   int
@@ -67,6 +69,8 @@ func NewConfig() (*Config, error) {
 		DwollaAPIKey:     os.Getenv("DWOLLA_API_KEY"),
 		DwollaAPISecret:  os.Getenv("DWOLLA_API_SECRET"),
 		DwollaAPIURL:     os.Getenv("DWOLLA_API_URL"),
+		DwollaWebhookURL:     os.Getenv("DWOLLA_WEBHOOK_URL"),
+		DwollaWebhookSecret:     os.Getenv("DWOLLA_WEBHOOK_SECRET"),
 		Auth0Domain:      os.Getenv("AUTH0_DOMAIN"),
 		Auth0Audience:    os.Getenv("AUTH0_AUDIENCE"),
 		AllowedOrigins:   strings.Split(os.Getenv("ALLOWED_ORIGINS"), ","),

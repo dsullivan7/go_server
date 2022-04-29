@@ -80,6 +80,8 @@ func Run() {
 		cfg.DwollaAPIKey,
 		cfg.DwollaAPISecret,
 		cfg.DwollaAPIURL,
+		cfg.DwollaWebhookURL,
+		cfg.DwollaWebhookSecret,
     logger,
 	)
 
