@@ -86,6 +86,26 @@
           "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/ALPACA_API_SECRET"
         },
         {
+          "name": "DWOLLA_API_URL",
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/DWOLLA_API_URL"
+        },
+        {
+          "name": "DWOLLA_API_KEY",
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/DWOLLA_API_KEY"
+        },
+        {
+          "name": "DWOLLA_API_SECRET",
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/DWOLLA_API_SECRET"
+        },
+        {
+          "name": "DWOLLA_WEBHOOK_URL",
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/DWOLLA_WEBHOOK_URL"
+        },
+        {
+          "name": "DWOLLA_WEBHOOK_SECRET",
+          "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/DWOLLA_WEBHOOK_SECRET"
+        },
+        {
           "name": "ENCRYPTION_KEY",
           "valueFrom": "arn:aws:ssm:us-east-2:${AWS_ACCOUNT_ID}:parameter/dev/pongo/ENCRYPTION_KEY"
         },
