@@ -26,6 +26,8 @@ type Bank struct {
 	dwollaAPIKey    string
 	dwollaAPISecret string
 	dwollaAPIURL    string
+	dwollaWebhookURL    string
+	dwollaWebhookSecret    string
 	logger logger.Logger
 }
 
@@ -264,7 +266,30 @@ func (bnk *Bank) CreateBankAccount(user models.User, plaidProcessorToken string)
 	return &models.BankAccount{ DwollaFundingSourceID: &dwollaFundingSourceID }, nil
 }
 
-// GetPlaidAccessor returns the accessor for plaid access tokens
+// CreateWebhook creates a webhook for dwolla.
+func (bnk *Bank) CreateWebhook() (*models.Webhook, error) {
+	body := map[string]interface{}{
+		"url": bnk.dwollaWebhookURL,
+		"secret": bnk.dwollaWebhookSecret,
+	}
+
+	dwollaResponse, errDwolla := bnk.sendRequest(
+		"/webhook-subscriptions",
+		http.MethodPost,
+		body,
+	)
+
+	if errDwolla != nil {
+		return nil, errDwolla
+	}
+
+	split := strings.Split(dwollaResponse.(string), "/")
+	dwollaID := split[len(split) - 1]
+
+	return &models.Webhook{ DwollaWebhookID: &dwollaID }, nil
+}
+
+// GetPlaidAccessor returns the accessor for plaid access tokens.
 func (bnk *Bank) GetPlaidAccessor() string {
 	return "dwolla"
 }

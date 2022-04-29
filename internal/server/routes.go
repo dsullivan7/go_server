@@ -58,6 +58,8 @@ func (s *ChiServer) Init() http.Handler {
 
 	router.Post("/api/bank-accounts", controllers.CreateBankAccount)
 
+	router.Post("/webhooks/dwolla", controllers.DwollaWebhook)
+
 	router.Group(func(r chi.Router) {
 		r.Use(middlewares.Auth())
 		r.Use(middlewares.User())
