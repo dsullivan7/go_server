@@ -17,7 +17,7 @@ type Order struct {
 	Status          string     `json:"status"`
 	Symbol          *string    `json:"symbol"`
 	AlpacaOrderID   *string    `json:"alpaca_order_id"`
-	CompletedAt     time.Time  `json:"completed_at"`
+	CompletedAt     *time.Time  `json:"completed_at"`
 	CreatedAt       time.Time  `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt       time.Time  `json:"updated_at" gorm:"default:CURRENT_TIMESTAMP"`
 	ChildOrders     []Order    `json:"child_orders" gorm:"foreignKey:OrderID"`

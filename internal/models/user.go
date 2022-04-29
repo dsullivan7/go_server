@@ -14,11 +14,11 @@ type User struct {
 	LastName         *string   `json:"last_name"`
 	PhoneNumber      *string   `json:"phone_number"`
 	Email            *string   `json:"email"`
-	Address1         *string   `json:"address_1"`
+	Address        *string   `json:"address"`
 	City             *string   `json:"city"`
 	State            *string   `json:"state"`
 	PostalCode       *string   `json:"postal_code"`
-	DateOfBirth      *string   `json:"-"`
+	DateOfBirth      *time.Time   `json:"-"`
 	SSN              *string   `json:"-"`
 	CreatedAt        time.Time `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt        time.Time `json:"updated_at" gorm:"default:CURRENT_TIMESTAMP"`

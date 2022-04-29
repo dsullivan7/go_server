@@ -167,7 +167,7 @@ func (srvc *Service) GetBalance(orders []models.Order, interest float64, current
 	var interestAmount float64
 
 	for _, order := range orders {
-		hours := currentTime.Sub(order.CompletedAt).Hours()
+		hours := currentTime.Sub(*order.CompletedAt).Hours()
 		orderInterest := float64(order.Amount) * hours * (interest / daysInYear / hoursInDay)
 
 		switch order.Side {

@@ -231,7 +231,7 @@ func (bnk *Bank) CreateCustomer(user models.User) (*models.User, error) {
 		"lastName":    user.LastName,
 		"email":       user.Email,
 		"type":        "personal",
-		"address1":    user.Address1,
+		"address1":    user.Address,
 		"city":        user.City,
 		"state":       user.State,
 		"postalCode":  user.PostalCode,

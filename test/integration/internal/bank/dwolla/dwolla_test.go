@@ -48,7 +48,7 @@ func TestDwollaCreateAccount(t *testing.T) {
 	// ssn := "666-55-4321"
 	// email := fmt.Sprint("dbsullivan23+", randomID.String(), "@gmail.com")
 	// phoneNumber := "555-444-3322"
-	// address1 := "42 Faux St"
+	// address := "42 Faux St"
 	// city := "New York"
 	// state := "NY"
 	// postalCode := "10009"
@@ -62,7 +62,7 @@ func TestDwollaCreateAccount(t *testing.T) {
 	//   SSN: &ssn,
 	//   Email: &email,
 	//   PhoneNumber: &phoneNumber,
-	//   Address1: &address1,
+	//   Address: &address,
 	//   City: &city,
 	//   State: &state,
 	//   PostalCode: &postalCode,

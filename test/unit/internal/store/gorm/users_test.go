@@ -47,7 +47,7 @@ func TestDBIntegration(parentT *testing.T) {
 		mock.ExpectQuery(
 			//nolint:lll
 			regexp.QuoteMeta(`
-        INSERT INTO "users" ("auth0_id","dwolla_customer_id","first_name","last_name","phone_number","email","address1","city","state","postal_code","date_of_birth","ssn")
+        INSERT INTO "users" ("auth0_id","dwolla_customer_id","first_name","last_name","phone_number","email","address","city","state","postal_code","date_of_birth","ssn")
         VALUES  ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
         RETURNING "user_id","created_at","updated_at"
        `)).

@@ -157,7 +157,7 @@ func TestOrders(tParent *testing.T) {
 				OrderID:     uuid1,
 				Side:        "buy",
 				Amount:      100,
-				CompletedAt: time1,
+				CompletedAt: &time1,
 			},
 		}
 
@@ -180,13 +180,13 @@ func TestOrders(tParent *testing.T) {
 				OrderID:     uuid1,
 				Side:        "buy",
 				Amount:      10000,
-				CompletedAt: time1,
+				CompletedAt: &time1,
 			},
 			models.Order{
 				OrderID:     uuid1,
 				Side:        "sell",
 				Amount:      5000,
-				CompletedAt: time2,
+				CompletedAt: &time2,
 			},
 		}
 

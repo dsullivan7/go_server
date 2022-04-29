@@ -16,6 +16,8 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/stretchr/testify/mock"
 )
 
 func TestOrderGet(t *testing.T) {
@@ -268,39 +270,49 @@ func TestOrderCreate(t *testing.T) {
 		amount,
 	))
 
-	orderPayloadParent := models.Order{
-		UserID: &userID,
-		Amount: amount,
-		Side:   "buy",
-	}
+	// orderPayloadParent := models.Order{
+	// 	UserID: &userID,
+	// 	Amount: amount,
+	// 	Side:   "buy",
+	// 	Status: "complete",
+	// 	CompletedAt: time.Now(),
+	// }
+
+	completedAt := time.Now()
 
 	orderCreatedParent := models.Order{
 		OrderID:   parentOrderID,
 		UserID:    &userID,
 		Amount:    amount,
 		Side:      "buy",
+		Status: "complete",
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
+		CompletedAt: &completedAt,
 	}
 
-	orderPayloadChild := models.Order{
-		UserID:        &userID,
-		ParentOrderID: &parentOrderID,
-		Amount:        amount,
-		Side:          "buy",
-	}
+	// orderPayloadChild := models.Order{
+	// 	UserID:        &userID,
+	// 	ParentOrderID: &parentOrderID,
+	// 	Amount:        amount,
+	// 	Side:          "buy",
+	// 	Status: "complete",
+	// 	CompletedAt: time.Now(),
+	// }
 
 	orderCreatedChild := models.Order{
 		OrderID:   uuid.New(),
 		UserID:    &userID,
 		Amount:    amount,
 		Side:      "buy",
+		Status: "complete",
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
+		CompletedAt: &completedAt,
 	}
 
-	testServer.Store.On("CreateOrder", orderPayloadParent).Return(&orderCreatedParent, nil)
-	testServer.Store.On("CreateOrder", orderPayloadChild).Return(&orderCreatedChild, nil)
+	testServer.Store.On("CreateOrder", mock.AnythingOfType("models.Order")).Return(&orderCreatedParent, nil)
+	testServer.Store.On("CreateOrder", mock.AnythingOfType("models.Order")).Return(&orderCreatedChild, nil)
 
 	req := httptest.NewRequest(
 		http.MethodPost,
@@ -328,6 +340,7 @@ func TestOrderCreate(t *testing.T) {
 	assert.Equal(t, orderResponse.UserID, orderCreatedParent.UserID)
 	assert.Equal(t, orderResponse.Amount, orderCreatedParent.Amount)
 	assert.Equal(t, orderResponse.Side, orderCreatedParent.Side)
+	assert.WithinDuration(t, *orderResponse.CompletedAt, *orderCreatedParent.CompletedAt, 0)
 	assert.WithinDuration(t, orderResponse.CreatedAt, orderCreatedParent.CreatedAt, 0)
 	assert.WithinDuration(t, orderResponse.UpdatedAt, orderCreatedParent.UpdatedAt, 0)
 

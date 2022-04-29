@@ -57,12 +57,14 @@ func (c *Controllers) CreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	userID := uuid.Must(uuid.Parse(orderReq["user_id"].(string)))
 
+	completedAt := time.Now()
+
 	orderPayload := models.Order{
 		UserID:      &userID,
 		Amount:      int(orderReq["amount"].(float64)),
 		Side:        orderReq["side"].(string),
 		Status:      "complete",
-		CompletedAt: time.Now(),
+		CompletedAt: &completedAt,
 	}
 
 	order, errOrder := c.store.CreateOrder(orderPayload)
@@ -79,7 +81,7 @@ func (c *Controllers) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		Amount:        int(orderReq["amount"].(float64)),
 		Side:          orderReq["side"].(string),
 		Status:        "complete",
-		CompletedAt:   time.Now(),
+		CompletedAt:   &completedAt,
 	}
 
 	_, errChildOrder := c.store.CreateOrder(childOrderPayload)
