@@ -3,17 +3,7 @@ package services
 import (
 	"go_server/internal/models"
 	"go_server/internal/services"
-
-	"github.com/stretchr/testify/mock"
 )
-
-type MockService struct {
-	mock.Mock
-}
-
-func NewMockService() *MockService {
-	return &MockService{}
-}
 
 func (mockService *MockService) ListPortfolioRecommendations(
 	portfolio models.Portfolio,

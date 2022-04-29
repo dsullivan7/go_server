@@ -8,7 +8,10 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"strings"
+	"errors"
 )
+
+var ErrUnrecognizedPortal = errors.New("portal type not found")
 
 type Profile struct {
 	EBTSNAPBalance string
@@ -29,7 +32,7 @@ func (gv *Gov) GetProfile(username string, password string, ipAddress string, po
 		return gv.getAccessHRAProfile(username, password, ipAddress)
 	}
 
-	return nil, fmt.Errorf("Portal type not found")
+	return nil, ErrUnrecognizedPortal
 }
 
 // nolint:funlen
