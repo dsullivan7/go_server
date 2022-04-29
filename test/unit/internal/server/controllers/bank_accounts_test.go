@@ -279,7 +279,7 @@ func TestBankAccountCreate(t *testing.T) {
 	dwollaFundingSourceID := "dwollaFundingSourceID"
 
 	user := models.User{
-		UserID: userID,
+		UserID:           userID,
 		DwollaCustomerID: &dwollaCustomerID,
 	}
 
@@ -288,10 +288,10 @@ func TestBankAccountCreate(t *testing.T) {
 	}
 
 	bankAccountPayload := models.BankAccount{
-		UserID:                  &userID,
-		Name:                    &name,
-		PlaidAccountID:          &plaidAccountID,
-		PlaidAccessToken:        &plaidAccessToken,
+		UserID:                &userID,
+		Name:                  &name,
+		PlaidAccountID:        &plaidAccountID,
+		PlaidAccessToken:      &plaidAccessToken,
 		DwollaFundingSourceID: &dwollaFundingSourceID,
 	}
 

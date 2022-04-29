@@ -281,13 +281,13 @@ func TestOrderCreate(t *testing.T) {
 	completedAt := time.Now()
 
 	orderCreatedParent := models.Order{
-		OrderID:   parentOrderID,
-		UserID:    &userID,
-		Amount:    amount,
-		Side:      "buy",
-		Status: "complete",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		OrderID:     parentOrderID,
+		UserID:      &userID,
+		Amount:      amount,
+		Side:        "buy",
+		Status:      "complete",
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
 		CompletedAt: &completedAt,
 	}
 
@@ -301,13 +301,13 @@ func TestOrderCreate(t *testing.T) {
 	// }
 
 	orderCreatedChild := models.Order{
-		OrderID:   uuid.New(),
-		UserID:    &userID,
-		Amount:    amount,
-		Side:      "buy",
-		Status: "complete",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		OrderID:     uuid.New(),
+		UserID:      &userID,
+		Amount:      amount,
+		Side:        "buy",
+		Status:      "complete",
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
 		CompletedAt: &completedAt,
 	}
 

@@ -257,44 +257,47 @@ func TestBankTransferCreate(t *testing.T) {
 	))
 
 	bankAccount := models.BankAccount{
-		BankAccountID:  uuid.New(),
-		UserID:          &userID,
+		BankAccountID: uuid.New(),
+		UserID:        &userID,
 		MasterAccount: false,
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}
 
 	bankAccountMaster := models.BankAccount{
-		BankAccountID:  uuid.New(),
+		BankAccountID: uuid.New(),
 		MasterAccount: true,
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}
 
 	bankTransferPayload := models.BankTransfer{
-		UserID:          &userID,
-		Amount:          amount,
-		Status:          "pending",
+		UserID:           &userID,
+		Amount:           amount,
+		Status:           "pending",
 		DwollaTransferID: &dwollaTransferID,
 	}
 
 	bankTransferCreated := models.BankTransfer{
-		BankTransferID:  uuid.New(),
-		UserID:          &userID,
-		Amount:          amount,
-		Status:          "pending",
+		BankTransferID:   uuid.New(),
+		UserID:           &userID,
+		Amount:           amount,
+		Status:           "pending",
 		DwollaTransferID: &dwollaTransferID,
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
 	}
 
-	testServer.Store.On("ListBankAccounts", map[string]interface{}{"user_id": userID}).Return([]models.BankAccount{ bankAccount }, nil)
+	testServer.Store.On(
+		"ListBankAccounts",
+		map[string]interface{}{"user_id": userID},
+	).Return([]models.BankAccount{bankAccount}, nil)
 	testServer.Store.
 		On("ListBankAccounts", map[string]interface{}{"master_account": true}).
-		Return([]models.BankAccount{ bankAccountMaster }, nil)
+		Return([]models.BankAccount{bankAccountMaster}, nil)
 	testServer.Bank.
 		On("CreateTransfer", bankAccount, bankAccountMaster, amount).
-		Return(&models.BankTransfer{ DwollaTransferID: &dwollaTransferID }, nil)
+		Return(&models.BankTransfer{DwollaTransferID: &dwollaTransferID}, nil)
 	testServer.Store.On("CreateBankTransfer", bankTransferPayload).Return(&bankTransferCreated, nil)
 
 	req := httptest.NewRequest(
