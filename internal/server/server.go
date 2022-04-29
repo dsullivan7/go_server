@@ -4,19 +4,19 @@ import (
 	"net/http"
 
 	"go_server/internal/authentication"
+	"go_server/internal/bank"
 	"go_server/internal/broker"
 	"go_server/internal/cipher"
 	"go_server/internal/config"
+	"go_server/internal/gov"
 	"go_server/internal/logger"
 	"go_server/internal/plaid"
-	"go_server/internal/bank"
 	"go_server/internal/server/controllers"
 	"go_server/internal/server/graph"
 	"go_server/internal/server/middlewares"
 	"go_server/internal/server/utils"
 	"go_server/internal/services"
 	"go_server/internal/store"
-	"go_server/internal/gov"
 
 	"github.com/go-chi/chi"
 )

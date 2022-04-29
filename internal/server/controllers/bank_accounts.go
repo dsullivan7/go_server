@@ -114,11 +114,11 @@ func (c *Controllers) CreateBankAccount(w http.ResponseWriter, r *http.Request) 
 	}
 
 	bankAccountPayload := models.BankAccount{
-		UserID:                  &userID,
-		Name:                    &name,
-		PlaidAccountID:          &plaidAccountID,
-		PlaidAccessToken:        &plaidAccessToken,
-		DwollaFundingSourceID:        bankAccountIntegration.DwollaFundingSourceID,
+		UserID:                &userID,
+		Name:                  &name,
+		PlaidAccountID:        &plaidAccountID,
+		PlaidAccessToken:      &plaidAccessToken,
+		DwollaFundingSourceID: bankAccountIntegration.DwollaFundingSourceID,
 	}
 
 	bankAccount, err := c.store.CreateBankAccount(bankAccountPayload)

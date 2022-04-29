@@ -26,9 +26,9 @@ func (c *Controllers) GetBalances(w http.ResponseWriter, r *http.Request) {
 	total, principal, interest := c.services.GetBalance(orders, interestRate, time.Now())
 
 	response := map[string]int{
-		"total": total,
+		"total":     total,
 		"principal": principal,
-		"interest": interest,
+		"interest":  interest,
 	}
 
 	render.JSON(w, r, response)

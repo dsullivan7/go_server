@@ -44,7 +44,7 @@ func (c *Controllers) ListBankTransfers(w http.ResponseWriter, r *http.Request) 
 	render.JSON(w, r, bankTransfers)
 }
 
-// nolint:funlen
+
 func (c *Controllers) CreateBankTransfer(w http.ResponseWriter, r *http.Request) {
 	var bankTransferReq map[string]interface{}
 
@@ -59,7 +59,7 @@ func (c *Controllers) CreateBankTransfer(w http.ResponseWriter, r *http.Request)
 
 	userID := uuid.Must(uuid.Parse(bankTransferReq["user_id"].(string)))
 
-	userBankAccounts, errUserBA := c.store.ListBankAccounts(map[string]interface{}{"user_id": userID })
+	userBankAccounts, errUserBA := c.store.ListBankAccounts(map[string]interface{}{"user_id": userID})
 
 	if errUserBA != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errUserBA})
@@ -67,7 +67,7 @@ func (c *Controllers) CreateBankTransfer(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	masterBankAccounts, errMasterBA := c.store.ListBankAccounts(map[string]interface{}{"master_account": true })
+	masterBankAccounts, errMasterBA := c.store.ListBankAccounts(map[string]interface{}{"master_account": true})
 
 	if errMasterBA != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errMasterBA})
@@ -84,9 +84,9 @@ func (c *Controllers) CreateBankTransfer(w http.ResponseWriter, r *http.Request)
 	}
 
 	bankTransferPayload := models.BankTransfer{
-		UserID:          &userID,
-		Amount:          int(bankTransferReq["amount"].(float64)),
-		Status:          "pending",
+		UserID:           &userID,
+		Amount:           int(bankTransferReq["amount"].(float64)),
+		Status:           "pending",
 		DwollaTransferID: bankTransferIntegration.DwollaTransferID,
 	}
 

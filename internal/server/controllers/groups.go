@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"go_server/internal/errors"
 	"go_server/internal/models"
 	"net/http"
@@ -42,12 +42,12 @@ func (c *Controllers) getGroupResponse(
 }
 
 func randomHex(n int) (string, error) {
-  bytes := make([]byte, n)
-  if _, err := rand.Read(bytes); err != nil {
-    return "", err
-  }
+	bytes := make([]byte, n)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
 
-  return hex.EncodeToString(bytes), nil
+	return hex.EncodeToString(bytes), nil
 }
 
 func (c *Controllers) GetGroup(w http.ResponseWriter, r *http.Request) {
@@ -129,8 +129,8 @@ func (c *Controllers) CreateGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	groupPayload := models.Group{
-		Name: groupRequest["name"].(string),
-		APIClientKey: apiClientKeyEnc,
+		Name:            groupRequest["name"].(string),
+		APIClientKey:    apiClientKeyEnc,
 		APIClientSecret: apiClientSecretEnc,
 	}
 
@@ -142,11 +142,11 @@ func (c *Controllers) CreateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if (groupRequest["group_users"] != nil) {
+	if groupRequest["group_users"] != nil {
 		for _, groupUserPayload := range groupRequest["group_users"].([]interface{}) {
 			userID := uuid.Must(uuid.Parse(groupUserPayload.(map[string]interface{})["user_id"].(string)))
 			groupUser := models.GroupUser{
-				UserID: userID,
+				UserID:  userID,
 				GroupID: group.GroupID,
 			}
 

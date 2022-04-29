@@ -8,12 +8,12 @@ import (
 	"errors"
 	"fmt"
 	"go_server/internal/bank"
-	"go_server/internal/models"
 	"go_server/internal/logger"
+	"go_server/internal/models"
 	"net/http"
-  "net/url"
-  "strings"
-  "time"
+	"net/url"
+	"strings"
+	"time"
 )
 
 var ErrDwollaAPI = errors.New("dwolla api error")
@@ -21,14 +21,14 @@ var ErrDwollaAPI = errors.New("dwolla api error")
 const centsToDollars = 100
 
 type Bank struct {
-	dwollaAPIAccessToken    string
-	dwollaAPIAccessTokenExpiresAt    time.Time
-	dwollaAPIKey    string
-	dwollaAPISecret string
-	dwollaAPIURL    string
-	dwollaWebhookURL    string
-	dwollaWebhookSecret    string
-	logger logger.Logger
+	dwollaAPIAccessToken          string
+	dwollaAPIAccessTokenExpiresAt time.Time
+	dwollaAPIKey                  string
+	dwollaAPISecret               string
+	dwollaAPIURL                  string
+	dwollaWebhookURL              string
+	dwollaWebhookSecret           string
+	logger                        logger.Logger
 }
 
 func NewBank(
@@ -40,12 +40,12 @@ func NewBank(
 	lggr logger.Logger,
 ) bank.Bank {
 	return &Bank{
-		dwollaAPIKey:    dwollaAPIKey,
-		dwollaAPISecret: dwollaAPISecret,
-		dwollaAPIURL:    dwollaAPIURL,
+		dwollaAPIKey:        dwollaAPIKey,
+		dwollaAPISecret:     dwollaAPISecret,
+		dwollaAPIURL:        dwollaAPIURL,
 		dwollaWebhookURL:    dwollaWebhookURL,
-		dwollaWebhookSecret:    dwollaWebhookSecret,
-		logger:    lggr,
+		dwollaWebhookSecret: dwollaWebhookSecret,
+		logger:              lggr,
 	}
 }
 
@@ -54,12 +54,12 @@ func (bnk *Bank) sendRequest(
 	method string,
 	body map[string]interface{},
 ) (interface{}, error) {
-  if (bnk.dwollaAPIAccessTokenExpiresAt.IsZero() || time.Now().After(bnk.dwollaAPIAccessTokenExpiresAt)) {
-    errAuth := bnk.authenticate()
+	if bnk.dwollaAPIAccessTokenExpiresAt.IsZero() || time.Now().After(bnk.dwollaAPIAccessTokenExpiresAt) {
+		errAuth := bnk.authenticate()
 		if errAuth != nil {
 			return nil, fmt.Errorf("failed to authenticate: %w", errAuth)
 		}
-  }
+	}
 
 	ctxt := context.Background()
 
@@ -80,9 +80,9 @@ func (bnk *Bank) sendRequest(
 		return nil, fmt.Errorf("failed to create the request: %w", errReq)
 	}
 
-  req.Header.Set("Accept", "application/vnd.dwolla.v1.hal+json")
-  req.Header.Set("Content-Type", "application/json")
-  req.Header.Set("Authorization", fmt.Sprint("Bearer ", bnk.dwollaAPIAccessToken))
+	req.Header.Set("Accept", "application/vnd.dwolla.v1.hal+json")
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", fmt.Sprint("Bearer ", bnk.dwollaAPIAccessToken))
 
 	res, errRes := http.DefaultClient.Do(req)
 
@@ -92,7 +92,7 @@ func (bnk *Bank) sendRequest(
 
 	defer res.Body.Close()
 
-	if (res.StatusCode == http.StatusCreated) {
+	if res.StatusCode == http.StatusCreated {
 		return res.Header.Get("Location"), nil
 	}
 
@@ -120,14 +120,14 @@ func (bnk *Bank) sendRequest(
 func (bnk *Bank) authenticate() error {
 	ctxt := context.Background()
 
-  data := url.Values{}
-  data.Set("grant_type", "client_credentials")
+	data := url.Values{}
+	data.Set("grant_type", "client_credentials")
 
 	req, errReq := http.NewRequestWithContext(
 		ctxt,
 		http.MethodPost,
 		fmt.Sprint(bnk.dwollaAPIURL, "/token"),
-    strings.NewReader(data.Encode()),
+		strings.NewReader(data.Encode()),
 	)
 
 	if errReq != nil {
@@ -137,8 +137,8 @@ func (bnk *Bank) authenticate() error {
 	authHeader := base64.StdEncoding.EncodeToString([]byte(fmt.Sprint(bnk.dwollaAPIKey, ":", bnk.dwollaAPISecret)))
 
 	req.Header.Set("Accept", "application/json")
-  req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-  req.Header.Set("Authorization", fmt.Sprint("Basic ", authHeader))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Authorization", fmt.Sprint("Basic ", authHeader))
 
 	res, errRes := http.DefaultClient.Do(req)
 
@@ -166,34 +166,34 @@ func (bnk *Bank) authenticate() error {
 		return fmt.Errorf("%w: %s", ErrDwollaAPI, dwollaResponse.(map[string]interface{})["message"].(string))
 	}
 
-  expirationDuration := time.Second * time.Duration(int(dwollaResponse.(map[string]interface{})["expires_in"].(float64)))
+	expirationDuration := time.Second * time.Duration(int(dwollaResponse.(map[string]interface{})["expires_in"].(float64)))
 
-  bnk.dwollaAPIAccessToken = dwollaResponse.(map[string]interface{})["access_token"].(string)
-  bnk.dwollaAPIAccessTokenExpiresAt = time.Now().Add(expirationDuration)
+	bnk.dwollaAPIAccessToken = dwollaResponse.(map[string]interface{})["access_token"].(string)
+	bnk.dwollaAPIAccessTokenExpiresAt = time.Now().Add(expirationDuration)
 
-  return nil
+	return nil
 }
 
 // CreateTransfer creates a transfer for the source to the destination.
 func (bnk *Bank) CreateTransfer(
 	source models.BankAccount,
 	destination models.BankAccount,
-  amount int,
+	amount int,
 ) (*models.BankTransfer, error) {
-  body := map[string]interface{}{
-    "_links": map[string]interface{}{
-      "source": map[string]string{
-        "href": fmt.Sprint(bnk.dwollaAPIURL, "/funding-sources/", *source.DwollaFundingSourceID),
-      },
-      "destination": map[string]string{
-        "href": fmt.Sprint(bnk.dwollaAPIURL, "/funding-sources/", *destination.DwollaFundingSourceID),
-      },
-    },
-    "amount": map[string]string{
-      "value": fmt.Sprintf("%f", float64(amount) / centsToDollars),
-      "currency": "USD",
-    },
-  }
+	body := map[string]interface{}{
+		"_links": map[string]interface{}{
+			"source": map[string]string{
+				"href": fmt.Sprint(bnk.dwollaAPIURL, "/funding-sources/", *source.DwollaFundingSourceID),
+			},
+			"destination": map[string]string{
+				"href": fmt.Sprint(bnk.dwollaAPIURL, "/funding-sources/", *destination.DwollaFundingSourceID),
+			},
+		},
+		"amount": map[string]string{
+			"value":    fmt.Sprintf("%f", float64(amount)/centsToDollars),
+			"currency": "USD",
+		},
+	}
 
 	dwollaResponse, errDwolla := bnk.sendRequest(
 		"/transfers",
@@ -206,30 +206,30 @@ func (bnk *Bank) CreateTransfer(
 	}
 
 	split := strings.Split(dwollaResponse.(string), "/")
-  dwollaTransferID := split[len(split) - 1]
+	dwollaTransferID := split[len(split)-1]
 
-	return &models.BankTransfer{ DwollaTransferID: &dwollaTransferID }, nil
+	return &models.BankTransfer{DwollaTransferID: &dwollaTransferID}, nil
 }
 
 // CreateCustomer creates a customer within dwolla.
 func (bnk *Bank) CreateCustomer(user models.User) (*models.User, error) {
-	if (user.DwollaCustomerID != nil) {
+	if user.DwollaCustomerID != nil {
 		// this user already has a customer, return the user
 		return &user, nil
 	}
 
-  body := map[string]interface{}{
-    "firstName": user.FirstName,
-    "lastName": user.LastName,
-    "email": user.Email,
-    "type": "personal",
-    "address1": user.Address1,
-    "city": user.City,
-    "state": user.State,
-    "postalCode": user.PostalCode,
-    "dateOfBirth": user.DateOfBirth,
-    "ssn": user.SSN,
-  }
+	body := map[string]interface{}{
+		"firstName":   user.FirstName,
+		"lastName":    user.LastName,
+		"email":       user.Email,
+		"type":        "personal",
+		"address1":    user.Address1,
+		"city":        user.City,
+		"state":       user.State,
+		"postalCode":  user.PostalCode,
+		"dateOfBirth": user.DateOfBirth,
+		"ssn":         user.SSN,
+	}
 
 	dwollaResponse, errDwolla := bnk.sendRequest(
 		"/customers",
@@ -242,17 +242,17 @@ func (bnk *Bank) CreateCustomer(user models.User) (*models.User, error) {
 	}
 
 	split := strings.Split(dwollaResponse.(string), "/")
-  dwollaCustomerID := split[len(split) - 1]
+	dwollaCustomerID := split[len(split)-1]
 
-	return &models.User{ DwollaCustomerID: &dwollaCustomerID }, nil
+	return &models.User{DwollaCustomerID: &dwollaCustomerID}, nil
 }
 
 // CreateBank creates a funding source within dwolla.
 func (bnk *Bank) CreateBankAccount(user models.User, plaidProcessorToken string) (*models.BankAccount, error) {
-  body := map[string]interface{}{
-    "name": user.UserID.String(),
-    "plaidToken": plaidProcessorToken,
-  }
+	body := map[string]interface{}{
+		"name":       user.UserID.String(),
+		"plaidToken": plaidProcessorToken,
+	}
 
 	dwollaResponse, errDwolla := bnk.sendRequest(
 		fmt.Sprint("/customers/", *user.DwollaCustomerID, "/funding-sources"),
@@ -265,15 +265,15 @@ func (bnk *Bank) CreateBankAccount(user models.User, plaidProcessorToken string)
 	}
 
 	split := strings.Split(dwollaResponse.(string), "/")
-  dwollaFundingSourceID := split[len(split) - 1]
+	dwollaFundingSourceID := split[len(split)-1]
 
-	return &models.BankAccount{ DwollaFundingSourceID: &dwollaFundingSourceID }, nil
+	return &models.BankAccount{DwollaFundingSourceID: &dwollaFundingSourceID}, nil
 }
 
 // CreateWebhook creates a webhook for dwolla.
 func (bnk *Bank) CreateWebhook() (*models.Webhook, error) {
 	body := map[string]interface{}{
-		"url": bnk.dwollaWebhookURL,
+		"url":    bnk.dwollaWebhookURL,
 		"secret": bnk.dwollaWebhookSecret,
 	}
 
@@ -288,9 +288,9 @@ func (bnk *Bank) CreateWebhook() (*models.Webhook, error) {
 	}
 
 	split := strings.Split(dwollaResponse.(string), "/")
-	dwollaID := split[len(split) - 1]
+	dwollaID := split[len(split)-1]
 
-	return &models.Webhook{ DwollaWebhookID: &dwollaID }, nil
+	return &models.Webhook{DwollaWebhookID: &dwollaID}, nil
 }
 
 // GetPlaidAccessor returns the accessor for plaid access tokens.

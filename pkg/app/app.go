@@ -3,16 +3,16 @@ package app
 import (
 	"fmt"
 	"go_server/internal/authentication/auth0"
+	"go_server/internal/bank/dwolla"
 	goServerAlpaca "go_server/internal/broker/alpaca"
 	"go_server/internal/cipher"
 	"go_server/internal/config"
 	"go_server/internal/db"
+	"go_server/internal/gov"
 	goServerZapLogger "go_server/internal/logger/zap"
 	"go_server/internal/plaid"
-	"go_server/internal/bank/dwolla"
 	"go_server/internal/server"
 	"go_server/internal/services"
-	"go_server/internal/gov"
 	"go_server/internal/store/gorm"
 	"log"
 	"net/http"
@@ -82,7 +82,7 @@ func Run() {
 		cfg.DwollaAPIURL,
 		cfg.DwollaWebhookURL,
 		cfg.DwollaWebhookSecret,
-    logger,
+		logger,
 	)
 
 	cphr := cipher.NewCipher()

@@ -26,19 +26,19 @@ func TestOrders(tParent *testing.T) {
 		openOrders := []models.Order{
 			models.Order{
 				OrderID: uuid1,
-				Side: "buy",
-				Amount: 200,
+				Side:    "buy",
+				Amount:  200,
 			},
 			models.Order{
 				OrderID: uuid2,
-				Side: "sell",
-				Amount: 200,
+				Side:    "sell",
+				Amount:  200,
 			},
 		}
 
 		childOrders := []models.Order{
-			models.Order{ Amount: 100, Side: "buy", ParentOrderID: &uuid1 },
-			models.Order{ Amount: 100, Side: "sell", ParentOrderID: &uuid2 },
+			models.Order{Amount: 100, Side: "buy", ParentOrderID: &uuid1},
+			models.Order{Amount: 100, Side: "sell", ParentOrderID: &uuid2},
 		}
 
 		result := srvc.GetOrders(openOrders, childOrders, 100, 100)
@@ -60,13 +60,13 @@ func TestOrders(tParent *testing.T) {
 		openOrders := []models.Order{
 			models.Order{
 				OrderID: uuid1,
-				Side: "buy",
-				Amount: 100,
+				Side:    "buy",
+				Amount:  100,
 			},
 			models.Order{
 				OrderID: uuid2,
-				Side: "sell",
-				Amount: 100,
+				Side:    "sell",
+				Amount:  100,
 			},
 		}
 
@@ -91,31 +91,31 @@ func TestOrders(tParent *testing.T) {
 		openOrders := []models.Order{
 			models.Order{
 				OrderID: uuid1,
-				Side: "buy",
-				Amount: 200,
+				Side:    "buy",
+				Amount:  200,
 			},
 			models.Order{
 				OrderID: uuid2,
-				Side: "sell",
-				Amount: 200,
+				Side:    "sell",
+				Amount:  200,
 			},
 			models.Order{
 				OrderID: uuid3,
-				Side: "sell",
-				Amount: 200,
+				Side:    "sell",
+				Amount:  200,
 			},
 		}
 
 		childOrders := []models.Order{
 			models.Order{
 				ParentOrderID: &uuid1,
-				Side: "buy",
-				Amount: 50,
+				Side:          "buy",
+				Amount:        50,
 			},
 			models.Order{
 				ParentOrderID: &uuid2,
-				Side: "sell",
-				Amount: 150,
+				Side:          "sell",
+				Amount:        150,
 			},
 		}
 
@@ -154,9 +154,9 @@ func TestOrders(tParent *testing.T) {
 
 		orders := []models.Order{
 			models.Order{
-				OrderID: uuid1,
-				Side: "buy",
-				Amount: 100,
+				OrderID:     uuid1,
+				Side:        "buy",
+				Amount:      100,
 				CompletedAt: time1,
 			},
 		}
@@ -177,15 +177,15 @@ func TestOrders(tParent *testing.T) {
 
 		orders := []models.Order{
 			models.Order{
-				OrderID: uuid1,
-				Side: "buy",
-				Amount: 10000,
+				OrderID:     uuid1,
+				Side:        "buy",
+				Amount:      10000,
 				CompletedAt: time1,
 			},
 			models.Order{
-				OrderID: uuid1,
-				Side: "sell",
-				Amount: 5000,
+				OrderID:     uuid1,
+				Side:        "sell",
+				Amount:      5000,
 				CompletedAt: time2,
 			},
 		}

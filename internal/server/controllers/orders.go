@@ -61,7 +61,7 @@ func (c *Controllers) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		UserID:      &userID,
 		Amount:      int(orderReq["amount"].(float64)),
 		Side:        orderReq["side"].(string),
-		Status: 		"complete",
+		Status:      "complete",
 		CompletedAt: time.Now(),
 	}
 
@@ -74,12 +74,12 @@ func (c *Controllers) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	childOrderPayload := models.Order{
-		ParentOrderID:	&order.OrderID,
-		UserID:      &userID,
-		Amount:      int(orderReq["amount"].(float64)),
-		Side:        orderReq["side"].(string),
-		Status: 		"complete",
-		CompletedAt: time.Now(),
+		ParentOrderID: &order.OrderID,
+		UserID:        &userID,
+		Amount:        int(orderReq["amount"].(float64)),
+		Side:          orderReq["side"].(string),
+		Status:        "complete",
+		CompletedAt:   time.Now(),
 	}
 
 	_, errChildOrder := c.store.CreateOrder(childOrderPayload)

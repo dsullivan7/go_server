@@ -13,7 +13,7 @@ type BankTransfer struct {
 	Status           string     `json:"status"`
 	AlpacaTransferID *string    `json:"alpaca_transfer_id"`
 	PlaidTransferID  *string    `json:"plaid_transfer_id"`
-	DwollaTransferID  *string    `json:"dwolla_transfer_id"`
+	DwollaTransferID *string    `json:"dwolla_transfer_id"`
 	CreatedAt        time.Time  `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt        time.Time  `json:"updated_at" gorm:"default:CURRENT_TIMESTAMP"`
 }

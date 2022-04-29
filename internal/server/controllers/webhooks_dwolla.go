@@ -8,9 +8,9 @@ import (
 )
 
 func (c *Controllers) DwollaWebhook(w http.ResponseWriter, r *http.Request) {
-  var webhookPayload map[string]interface{}
+	var webhookPayload map[string]interface{}
 
-  errDecode := json.NewDecoder(r.Body).Decode(&webhookPayload)
+	errDecode := json.NewDecoder(r.Body).Decode(&webhookPayload)
 
 	if errDecode != nil {
 		c.utils.HandleError(w, r, errors.HTTPUserError{Err: errDecode})
@@ -19,22 +19,22 @@ func (c *Controllers) DwollaWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if webhookPayload["topic"] == "customer_transfer_completed" {
-    dwollaTransferID := webhookPayload["resourceId"]
-    transfers, errList := c.store.ListBankTransfers(map[string]interface{}{"dwolla_transfer_id": dwollaTransferID })
+		dwollaTransferID := webhookPayload["resourceId"]
+		transfers, errList := c.store.ListBankTransfers(map[string]interface{}{"dwolla_transfer_id": dwollaTransferID})
 
-    if errList != nil {
-      c.utils.HandleError(w, r, errors.HTTPUserError{Err: errList})
+		if errList != nil {
+			c.utils.HandleError(w, r, errors.HTTPUserError{Err: errList})
 
-      return
-    }
+			return
+		}
 
-    transfer := transfers[0]
-    _, errModify := c.store.ModifyBankTransfer(transfer.BankTransferID, models.BankTransfer{ Status: "complete" })
+		transfer := transfers[0]
+		_, errModify := c.store.ModifyBankTransfer(transfer.BankTransferID, models.BankTransfer{Status: "complete"})
 
-    if errModify != nil {
-      c.utils.HandleError(w, r, errors.HTTPUserError{Err: errModify})
+		if errModify != nil {
+			c.utils.HandleError(w, r, errors.HTTPUserError{Err: errModify})
 
-      return
-    }
-  }
+			return
+		}
+	}
 }

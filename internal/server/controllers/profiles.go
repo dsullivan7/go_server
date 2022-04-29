@@ -1,12 +1,13 @@
 package controllers
 
 import (
-	"fmt"
-	"time"
 	"encoding/json"
+	"fmt"
 	"go_server/internal/errors"
 	"go_server/internal/models"
 	"net/http"
+	"time"
+
 	"github.com/google/uuid"
 
 	"github.com/go-chi/chi"
@@ -14,10 +15,10 @@ import (
 )
 
 type ProfileResponse struct {
-	ProfileID           uuid.UUID  `json:"profile_id"`
-	EBTSNAPBalance        	string    `json:"ebt_snap_balance"`
-	CreatedAt               time.Time  `json:"created_at"`
-	UpdatedAt               time.Time  `json:"updated_at"`
+	ProfileID      uuid.UUID `json:"profile_id"`
+	EBTSNAPBalance string    `json:"ebt_snap_balance"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
 }
 
 func (c *Controllers) getProfileResponse(
@@ -143,7 +144,6 @@ func (c *Controllers) CreateProfile(w http.ResponseWriter, r *http.Request) {
 	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, profileResponse)
 }
-
 
 func (c *Controllers) ModifyProfile(w http.ResponseWriter, r *http.Request) {
 	var profilePayload models.Profile

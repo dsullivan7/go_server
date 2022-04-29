@@ -37,7 +37,7 @@ func (srvc *Service) getAssetOrders(
 		remainingSecurityValue := val
 		for _, openOrder := range openOrders {
 			// break the loop if no security value remains
-			if (remainingSecurityValue <= 0) {
+			if remainingSecurityValue <= 0 {
 				break
 			}
 
@@ -51,11 +51,11 @@ func (srvc *Service) getAssetOrders(
 			parentOrderID := openOrder.OrderID
 
 			childOrder := models.Order{
-				OrderID: uuid.New(),
+				OrderID:         uuid.New(),
 				MatchingOrderID: nil,
-				ParentOrderID: &parentOrderID,
-				Amount: childOrderAmount,
-				Side: side,
+				ParentOrderID:   &parentOrderID,
+				Amount:          childOrderAmount,
+				Side:            side,
 			}
 
 			// append the new child order to the open order
@@ -77,7 +77,7 @@ func (srvc *Service) getMatchOrders(
 	i := 0
 	j := 0
 
-	for (i < len(openBuyOrders) && j < len(openSellOrders)) {
+	for i < len(openBuyOrders) && j < len(openSellOrders) {
 		openBuyOrder := openBuyOrders[i]
 		openSellOrder := openSellOrders[j]
 
@@ -90,7 +90,7 @@ func (srvc *Service) getMatchOrders(
 			continue
 		}
 
-		if (remainingSell == 0) {
+		if remainingSell == 0 {
 			j++
 
 			continue
@@ -102,19 +102,19 @@ func (srvc *Service) getMatchOrders(
 		childOrderAmount := int(math.Min(float64(remainingBuy), float64(remainingSell)))
 
 		childOrder1 := models.Order{
-			OrderID: uuid1,
-			ParentOrderID: &openBuyOrder.OrderID,
+			OrderID:         uuid1,
+			ParentOrderID:   &openBuyOrder.OrderID,
 			MatchingOrderID: &uuid2,
-			Amount: childOrderAmount,
-			Side: "buy",
+			Amount:          childOrderAmount,
+			Side:            "buy",
 		}
 
 		childOrder2 := models.Order{
-			OrderID: uuid2,
-			ParentOrderID: &openSellOrder.OrderID,
+			OrderID:         uuid2,
+			ParentOrderID:   &openSellOrder.OrderID,
 			MatchingOrderID: &uuid1,
-			Amount: childOrderAmount,
-			Side: "sell",
+			Amount:          childOrderAmount,
+			Side:            "sell",
 		}
 
 		orders = append(orders, childOrder1, childOrder2)
@@ -126,10 +126,10 @@ func (srvc *Service) getMatchOrders(
 
 // ListOrders returns what orders need to be made to resolve the market under the given parameters.
 func (srvc *Service) GetOrders(
-  openOrders []models.Order,
-  childOrders []models.Order,
-  netSecurityValue int,
-  netCashValue int,
+	openOrders []models.Order,
+	childOrders []models.Order,
+	netSecurityValue int,
+	netCashValue int,
 ) []models.Order {
 	var orders []models.Order
 

@@ -31,11 +31,11 @@ type Config struct {
 	AlpacaAPISecret string
 	AlpacaAPIURL    string
 
-	DwollaAPIKey    string
-	DwollaAPISecret string
-	DwollaAPIURL    string
+	DwollaAPIKey        string
+	DwollaAPISecret     string
+	DwollaAPIURL        string
 	DwollaWebhookURL    string
-	DwollaWebhookSecret    string
+	DwollaWebhookSecret string
 
 	AllowedOrigins []string
 	RouterMaxAge   int
@@ -51,31 +51,31 @@ func NewConfig() (*Config, error) {
 	}
 
 	config := &Config{
-		Port:             os.Getenv("PORT"),
-		DBUser:           os.Getenv("DB_USER"),
-		DBPassword:       os.Getenv("DB_PASSWORD"),
-		DBPort:           os.Getenv("DB_PORT"),
-		DBHost:           os.Getenv("DB_HOST"),
-		DBName:           os.Getenv("DB_NAME"),
-		DBSSL:            dbSSL,
-		TwoCaptchaKey:    os.Getenv("TWO_CAPTCHA_KEY"),
-		PlaidClientID:    os.Getenv("PLAID_CLIENT_ID"),
-		PlaidSecret:      os.Getenv("PLAID_SECRET"),
-		PlaidRedirectURI: os.Getenv("PLAID_REDIRECT_URI"),
-		PlaidAPIURL:      os.Getenv("PLAID_API_URL"),
-		AlpacaAPIKey:     os.Getenv("ALPACA_API_KEY"),
-		AlpacaAPISecret:  os.Getenv("ALPACA_API_SECRET"),
-		AlpacaAPIURL:     os.Getenv("ALPACA_API_URL"),
-		DwollaAPIKey:     os.Getenv("DWOLLA_API_KEY"),
-		DwollaAPISecret:  os.Getenv("DWOLLA_API_SECRET"),
-		DwollaAPIURL:     os.Getenv("DWOLLA_API_URL"),
-		DwollaWebhookURL:     os.Getenv("DWOLLA_WEBHOOK_URL"),
-		DwollaWebhookSecret:     os.Getenv("DWOLLA_WEBHOOK_SECRET"),
-		Auth0Domain:      os.Getenv("AUTH0_DOMAIN"),
-		Auth0Audience:    os.Getenv("AUTH0_AUDIENCE"),
-		AllowedOrigins:   strings.Split(os.Getenv("ALLOWED_ORIGINS"), ","),
-		EncryptionKey:    os.Getenv("ENCRYPTION_KEY"),
-		RouterMaxAge:     300,
+		Port:                os.Getenv("PORT"),
+		DBUser:              os.Getenv("DB_USER"),
+		DBPassword:          os.Getenv("DB_PASSWORD"),
+		DBPort:              os.Getenv("DB_PORT"),
+		DBHost:              os.Getenv("DB_HOST"),
+		DBName:              os.Getenv("DB_NAME"),
+		DBSSL:               dbSSL,
+		TwoCaptchaKey:       os.Getenv("TWO_CAPTCHA_KEY"),
+		PlaidClientID:       os.Getenv("PLAID_CLIENT_ID"),
+		PlaidSecret:         os.Getenv("PLAID_SECRET"),
+		PlaidRedirectURI:    os.Getenv("PLAID_REDIRECT_URI"),
+		PlaidAPIURL:         os.Getenv("PLAID_API_URL"),
+		AlpacaAPIKey:        os.Getenv("ALPACA_API_KEY"),
+		AlpacaAPISecret:     os.Getenv("ALPACA_API_SECRET"),
+		AlpacaAPIURL:        os.Getenv("ALPACA_API_URL"),
+		DwollaAPIKey:        os.Getenv("DWOLLA_API_KEY"),
+		DwollaAPISecret:     os.Getenv("DWOLLA_API_SECRET"),
+		DwollaAPIURL:        os.Getenv("DWOLLA_API_URL"),
+		DwollaWebhookURL:    os.Getenv("DWOLLA_WEBHOOK_URL"),
+		DwollaWebhookSecret: os.Getenv("DWOLLA_WEBHOOK_SECRET"),
+		Auth0Domain:         os.Getenv("AUTH0_DOMAIN"),
+		Auth0Audience:       os.Getenv("AUTH0_AUDIENCE"),
+		AllowedOrigins:      strings.Split(os.Getenv("ALLOWED_ORIGINS"), ","),
+		EncryptionKey:       os.Getenv("ENCRYPTION_KEY"),
+		RouterMaxAge:        300,
 	}
 
 	return config, nil
