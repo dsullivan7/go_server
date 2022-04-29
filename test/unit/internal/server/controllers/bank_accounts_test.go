@@ -275,14 +275,24 @@ func TestBankAccountCreate(t *testing.T) {
 	plaidPublicToken := "plaidPublicToken"
 	plaidProcessorToken := "plaidProcessorToken"
 	plaidAccountID := "plaidAccountID"
-	alpacaACHRelationshipID := "alpacaACHRelationshipID"
+	dwollaCustomerID := "dwollaCustomerID"
+	dwollaFundingSourceID := "dwollaFundingSourceID"
+
+	user := models.User{
+		UserID: userID,
+		DwollaCustomerID: &dwollaCustomerID,
+	}
+
+	bankAccountIntegration := models.BankAccount{
+		DwollaFundingSourceID: &dwollaFundingSourceID,
+	}
 
 	bankAccountPayload := models.BankAccount{
 		UserID:                  &userID,
 		Name:                    &name,
 		PlaidAccountID:          &plaidAccountID,
 		PlaidAccessToken:        &plaidAccessToken,
-		AlpacaACHRelationshipID: &alpacaACHRelationshipID,
+		DwollaFundingSourceID: &dwollaFundingSourceID,
 	}
 
 	bankAccountCreated := models.BankAccount{
@@ -291,47 +301,32 @@ func TestBankAccountCreate(t *testing.T) {
 		Name:                    &name,
 		PlaidAccessToken:        &plaidAccessToken,
 		PlaidAccountID:          &plaidAccountID,
-		AlpacaACHRelationshipID: &alpacaACHRelationshipID,
+		AlpacaACHRelationshipID: &dwollaFundingSourceID,
 		CreatedAt:               time.Now(),
 		UpdatedAt:               time.Now(),
-	}
-
-	brokerageAccountID := uuid.New()
-	alpacaAccountID := "alpacaAccountID"
-
-	brokerageAccount := models.BrokerageAccount{
-		BrokerageAccountID: brokerageAccountID,
-		UserID:             &userID,
-		AlpacaAccountID:    &alpacaAccountID,
-		CreatedAt:          time.Now(),
-		UpdatedAt:          time.Now(),
 	}
 
 	jsonStr := []byte(fmt.Sprintf(
 		`{
 				"user_id": "%s",
-				"brokerage_account_id": "%s",
 				"plaid_public_token": "%s"
 			}`,
 		userID.String(),
-		brokerageAccountID,
 		plaidPublicToken,
 	))
 
-	testServer.Store.On("GetBrokerageAccount", brokerageAccountID).Return(&brokerageAccount, nil)
+	testServer.Store.On("GetUser", userID).Return(&user, nil)
 	testServer.PlaidClient.On("GetAccessToken", plaidPublicToken).Return(plaidAccessToken, nil)
 	testServer.PlaidClient.On("GetAccount", plaidAccessToken).Return(plaidAccountID, name, nil)
+	testServer.Bank.On("CreateCustomer", user).Return(&user, nil)
+	testServer.Bank.On("GetPlaidAccessor").Return("dwolla", nil)
 	testServer.PlaidClient.On(
 		"CreateProcessorToken",
 		plaidAccessToken,
 		plaidAccountID,
-		"alpaca",
+		"dwolla",
 	).Return(plaidProcessorToken, nil)
-	testServer.Broker.On(
-		"CreateACHRelationship",
-		alpacaAccountID,
-		plaidProcessorToken,
-	).Return(alpacaACHRelationshipID, nil)
+	testServer.Bank.On("CreateBankAccount", user, plaidProcessorToken).Return(&bankAccountIntegration, nil)
 	testServer.Store.On("CreateBankAccount", bankAccountPayload).Return(&bankAccountCreated, nil)
 
 	req := httptest.NewRequest(
