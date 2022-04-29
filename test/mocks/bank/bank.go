@@ -14,7 +14,11 @@ func NewMockBank() *MockBank {
 	return &MockBank{}
 }
 
-func (mockBank *MockBank) CreateTransfer(source models.BankAccount, destination models.BankAccount, amount int) (*models.BankTransfer, error) {
+func (mockBank *MockBank) CreateTransfer(
+	source models.BankAccount,
+	destination models.BankAccount,
+	amount int,
+) (*models.BankTransfer, error) {
 	args := mockBank.Called(source, destination, amount)
 
 	return args.Get(0).(*models.BankTransfer), args.Error(1)
@@ -30,6 +34,12 @@ func (mockBank *MockBank) CreateBankAccount(user models.User, plaidProcessorToke
 	args := mockBank.Called(user, plaidProcessorToken)
 
 	return args.Get(0).(*models.BankAccount), args.Error(1)
+}
+
+func (mockBank *MockBank) CreateWebhook() (*models.Webhook, error) {
+	args := mockBank.Called()
+
+	return args.Get(0).(*models.Webhook), args.Error(1)
 }
 
 func (mockBank *MockBank) GetPlaidAccessor() string {

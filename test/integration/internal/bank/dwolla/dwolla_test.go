@@ -16,7 +16,7 @@ import (
 )
 
 func TestDwollaCreateAccount(t *testing.T) {
-	// t.Skip("No integration")
+	t.Skip("No integration")
 	t.Parallel()
 
 	cfg, configError := config.NewConfig()
@@ -29,9 +29,6 @@ func TestDwollaCreateAccount(t *testing.T) {
 
 	logger := goServerZapLogger.NewLogger(zapLogger)
 
-	println(cfg.DwollaWebhookURL)
-	println(cfg.DwollaWebhookSecret)
-
 	dwollaBank := dwolla.NewBank(
 		cfg.DwollaAPIKey,
 		cfg.DwollaAPISecret,
@@ -41,7 +38,7 @@ func TestDwollaCreateAccount(t *testing.T) {
 		logger,
 	)
 
-	dwollaBank.CreateWebhook()
+	webhook, errWebhook := dwollaBank.CreateWebhook()
 
 	// randomID := uuid.New()
 	//
@@ -84,5 +81,7 @@ func TestDwollaCreateAccount(t *testing.T) {
 	//
 	// assert.Nil(t, errBank)
 	// assert.NotNil(t, bankAccount.DwollaFundingSourceID)
-	assert.NotNil(t, dwollaBank)
+
+	assert.Nil(t, errWebhook)
+	assert.NotNil(t, webhook)
 }

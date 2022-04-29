@@ -3,12 +3,12 @@ package gov
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
 	"strings"
-	"errors"
 )
 
 var ErrUnrecognizedPortal = errors.New("portal type not found")

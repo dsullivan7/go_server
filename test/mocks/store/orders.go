@@ -18,6 +18,12 @@ func (mockStore *MockStore) ListOrders(query map[string]interface{}) ([]models.O
 	return args.Get(0).([]models.Order), args.Error(1)
 }
 
+func (mockStore *MockStore) ListChildOrders(userID uuid.UUID) ([]models.Order, error) {
+	args := mockStore.Called(userID)
+
+	return args.Get(0).([]models.Order), args.Error(1)
+}
+
 func (mockStore *MockStore) CreateOrder(orderPayload models.Order) (*models.Order, error) {
 	args := mockStore.Called(orderPayload)
 

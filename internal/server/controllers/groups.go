@@ -21,8 +21,6 @@ const secretLength = 32
 func (c *Controllers) getGroupResponse(
 	group models.Group,
 ) (*models.Group, error) {
-	groupResponse := models.Group(group)
-
 	apiClientKey, errDecryptKey := c.cipher.Decrypt(group.APIClientKey, c.config.EncryptionKey)
 
 	if errDecryptKey != nil {
@@ -35,16 +33,16 @@ func (c *Controllers) getGroupResponse(
 		return nil, fmt.Errorf("error decrypting client_secret: %w", errDecryptSecret)
 	}
 
-	groupResponse.APIClientKey = apiClientKey
-	groupResponse.APIClientSecret = apiClientSecret
+	group.APIClientKey = apiClientKey
+	group.APIClientSecret = apiClientSecret
 
-	return &groupResponse, nil
+	return &group, nil
 }
 
 func randomHex(n int) (string, error) {
 	bytes := make([]byte, n)
 	if _, err := rand.Read(bytes); err != nil {
-		return "", err
+		return "", fmt.Errorf("error generating random bytes: %w", err)
 	}
 
 	return hex.EncodeToString(bytes), nil
@@ -86,6 +84,7 @@ func (c *Controllers) ListGroups(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, groups)
 }
 
+//nolint:funlen,cyclop
 func (c *Controllers) CreateGroup(w http.ResponseWriter, r *http.Request) {
 	var groupRequest map[string]interface{}
 
@@ -150,7 +149,13 @@ func (c *Controllers) CreateGroup(w http.ResponseWriter, r *http.Request) {
 				GroupID: group.GroupID,
 			}
 
-			c.store.CreateGroupUser(groupUser)
+			_, errCreateGroupUser := c.store.CreateGroupUser(groupUser)
+
+			if errCreateGroupUser != nil {
+				c.utils.HandleError(w, r, errors.HTTPServerError{Err: errCreateGroupUser})
+
+				return
+			}
 		}
 	}
 

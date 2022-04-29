@@ -16,8 +16,12 @@ func (mockService *MockService) GetOrders(
 	return args.Get(0).([]models.Order)
 }
 
- func (mockService *MockService) GetBalance(orders []models.Order, interest float64, currentTime time.Time) (int, int, int) {
-	 args := mockService.Called(orders, interest, currentTime)
+func (mockService *MockService) GetBalance(
+	orders []models.Order,
+	interest float64,
+	currentTime time.Time,
+) (int, int, int) {
+	args := mockService.Called(orders, interest, currentTime)
 
-	 return args.Int(0), args.Int(1), args.Int(2)
- }
+	return args.Int(0), args.Int(1), args.Int(2)
+}

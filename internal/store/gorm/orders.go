@@ -31,7 +31,11 @@ func (gormStore *Store) ListOrders(query map[string]interface{}) ([]models.Order
 func (gormStore *Store) ListChildOrders(userID uuid.UUID) ([]models.Order, error) {
 	var orders []models.Order
 
-	err := gormStore.database.Where("user_id = ? and parent_order_id is not null", userID).Order("created_at asc").Find(&orders).Error
+	err := gormStore.database.Where("user_id = ? and parent_order_id is not null", userID).
+		Order("created_at asc").
+		Find(&orders).
+		Error
+
 	if err != nil {
 		return nil, err
 	}

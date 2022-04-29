@@ -17,6 +17,7 @@ import (
 )
 
 var ErrDwollaAPI = errors.New("dwolla api error")
+var ErrTypeConversion = errors.New("type conversion error")
 
 const centsToDollars = 100
 
@@ -49,6 +50,7 @@ func NewBank(
 	}
 }
 
+//nolint:funlen,cyclop,unparam
 func (bnk *Bank) sendRequest(
 	path string,
 	method string,
@@ -168,7 +170,13 @@ func (bnk *Bank) authenticate() error {
 
 	expirationDuration := time.Second * time.Duration(int(dwollaResponse.(map[string]interface{})["expires_in"].(float64)))
 
-	bnk.dwollaAPIAccessToken = dwollaResponse.(map[string]interface{})["access_token"].(string)
+	apiAccessToken, ok := dwollaResponse.(map[string]interface{})["access_token"].(string)
+
+	if !ok {
+		return ErrTypeConversion
+	}
+
+	bnk.dwollaAPIAccessToken = apiAccessToken
 	bnk.dwollaAPIAccessTokenExpiresAt = time.Now().Add(expirationDuration)
 
 	return nil

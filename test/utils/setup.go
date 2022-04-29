@@ -3,16 +3,16 @@ package utils
 import (
 	"go_server/internal/authentication"
 	"go_server/internal/config"
+	"go_server/internal/gov"
 	"go_server/internal/logger"
 	goServerZapLogger "go_server/internal/logger/zap"
 	"go_server/internal/server"
 	"go_server/internal/server/graph"
-	"go_server/internal/gov"
 	mockAuthentication "go_server/test/mocks/authentication"
+	mockBank "go_server/test/mocks/bank"
 	mockBroker "go_server/test/mocks/broker"
 	mockCipher "go_server/test/mocks/cipher"
 	mockPlaid "go_server/test/mocks/plaid"
-	mockBank "go_server/test/mocks/bank"
 	mockServices "go_server/test/mocks/services"
 	mockStore "go_server/test/mocks/store"
 
@@ -30,7 +30,7 @@ type TestServer struct {
 	Store          *mockStore.MockStore
 	Authentication authentication.Authentication
 	PlaidClient    *mockPlaid.MockPlaid
-	Bank    *mockBank.MockBank
+	Bank           *mockBank.MockBank
 	Broker         *mockBroker.MockBroker
 	Cipher         *mockCipher.MockCipher
 }

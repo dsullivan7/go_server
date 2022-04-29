@@ -269,18 +269,18 @@ func TestOrderCreate(t *testing.T) {
 	))
 
 	orderPayloadParent := models.Order{
-		UserID:      &userID,
-		Amount:      amount,
-		Side:        "buy",
+		UserID: &userID,
+		Amount: amount,
+		Side:   "buy",
 	}
 
 	orderCreatedParent := models.Order{
-		OrderID:     parentOrderID,
-		UserID:      &userID,
-		Amount:      amount,
-		Side:        "buy",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		OrderID:   parentOrderID,
+		UserID:    &userID,
+		Amount:    amount,
+		Side:      "buy",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	orderPayloadChild := models.Order{
@@ -291,12 +291,12 @@ func TestOrderCreate(t *testing.T) {
 	}
 
 	orderCreatedChild := models.Order{
-		OrderID:       uuid.New(),
-		UserID:        &userID,
-		Amount:        amount,
-		Side:          "buy",
-		CreatedAt:     time.Now(),
-		UpdatedAt:     time.Now(),
+		OrderID:   uuid.New(),
+		UserID:    &userID,
+		Amount:    amount,
+		Side:      "buy",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	testServer.Store.On("CreateOrder", orderPayloadParent).Return(&orderCreatedParent, nil)
