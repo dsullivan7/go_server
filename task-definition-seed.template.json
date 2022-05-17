@@ -18,9 +18,9 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/pongo/db-init",
+          "awslogs-group": "/pongo/migrate",
           "awslogs-region": "us-east-2",
-          "awslogs-stream-prefix": "db-init"
+          "awslogs-stream-prefix": "migrate"
         }
       },
       "secrets": [

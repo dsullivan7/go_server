@@ -47,6 +47,10 @@ build-docker:
 test-docker:
 	docker-compose run --rm golang go test -v $(TESTS)
 
+.PHONY: docs
+docs:
+	redoc-cli build ./docs/main.yaml -o docs.html
+
 .PHONY: lint
 lint:
 	golangci-lint run
